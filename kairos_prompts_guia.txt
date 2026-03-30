@@ -1,0 +1,1030 @@
+================================================================================
+                              K A I R O S
+                Sistema de Control Horario Institucional
+================================================================================
+          Guia de Prompts para Construccion por Fases
+                        con Claude Code
+
+          Laravel 12  |  Bootstrap 5  |  PHP 8.3+
+          Estructura estandar de Laravel
+          Cliente de referencia: Universidad Nacional de San Juan
+
+          Marzo 2026
+================================================================================
+
+
+INTRODUCCION
+============
+
+Este documento contiene los prompts organizados por fases para construir paso
+a paso con Claude Code una webapp completa de control horario institucional.
+Cada fase es un bloque autocontenido que puede copiarse y ejecutarse
+secuencialmente.
+
+NOTA: Antes de cada fase, verificar que la anterior compile y funcione
+correctamente. Claude Code trabaja mejor con contexto incremental.
+
+Convenciones:
+- Las tablas de BD usan nombres en espanol.
+- Las FK siguen el patron id_nombre_tabla.
+- Los dias habiles son lunes a viernes salvo feriados marcados en calendario.
+
+Estructura:
+- Se utiliza la estructura estandar de Laravel 12 sin modificaciones de
+  directorios.
+
+
+================================================================================
+FASE 0 - Entorno y Proyecto Base
+================================================================================
+
+Inicializar el proyecto Laravel 12 con estructura estandar, configurar
+dependencias base y preparar el entorno de desarrollo.
+
+--------------------------------------------------------------------------------
+PROMPT 0.1 - Crear proyecto e instalar dependencias
+--------------------------------------------------------------------------------
+
+Crea un nuevo proyecto Laravel 12 llamado "kairos".
+Usa la estructura estandar de directorios de Laravel 12
+sin modificaciones.
+
+Instala las siguientes dependencias:
+- laravel/socialite (login con Google)
+- spatie/laravel-activitylog (logs)
+- spatie/laravel-permission (roles y permisos)
+- phpoffice/phpspreadsheet (informes Excel)
+- tecnickcom/tcpdf (informes PDF)
+
+Configura .env para usar Mysql.
+Configura el timezone a America/Argentina/San_Juan.
+Configura locale a es_AR.
+Configura APP_NAME a "Kairos".
+
+--------------------------------------------------------------------------------
+PROMPT 0.2 - Configurar estructura base de la BD
+--------------------------------------------------------------------------------
+
+Configura la base de datos con las siguientes convenciones:
+- Todos los nombres de tablas en espanol
+- Las FK siguen el patron: id_nombre_de_tabla_externa
+- Timestamps en espanol: creado_en, actualizado_en
+
+Crea un trait HasSpanishTimestamps para los modelos
+que mapee estos campos.
+
+Crea un BaseModel que extienda Eloquent Model con:
+- El trait de timestamps en espanol
+- Configuracion de logs de Spatie por defecto
+
+
+================================================================================
+FASE 1 - Autenticacion, Roles y Permisos
+================================================================================
+
+Implementar el sistema de autenticacion con login clasico y Google SSO, el
+sistema de roles globales y por institucion, y la gestion de permisos CRUD
+dinamicos.
+
+--------------------------------------------------------------------------------
+PROMPT 1.1 - Migracion de usuarios y autenticacion
+--------------------------------------------------------------------------------
+
+Crea la migracion para la tabla "usuarios" con los campos:
+- id (PK)
+- apellidos (string, not null)
+- nombres (string, not null)
+- documento (string, not null, unique)
+- email (string, nullable, unique)
+- sexo (enum: M, F, X)
+- foto (string, nullable)
+- password (string, nullable - puede loguearse solo con Google)
+- google_id (string, nullable)
+- activo (boolean, default true)
+- creado_en, actualizado_en
+
+Configura el modelo Usuario que extienda Authenticatable.
+Implementa login clasico (email+password) y con Google via Socialite.
+Si el usuario se loguea con Google por primera vez y el email
+coincide con uno existente, vincular la cuenta.
+
+--------------------------------------------------------------------------------
+PROMPT 1.2 - Roles globales y por institucion
+--------------------------------------------------------------------------------
+
+Usando spatie/laravel-permission, configura dos capas de roles:
+
+ROLES GLOBALES (tabla roles de spatie):
+- Administrador General: acceso total al sistema
+
+ROLES POR INSTITUCION (tabla roles_institucion):
+- id, nombre, id_institucion, creado_en, actualizado_en
+
+Roles predeterminados por institucion:
+- Administrador
+- Director Administrativo
+- Jefe de Personal
+- Departamento Personal
+- Usuario Comun
+
+Crea la tabla "roles_institucion_usuario":
+- id_usuario, id_rol_institucion, id_institucion
+- activo, fecha_desde, fecha_hasta (nullable)
+
+Crea migracion para tabla "permisos_rol":
+- Cada rol puede tener permisos CRUD asignados dinamicamente
+- Los permisos se asocian a modulos/recursos del sistema
+
+Implementa middleware CheckInstitutionRole que verifique
+el rol del usuario en la institucion activa.
+
+--------------------------------------------------------------------------------
+PROMPT 1.3 - Pagina de Login
+--------------------------------------------------------------------------------
+
+Crea la pagina de login siguiendo este diseno:
+
+LAYOUT: Dos columnas 50/50, full viewport height.
+
+PANEL IZQUIERDO:
+- Slideshow de 3 imagenes con overlay gradiente azul marino/dorado
+- Logo con icono de brujula y texto "KAIROS"
+- Estadisticas institucionales animadas (personal, dependencias,
+  disponibilidad)
+- Badge "Universidad Nacional de San Juan" en la parte inferior
+- El slide debe ser automatico con transicion suave
+
+PANEL DERECHO:
+- Fondo blanco, formulario centrado verticalmente
+- Titulo con tipografia Playfair Display
+- Campos email y password con iconos flotantes (Bootstrap Icons)
+- Toggle mostrar/ocultar password con icono de ojo
+- Boton "Iniciar Sesion" con estado de carga (spinner)
+- Separador "o continuar con"
+- Boton "Acceder con Google" (estilo oficial)
+- Link "Acceso SSO via SIU" debajo
+- Animacion shake en error de credenciales
+- Indicador "Sistema operativo" con punto pulsante verde
+
+RESPONSIVE: En mobile, imagen arriba (30vh) y form abajo.
+Animacion fadeUp al cargar la pagina.
+
+Usa HTML5, CSS3, Bootstrap 5. NO usar frameworks JS,
+solo vanilla JS para las interacciones.
+
+
+================================================================================
+FASE 2 - Instituciones y Dependencias
+================================================================================
+
+Modelar la estructura jerarquica de instituciones y sus dependencias internas,
+incluyendo la capacidad de tener sub-instituciones dependientes.
+
+--------------------------------------------------------------------------------
+PROMPT 2.1 - Instituciones jerarquicas
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "instituciones":
+- id, nombre, sigla, descripcion (nullable)
+- id_institucion_padre (FK nullable, self-referencing)
+- logo (string nullable), direccion, telefono, email
+- configuracion (json) - para configs especificas como:
+  * umbral_jornada_minima (default 60 minutos)
+  * banco_horas_por (enum: usuario, designacion)
+  * permite_avisos_usuario (boolean, default false)
+  * horas_extra_autorizadas (boolean, default false)
+- activa (boolean)
+- creado_en, actualizado_en
+
+El modelo Institucion debe tener:
+- Relacion recursiva padre/hijas
+- Metodo arbolCompleto() que devuelva toda la jerarquia
+- Scope para instituciones activas
+
+Crea un seeder con la estructura de ejemplo:
+- UNSJ (raiz)
+  - Rectorado
+    - CREACOM
+  - Colegio Central Universitario
+  - Escuela de Comercio
+  - Escuela Industrial
+  - Facultad de Ingenieria
+
+--------------------------------------------------------------------------------
+PROMPT 2.2 - Dependencias y jefaturas
+--------------------------------------------------------------------------------
+
+Crea migraciones y modelos para:
+
+TABLA "dependencias":
+- id, nombre, sigla (nullable), descripcion (nullable)
+- id_institucion (FK not null)
+- id_dependencia_padre (FK nullable, self-referencing)
+- activa (boolean)
+- creado_en, actualizado_en
+
+TABLA "jefaturas":
+- id, id_dependencia (FK), id_usuario (FK)
+- cargo (string - ej: "Jefe", "Coordinador")
+- fecha_desde (date, not null), fecha_hasta (date, nullable)
+- activa (boolean)
+- creado_en, actualizado_en
+
+El modelo Dependencia debe:
+- Tener relacion con Institucion
+- Soportar jerarquia (padre/hijos)
+- Metodo jefeActual() que devuelva la jefatura vigente
+- Scope dependenciasActivas
+
+El modelo Jefatura debe:
+- Scope vigente (fecha_desde <= hoy, fecha_hasta null o >= hoy)
+
+IMPORTANTE: Un jefe debe poder ver el estado de situacion
+de todos los empleados de su dependencia.
+
+
+================================================================================
+FASE 3 - Designaciones y Cargos
+================================================================================
+
+Implementar el sistema de cargos, horas catedra y designaciones que vinculan
+usuarios con instituciones, definiendo sus obligaciones horarias.
+
+--------------------------------------------------------------------------------
+PROMPT 3.1 - Cargos y designaciones
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "cargos":
+- id, nombre, descripcion (nullable)
+- horas_semanales (decimal 5,2)
+- horas_mensuales (decimal 6,2, nullable)
+- tipo (enum: cargo, horas_catedra)
+- id_institucion (FK)
+- activo (boolean)
+- creado_en, actualizado_en
+
+TABLA "designaciones":
+- id, id_usuario (FK), id_cargo (FK)
+- id_institucion (FK), id_dependencia (FK)
+- fecha_inicio (date, not null)
+- fecha_fin (date, nullable)
+- resolucion (string, nullable)
+- horas_semanales_efectivas (decimal 5,2, nullable)
+  -- Si es null, se usan las del cargo
+  -- Nunca puede exceder las horas del cargo
+- activa (boolean)
+- creado_en, actualizado_en
+
+El modelo Designacion debe:
+- Calcular horasSemanalesObligatorias() considerando
+  horas_semanales_efectivas o las del cargo
+- Scope vigente()
+- Scope porInstitucion($id)
+- Validar que horas_semanales_efectivas <= cargo.horas_semanales
+
+NOTA: Un usuario puede tener multiples designaciones
+en distintas instituciones simultaneamente.
+
+
+================================================================================
+FASE 4 - Declaraciones Juradas (DDJJ)
+================================================================================
+
+Sistema de declaraciones juradas donde los usuarios registran sus horarios de
+cumplimiento, incluyendo trabajo presencial, remoto y en instituciones externas.
+
+--------------------------------------------------------------------------------
+PROMPT 4.1 - Modelo DDJJ
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "declaraciones_juradas":
+- id, id_usuario (FK), id_designacion (FK)
+- fecha_inicio (date, not null)
+- fecha_fin (date, nullable)
+- estado (enum: borrador, presentada, aprobada, rechazada)
+- observaciones (text, nullable)
+- creado_en, actualizado_en
+
+TABLA "horarios_ddjj":
+- id, id_declaracion_jurada (FK)
+- dia_semana (enum: lunes, martes, miercoles, jueves, viernes)
+- hora_entrada (time), hora_salida (time)
+- modalidad (enum: presencial, remoto)
+- id_institucion_externa (FK nullable)
+  -- Para registrar horarios en instituciones externas
+- id_dependencia (FK nullable)
+- creado_en, actualizado_en
+
+VALIDACIONES CRITICAS en el modelo/servicio:
+1. No pueden coexistir dos DDJJ activas para la misma
+   designacion. Una debe finalizar antes de crear otra.
+2. No puede haber horarios superpuestos considerando TODAS
+   las DDJJ activas del usuario (en todas sus designaciones).
+3. La suma de horas declaradas por semana no puede exceder
+   las horas obligatorias de la designacion.
+
+Crea un servicio DDJJService con:
+- validarSuperposicion($usuario, $horarios, $excluirDDJJ = null)
+- validarHorasMaximas($designacion, $horarios)
+- presentar($ddjj) - cambia estado y valida
+- aprobar($ddjj, $aprobadoPor)
+
+Crea un FormRequest DDJJRequest con todas las validaciones.
+
+
+================================================================================
+FASE 5 - Calendario Institucional
+================================================================================
+
+Sistema de calendario que registra eventos que afectan el computo horario:
+feriados, suspensiones totales o parciales, y eventos condicionales segun
+atributos del personal.
+
+--------------------------------------------------------------------------------
+PROMPT 5.1 - Eventos del calendario
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "eventos_calendario":
+- id, id_institucion (FK)
+- titulo, descripcion (nullable)
+- fecha (date, not null)
+- tipo (enum: feriado, suspension_total, suspension_parcial,
+  evento_condicional, dia_no_laborable)
+- hora_desde (time, nullable) -- para suspensiones parciales
+- hora_hasta (time, nullable)
+- afecta_computo (boolean, default true)
+- creado_en, actualizado_en
+
+TABLA "condiciones_evento":
+- id, id_evento_calendario (FK)
+- tipo_condicion (enum: sexo, cargo, dependencia, custom)
+- valor_condicion (string)
+  -- ej: "F" para sexo femenino, id de cargo, etc.
+- efecto (enum: retiro_anticipado, ingreso_tardio,
+  jornada_reducida, exencion)
+- minutos_afectados (integer, nullable)
+  -- ej: 120 para "se retiran 2 horas antes"
+- creado_en, actualizado_en
+
+Crea CalendarioService con:
+- obtenerEventosFecha($institucion, $fecha)
+- esHabil($institucion, $fecha)
+- calcularJornadaEfectiva($usuario, $designacion, $fecha)
+  -- Retorna los horarios ajustados considerando eventos
+  -- Si la jornada resultante <= umbral_jornada_minima
+     de la institucion, marcar para revision del jefe de personal
+- diasHabilesEntre($institucion, $fechaDesde, $fechaHasta)
+
+Ejemplos de eventos a considerar:
+- "Feriado Nacional 25 de Mayo" -> suspension total
+- "Suspension por razones climatologicas a partir de 13:00"
+  -> suspension parcial desde las 13:00
+- "Dia de la Madre: personal femenino se retira 2h antes"
+  -> evento condicional, sexo=F, retiro_anticipado, 120 min
+
+
+================================================================================
+FASE 6 - Avisos de Ausencias y Tardanzas
+================================================================================
+
+Sistema de avisos que permite registrar ausencias y tardanzas, configurable por
+institucion para permitir o no la carga directa por parte del usuario.
+
+--------------------------------------------------------------------------------
+PROMPT 6.1 - Avisos
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "avisos":
+- id, id_usuario (FK) -- el usuario que avisa
+- id_designacion (FK)
+- id_institucion (FK)
+- tipo (enum: ausencia, tardanza)
+- fecha (date, not null)
+- hora_estimada_llegada (time, nullable) -- para tardanzas
+- motivo (text, nullable)
+- id_registrado_por (FK usuarios)
+  -- quien cargo el aviso en el sistema
+- creado_en, actualizado_en
+
+LOGICA DE NEGOCIO:
+- Por defecto, los avisos los carga personal del
+  Departamento de Personal en nombre del usuario.
+- Si la institucion tiene permite_avisos_usuario = true
+  en su configuracion, el propio usuario puede cargar avisos.
+- En ese caso, id_registrado_por = id del propio usuario.
+
+Los avisos deben ser visibles para:
+- El usuario que aviso
+- Personal del Departamento de Personal
+- El jefe de la dependencia del usuario
+
+Crea AvisoPolicy que implemente estas reglas de visibilidad.
+Crea AvisoController con CRUD y filtros por dependencia y fecha.
+
+
+================================================================================
+FASE 7 - Licencias y Permisos
+================================================================================
+
+Sistema de licencias con tipos configurables, computo por dias corridos o
+habiles, aprobacion por jefe de personal, y afectacion a nivel usuario o
+designacion.
+
+--------------------------------------------------------------------------------
+PROMPT 7.1 - Tipos de licencia y registro
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "tipos_licencia":
+- id, nombre (ej: "Enfermedad", "Fallecimiento familiar")
+- descripcion (nullable)
+- computo (enum: dias_corridos, dias_habiles)
+- afecta (enum: usuario, designacion)
+  -- usuario: afecta todas las designaciones
+  -- designacion: solo la designacion indicada
+- dias_maximos (integer, nullable)
+- requiere_documentacion (boolean, default false)
+- activo (boolean)
+- creado_en, actualizado_en
+
+TABLA "licencias":
+- id, id_usuario (FK)
+- id_designacion (FK, nullable)
+  -- null si afecta al usuario completo
+- id_tipo_licencia (FK)
+- fecha_inicio (date), fecha_fin (date, nullable)
+- dias_computados (integer, nullable)
+- estado (enum: pendiente, aprobada, rechazada)
+- motivo (text, nullable)
+- documentacion (string, nullable) -- ruta archivo
+- id_registrado_por (FK usuarios, not null)
+- id_aprobado_por (FK usuarios, nullable)
+- fecha_aprobacion (datetime, nullable)
+- observaciones_aprobacion (text, nullable)
+- creado_en, actualizado_en
+
+REGLAS:
+1. Ningun usuario puede cargar sus propias licencias
+   (id_registrado_por != id_usuario siempre)
+2. Las licencias deben ser aprobadas por Jefe de Personal
+3. Al aprobar, calcular dias_computados segun tipo de computo:
+   - dias_corridos: contar todos los dias del rango
+   - dias_habiles: contar solo L-V excluyendo feriados
+
+Crea LicenciaService con:
+- registrar($datos, $registradoPor)
+  -- Validar que registradoPor != usuario
+- aprobar($licencia, $aprobadoPor)
+- rechazar($licencia, $aprobadoPor, $observaciones)
+- calcularDias($tipoLicencia, $fechaInicio, $fechaFin, $institucion)
+- licenciasVigentes($usuario, $fecha)
+
+
+================================================================================
+FASE 8 - Dispositivos y Marcas de Horario
+================================================================================
+
+Implementar el sistema de dispositivos de marcas, captura de marcas originales
+y procesamiento a marcas computadas con toda la logica de negocio asociada.
+
+--------------------------------------------------------------------------------
+PROMPT 8.1 - Dispositivos de marcas
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "dispositivos":
+- id, nombre, ubicacion (string)
+- id_institucion (FK)
+- tipo (enum: biometrico, web, otro)
+- modo_conexion (enum: directo_bd, importacion, web)
+- ip_address (string, nullable)
+- configuracion (json, nullable)
+- activo (boolean)
+- creado_en, actualizado_en
+
+El sistema soporta distintos tipos de dispositivos:
+- Biometricos: interactuan directo con la BD o requieren
+  importacion de archivos de marcas
+- Web: computadores autorizados donde se habilita un modulo
+  de marca de E/S desde el navegador (se desarrolla en Fase 14)
+
+Crea DispositivoController con CRUD completo.
+
+--------------------------------------------------------------------------------
+PROMPT 8.2 - Marcas originales y procesamiento
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "marcas_originales":
+- id, id_usuario (FK), id_dispositivo (FK)
+- fecha_hora (datetime, not null)
+- tipo_captura (enum: automatica, importada, web)
+- datos_raw (json, nullable) -- datos crudos del dispositivo
+- procesada (boolean, default false)
+- creado_en, actualizado_en
+
+TABLA "marcas_computadas":
+- id, id_usuario (FK), id_designacion (FK)
+- fecha (date, not null)
+- hora_entrada (time, nullable)
+- hora_salida (time, nullable)
+- id_marca_original_entrada (FK nullable)
+- id_marca_original_salida (FK nullable)
+- tipo (enum: normal, tardanza, ausencia, licencia, feriado,
+  suspension, sin_obligacion)
+- minutos_trabajados (integer, default 0)
+- minutos_obligatorios (integer, default 0)
+- minutos_extra (integer, default 0)
+- minutos_faltantes (integer, default 0)
+- tiempo_extra_autorizado (boolean, default false)
+- tiene_error (boolean, default false)
+- tiene_observacion (boolean, default false)
+- errores (json, nullable)
+- observaciones (json, nullable)
+- creado_en, actualizado_en
+
+Crea MarcaService con:
+- procesarMarcasOriginales($fecha, $institucion = null)
+  -- Determinar E/S a partir de las marcas originales
+  -- Cruzar con DDJJ del usuario para esa fecha
+  -- Cruzar con calendario (feriados, suspensiones)
+  -- Cruzar con licencias vigentes
+  -- Calcular tardanza, minutos trabajados, extra, faltantes
+  -- Generar errores si no hay razon para ausencia
+  -- Generar observaciones (ej: "Trabajo en feriado")
+
+- importarMarcas($archivo, $dispositivo)
+  -- Para dispositivos que requieren importacion de archivos
+
+
+================================================================================
+FASE 9 - Banco de Horas y Tiempo Extra
+================================================================================
+
+Sistema de acumulacion de horas extra y faltantes, configurable por usuario o
+designacion, con autorizacion para acumular y banco de horas que puede ir en
+negativo.
+
+--------------------------------------------------------------------------------
+PROMPT 9.1 - Banco de horas
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "bancos_horas":
+- id
+- id_usuario (FK)
+- id_designacion (FK, nullable)
+  -- null si el banco es por usuario
+- saldo_minutos (integer, default 0)
+  -- puede ser negativo si se autoriza
+- autorizado_acumular (boolean, default false)
+- autorizado_negativo (boolean, default false)
+- creado_en, actualizado_en
+- UNIQUE(id_usuario, id_designacion)
+
+TABLA "movimientos_banco_horas":
+- id, id_banco_horas (FK)
+- fecha (date, not null)
+- tipo (enum: extra, faltante, ajuste_manual, autorizacion)
+- minutos (integer) -- positivo o negativo
+- motivo (text, nullable)
+- id_marca_computada (FK, nullable)
+- id_registrado_por (FK usuarios, nullable)
+- creado_en, actualizado_en
+
+TABLA "tiempos_extra":
+- id, id_usuario (FK)
+- id_designacion (FK, nullable)
+- fecha (date), minutos (integer)
+- motivo (text, not null)
+- id_registrado_por (FK usuarios)
+- creado_en, actualizado_en
+
+Crea BancoHorasService con:
+- obtenerOCrearBanco($usuario, $designacion = null)
+  -- Segun configuracion de la institucion:
+     banco_horas_por = usuario o designacion
+- acreditarExtra($banco, $minutos, $marca = null)
+  -- Solo si autorizado_acumular = true
+- debitarFaltante($banco, $minutos, $marca = null)
+  -- Solo si autorizado_acumular = true
+- ajusteManual($banco, $minutos, $motivo, $registradoPor)
+- consultarSaldo($usuario, $designacion = null)
+
+REGLA: Por defecto, las horas extra NO se acumulan y
+las faltantes NO se restan. Solo opera cuando el usuario/
+designacion esta autorizado.
+
+
+================================================================================
+FASE 10 - Informes Diarios
+================================================================================
+
+Generacion automatica de informes diarios con todas las novedades: horarios
+trabajados, ausencias justificadas e injustificadas, errores que requieren
+atencion urgente.
+
+--------------------------------------------------------------------------------
+PROMPT 10.1 - Informes de horas
+--------------------------------------------------------------------------------
+
+Crea las migraciones y modelos para:
+
+TABLA "informes_diarios":
+- id, id_institucion (FK)
+- fecha (date, not null)
+- generado_en (datetime)
+- estado (enum: generado, revisado, cerrado)
+- id_generado_por (FK usuarios, nullable) -- null si automatico
+- creado_en, actualizado_en
+
+TABLA "items_informe":
+- id, id_informe_diario (FK)
+- id_usuario (FK), id_designacion (FK)
+- id_marca_computada (FK, nullable)
+- tipo_novedad (enum: presente, ausencia_justificada,
+  ausencia_injustificada, tardanza, licencia, feriado,
+  suspension, error_atencion_urgente)
+- detalle (text, nullable)
+- hora_entrada (time, nullable), hora_salida (time, nullable)
+- minutos_trabajados (integer, default 0)
+- razon_ausencia (string, nullable)
+- requiere_atencion (boolean, default false)
+- creado_en, actualizado_en
+
+Crea InformeService con:
+- generarInformeDiario($institucion, $fecha)
+  -- Recorrer todas las designaciones activas
+  -- Para cada una, verificar si debia trabajar (DDJJ + calendario)
+  -- Cruzar con marcas_computadas
+  -- Cruzar con licencias y avisos
+  -- Si debia trabajar y no hay marca NI razon:
+     tipo = error_atencion_urgente, requiere_atencion = true
+  -- Registrar todas las novedades
+
+- exportarExcel($informe) usando PhpSpreadsheet
+- exportarPDF($informe) usando TCPDF
+
+Crea un Command GenerarInformeDiario que se ejecute
+diariamente via scheduler (al finalizar la jornada).
+
+El informe debe resaltar visualmente:
+- ROJO: errores de atencion urgente
+- AMARILLO: tardanzas
+- VERDE: presentes completos
+- AZUL: licencias/permisos
+
+
+================================================================================
+FASE 11 - Layout Principal y Navegacion
+================================================================================
+
+Implementar el layout principal (app.blade.php) con cabecera, menu horizontal
+dinamico segun rol, y el diseno basado en los colores de la bandera argentina.
+
+--------------------------------------------------------------------------------
+PROMPT 11.1 - Layout app.blade.php
+--------------------------------------------------------------------------------
+
+Crea el layout principal app.blade.php con el siguiente diseno:
+
+PALETA DE COLORES (bandera argentina):
+- Celeste: #75AADB
+- Azul oscuro: #1B4F72
+- Dorado/Sol: #D4A017
+- Blanco: #FFFFFF
+- Grises complementarios para textos y fondos
+
+CABECERA (header sticky):
+- Izquierda: Logo de la app (icono brujula + "KAIROS")
+- Centro: Nombre de la institucion activa
+- Derecha:
+  * Icono de notificaciones con badge contador
+  * Foto del usuario (circular, 36px) + nombre
+  * Dropdown menu:
+    - Perfil
+    - Configuracion
+    - (separador)
+    - Cerrar sesion
+
+MENU HORIZONTAL (debajo de la cabecera):
+- Fondo azul oscuro, texto blanco
+- Items con iconos Bootstrap Icons
+- Dropdowns para submenus
+- Debe cambiar segun el rol del usuario activo:
+
+  Administrador General:
+  - Dashboard | Instituciones | Usuarios | Roles | Config | Logs
+
+  Administrador Institucion:
+  - Dashboard | Dependencias | Personal | Designaciones
+    | Calendario | Informes | Config
+
+  Jefe de Personal:
+  - Dashboard | Personal | Designaciones | DDJJ | Licencias
+    | Marcas | Informes | Banco Horas
+
+  Depto Personal:
+  - Dashboard | Avisos | DDJJ | Licencias | Marcas | Informes
+
+  Director Administrativo:
+  - Dashboard | Informes | Personal | Estadisticas
+
+  Jefe de Dependencia:
+  - Dashboard | Mi Dependencia | Avisos | Informes
+
+  Usuario Comun:
+  - Dashboard | Mis Marcas | Mi DDJJ | Mis Avisos
+
+FOOTER:
+- Fondo azul oscuro
+- "KAIROS v1.0 - Sistema de Control Horario"
+- Links: Soporte | Documentacion
+
+CONTENIDO:
+- Area con @yield('content')
+- Breadcrumb debajo del menu
+- Alertas flash con Bootstrap alerts
+
+Usa Bootstrap 5 + Bootstrap Icons (CDN).
+El diseno debe ser responsive y profesional.
+
+
+================================================================================
+FASE 12 - CRUD y Vistas de Gestion
+================================================================================
+
+Implementar las pantallas de gestion para cada modulo del sistema: listados con
+filtros, formularios de alta/edicion, y vistas de detalle.
+
+--------------------------------------------------------------------------------
+PROMPT 12.1 - CRUDs principales
+--------------------------------------------------------------------------------
+
+Crea los controladores, vistas y rutas para los CRUDs
+de los siguientes modulos. Cada uno debe tener:
+- Listado paginado con busqueda y filtros
+- Formulario de crear/editar con validaciones client-side
+- Vista de detalle
+- Confirmacion antes de eliminar (soft delete donde corresponda)
+- Tabla responsive con Bootstrap
+
+Estilo visual coherente con el layout de la Fase 11.
+
+MODULOS (en orden de prioridad):
+
+1. INSTITUCIONES
+   - Listado tipo arbol colapsable
+   - CRUD con selector de institucion padre
+   - Panel de configuracion (JSON visual)
+
+2. DEPENDENCIAS
+   - Filtro por institucion
+   - Asignar/cambiar jefe con historico
+
+3. USUARIOS
+   - Busqueda por documento, nombre, email
+   - Foto con preview al subir
+   - Tab de designaciones activas
+   - Tab de roles asignados
+
+4. DESIGNACIONES
+   - Filtro por institucion, dependencia, usuario
+   - Validacion de horas vs cargo
+   - Indicador visual de estado (activa/finalizada)
+
+5. DDJJ
+   - Wizard de carga paso a paso:
+     Paso 1: seleccionar designacion
+     Paso 2: grilla semanal arrastrando horarios
+     Paso 3: revision y presentacion
+   - Vista de grilla semanal visual (tipo calendario)
+
+6. CALENDARIO
+   - Vista mensual interactiva
+   - Click en fecha para agregar evento
+   - Codificacion por colores segun tipo de evento
+   - Indicador de condiciones especiales
+
+7. LICENCIAS
+   - Workflow visual: Pendiente -> Aprobada/Rechazada
+   - Filtro por estado, tipo, fecha
+   - Calculo automatico de dias al seleccionar rango
+
+8. MARCAS
+   - Vista diaria por usuario con timeline visual
+   - Importacion masiva desde archivo
+   - Panel de marcas con errores/observaciones resaltadas
+
+9. INFORMES
+   - Selector de fecha e institucion
+   - Vista resumida con semaforo de colores
+   - Drill-down a detalle por usuario
+   - Exportar a Excel y PDF
+
+10. BANCO DE HORAS
+    - Saldo actual con indicador visual (+/-)
+    - Historial de movimientos
+    - Formulario de ajuste manual
+
+Cada vista debe incluir breadcrumbs y respetar los permisos.
+
+
+================================================================================
+FASE 13 - Dashboard y Estadisticas
+================================================================================
+
+Dashboard personalizado segun el rol del usuario con widgets, graficas y accesos
+rapidos a las funciones mas utilizadas.
+
+--------------------------------------------------------------------------------
+PROMPT 13.1 - Dashboard por rol
+--------------------------------------------------------------------------------
+
+Crea un dashboard dinamico que cambie segun el rol:
+
+ADMINISTRADOR GENERAL:
+- Cards: total instituciones, usuarios, dispositivos activos
+- Grafico: actividad del sistema (ultimos 30 dias)
+- Alertas: errores de sistema, logs criticos
+
+JEFE DE PERSONAL / DEPTO PERSONAL:
+- Cards: presentes hoy, ausentes, tardanzas, sin justificar
+- Grafico de barras: asistencia semanal
+- Lista: errores de atencion urgente del dia
+- Calendario mini con eventos proximos
+
+JEFE DE DEPENDENCIA:
+- Cards: personal a cargo, presentes, ausentes
+- Lista: estado de cada empleado hoy
+- Avisos pendientes de su dependencia
+
+USUARIO COMUN:
+- Resumen de hoy: hora entrada, hora salida, estado
+- Proximos dias de DDJJ
+- Saldo banco de horas
+- Mis ultimos avisos/licencias
+
+Usa Chart.js para los graficos (via CDN).
+Cards con iconos y colores del sistema.
+Layout responsive con grilla Bootstrap.
+
+
+================================================================================
+FASE 14 - Modulo de Marca Web
+================================================================================
+
+Implementar el modulo de marcas de E/S desde computadores autorizados,
+verificando la identidad del equipo.
+
+--------------------------------------------------------------------------------
+PROMPT 14.1 - Modulo de marca desde navegador
+--------------------------------------------------------------------------------
+
+Crea el modulo para registrar marcas de E/S desde
+computadores autorizados.
+
+TABLA "computadores_autorizados":
+- id, id_dispositivo (FK)
+- fingerprint (string, unique) -- fingerprint del navegador
+- nombre_equipo (string)
+- id_dependencia (FK)
+- autorizado (boolean)
+- creado_en, actualizado_en
+
+FLUJO:
+1. Al acceder al modulo, verificar que el computador esta
+   autorizado (por fingerprint del navegador)
+2. Si no esta autorizado, mostrar pantalla de solicitud
+   de autorizacion con datos del equipo
+3. Si esta autorizado:
+   - Mostrar reloj grande en tiempo real
+   - Boton "ENTRADA" (verde) y "SALIDA" (rojo)
+   - El usuario se identifica con su documento
+   - Al marcar, muestra confirmacion con hora registrada
+   - Animacion y feedback visual claro
+
+PANTALLA DE MARCA:
+- Fondo con gradiente azul oscuro
+- Reloj digital grande centrado (HH:MM:SS)
+- Fecha actual debajo del reloj
+- Campo de documento con autofocus
+- Botones grandes E/S con iconos
+- Feedback: "Marca registrada: [ENTRADA/SALIDA] a las HH:MM"
+- Logo de la institucion
+- Historial de ultimas 5 marcas del equipo
+
+SEGURIDAD:
+- Rate limiting: max 1 marca por usuario cada 5 minutos
+- Log de intentos fallidos
+- Solo accesible desde IPs de la red institucional (configurable)
+
+Crea las rutas, controlador y vista standalone
+(no usa el layout principal, tiene su propio diseno).
+
+
+================================================================================
+FASE 15 - Testing, Seeders y Optimizacion
+================================================================================
+
+Crear seeders completos con datos de ejemplo, tests para las reglas de negocio
+criticas, y optimizar rendimiento.
+
+--------------------------------------------------------------------------------
+PROMPT 15.1 - Seeders y datos de ejemplo
+--------------------------------------------------------------------------------
+
+Crea seeders completos para demo con datos realistas:
+
+1. InstitutionSeeder: UNSJ con toda su estructura jerarquica
+2. DependenciaSeeder: 5-10 dependencias por institucion
+3. UsuarioSeeder: 50 usuarios con datos variados
+4. CargoSeeder: cargos tipicos universitarios
+5. DesignacionSeeder: designaciones multiples
+6. DDJJSeeder: declaraciones juradas con horarios variados
+7. CalendarioSeeder: feriados 2026 de Argentina
+8. LicenciaSeeder: licencias de ejemplo en varios estados
+9. MarcaSeeder: marcas de los ultimos 30 dias
+10. InformeSeeder: informes generados
+
+Crea un comando php artisan kairos:demo-reset que:
+- Limpie toda la BD
+- Ejecute todas las migraciones
+- Cargue todos los seeders
+- Procese marcas y genere informes
+
+--------------------------------------------------------------------------------
+PROMPT 15.2 - Tests de reglas de negocio
+--------------------------------------------------------------------------------
+
+Crea Feature Tests para las reglas de negocio criticas:
+
+1. DDJJTest:
+   - No permite horarios superpuestos
+   - No permite dos DDJJ activas simultaneas
+   - Valida horas maximas por designacion
+
+2. LicenciaTest:
+   - No permite auto-carga de licencia
+   - Calcula dias correctamente (corridos vs habiles)
+   - Requiere aprobacion de jefe de personal
+
+3. CalendarioTest:
+   - Calcula jornada efectiva con suspension parcial
+   - Aplica condiciones por sexo correctamente
+   - Marca para revision si jornada < umbral minimo
+
+4. MarcaTest:
+   - Procesa marcas originales correctamente
+   - Detecta tardanzas
+   - Calcula horas extra y faltantes
+   - Genera errores cuando no hay justificacion
+
+5. BancoHorasTest:
+   - Solo acumula si esta autorizado
+   - Permite negativos solo si esta autorizado
+   - Calcula saldo correctamente
+
+6. InformeTest:
+   - Genera informe completo
+   - Marca errores de atencion urgente
+   - Exporta a Excel y PDF sin errores
+
+
+================================================================================
+NOTAS FINALES
+================================================================================
+
+Orden de ejecucion: Cada fase depende de las anteriores. Ejecutar en orden y
+verificar que compila antes de avanzar.
+
+Iteracion: Si Claude Code genera errores, copiar el error completo y pedir
+correccion antes de avanzar a la siguiente fase.
+
+Contexto: Al iniciar cada fase, dar contexto a Claude Code de lo ya construido.
+Puede ser util incluir un listado de las migraciones existentes.
+
+Personalizacion: Los prompts estan pensados para la UNSJ como ejemplo. Para
+otra institucion, ajustar nombres en los seeders y configuraciones.
+
+TIP: Si una fase es muy larga para Claude Code, dividirla en sub-prompts mas
+pequenos (ej: primero migraciones, luego modelos, luego controladores, luego
+vistas).
+
+================================================================================
+                          Fin del documento
+================================================================================
