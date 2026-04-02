@@ -25,14 +25,15 @@ NOTA: Antes de cada fase, verificar que la anterior compile y funcione
 correctamente. Claude Code trabaja mejor con contexto incremental.
 
 Convenciones:
-- Las tablas de BD usan nombres en espanol.
+- Los campos de las tablas de BD usan nombres en espanol excepto los campos de created_at y updated_at.
+- Los nombres de las tablas se escribirán en esapñol excepto las tablas y campos originales de la instalación de Laravel 12
 - Las FK siguen el patron id_nombre_tabla.
 - Los dias habiles son lunes a viernes salvo feriados marcados en calendario.
 
 Estructura:
 - Se utiliza la estructura estandar de Laravel 12 sin modificaciones de
   directorios.
-
+- cada migracion debe crear una única tabla correspendiente a su nombre
 
 ================================================================================
 FASE 0 - Entorno y Proyecto Base
@@ -51,6 +52,7 @@ sin modificaciones.
 
 Instala las siguientes dependencias:
 - laravel/socialite (login con Google)
+- el usuario para identificarse utiliza su documento
 - spatie/laravel-activitylog (logs)
 - spatie/laravel-permission (roles y permisos)
 - phpoffice/phpspreadsheet (informes Excel)
@@ -116,6 +118,7 @@ Usando spatie/laravel-permission, configura dos capas de roles:
 
 ROLES GLOBALES (tabla roles de spatie):
 - Administrador General: acceso total al sistema
+- Auditor General
 
 ROLES POR INSTITUCION (tabla roles_institucion):
 - id, nombre, id_institucion, creado_en, actualizado_en
@@ -125,6 +128,7 @@ Roles predeterminados por institucion:
 - Director Administrativo
 - Jefe de Personal
 - Departamento Personal
+- Auditor
 - Usuario Comun
 
 Crea la tabla "roles_institucion_usuario":

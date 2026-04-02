@@ -2,7 +2,26 @@
   "permissions": {
     "allow": [
       "Bash(composer require:*)",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(wc:*)",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"CREATE DATABASE IF NOT EXISTS kairos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SHOW TABLES;\" 2>&1)",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SELECT migration, batch FROM migrations ORDER BY batch, migration;\" 2>&1)",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SHOW TABLES;\")",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SELECT name FROM roles;\")",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"DESCRIBE usuarios;\" 2>&1)",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SELECT id, nombre FROM roles;\")",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SELECT id, nombre FROM roles_institucion;\")",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"SELECT id, name FROM roles;\")",
+      "Bash(php -r \":*)",
+      "Bash(/d/xampp/mysql/bin/mysql.exe -u root kairos -e \"\nSELECT i.id, i.sigla, i.nombre,\n       IFNULL\\(p.sigla, '—'\\) AS padre\nFROM instituciones i\nLEFT JOIN instituciones p ON p.id = i.id_institucion_padre\nORDER BY i.id;\" 2>&1)",
+      "Bash(grep:*)",
+      "Bash(php -r ':*)",
+      "Bash(php /tmp/debug_cal.php)",
+      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000000_create_users_table.php)",
+      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000001_create_cache_table.php)",
+      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000002_create_jobs_table.php)",
+      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/2026_03_30_195927_create_permission_tables.php)"
     ]
   }
 }

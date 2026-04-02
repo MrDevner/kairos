@@ -2,24 +2,37 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            // Roles y permisos globales (Spatie)
+            RolesPermisosSeeder::class,
+            // Roles institucionales
+            RolesInstitucionSeeder::class,
+            // Instituciones (UNSJ + facultades)
+            InstitucionesSeeder::class,
+            // Dependencias por institución
+            DependenciaSeeder::class,
+            // Cargos por institución
+            CargoSeeder::class,
+            // Usuarios (admin + 20 personal)
+            UsuarioSeeder::class,
+            // Designaciones (usuario + cargo + dependencia)
+            DesignacionSeeder::class,
+            // Declaraciones juradas con horarios
+            DDJJSeeder::class,
+            // Tipos de licencia + licencias de ejemplo
+            LicenciaSeeder::class,
+            // Calendario: feriados 2026
+            CalendarioSeeder::class,
+            // Marcas originales (últimos 30 días)
+            MarcaSeeder::class,
+            // Informes diarios de la última semana
+            InformeSeeder::class,
         ]);
     }
 }
