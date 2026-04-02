@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Dispositivo;
+use App\Models\Institucion;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class DispositivoController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $query = Dispositivo::with('institucion')->orderBy('nombre');
+
+        if ($request->filled('institucion')) {
+            $query->deInstitucion((int) $request->institucion);
+        }
+
+        if ($request->filled('tipo')) {
+            $query->tipo($request->tipo);
+        }
+
+        $dispositivos = $query->paginate(25)->withQueryString();
+        $instituciones = Institucion::activas()->orderBy('nombre')->get();
+
+        return view('dispositivos.index', compact('dispositivos', 'instituciones'));
+    }
+
+    public function create(): View
+    {
+        $instituciones = Institucion::activas()->orderBy('nombre')->get();
+        return view('dispositivos.create', compact('instituciones'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $this->validar($request);
+        $data['activo'] = $request->boolean('activo');
+        Dispositivo::create($data);
+
+        return redirect()->route('dispositivos.index')
+            ->with('success', 'Dispositivo creado correctamente.');
+    }
+
+    public function show(Dispositivo $dispositivo): View
+    {
+        $dispositivo->load('institucion');
+        return view('dispositivos.show', compact('dispositivo'));
+    }
+
+    public function edit(Dispositivo $dispositivo): View
+    {
+        $instituciones = Institucion::activas()->orderBy('nombre')->get();
+        return view('dispositivos.edit', compact('dispositivo', 'instituciones'));
+    }
+
+    public function update(Request $request, Dispositivo $dispositivo): RedirectResponse
+    {
+        $data = $this->validar($request);
+        $data['activo'] = $request->boolean('activo');
+        $dispositivo->update($data);
+
+        return redirect()->route('dispositivos.show', $dispositivo)
+            ->with('success', 'Dispositivo actualizado.');
+    }
+
+    public function destroy(Dispositivo $dispositivo): RedirectResponse
+    {
+        $dispositivo->delete();
+
+        return redirect()->route('dispositivos.index')
+            ->with('success', 'Dispositivo eliminado.');
+    }
+
+    private function validar(Request $request): array
+    {
+        return $request->validate([
+            'nombre'        => ['required', 'string', 'max:255'],
+            'ubicacion'     => ['required', 'string', 'max:255'],
+            'id_institucion' => ['required', 'integer', 'exists:instituciones,id'],
+            'tipo'          => ['required', 'in:biometrico,web,otro'],
+            'modo_conexion' => ['required', 'in:directo_bd,importacion,web'],
+            'ip_address'    => ['nullable', 'ip'],
+            'configuracion' => ['nullable', 'array'],
+            'activo'        => ['boolean'],
+        ]);
+    }
+}
