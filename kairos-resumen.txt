@@ -1,0 +1,26 @@
+ Proyecto: Kairos — Sistema de Control Horario Institucional
+  Directorio: D:\xampp\htdocs\kairos\kairos
+  Stack: Laravel 12, MySQL (prefix kairos_), Bootstrap 5.3, Spatie Permission v6, Spatie Activitylog
+
+  ---
+  Lo que se hizo en las últimas sesiones
+
+  1. Menú unificado — _nav.blade.php único con secciones: Dashboard, Principal, Personal, Informes, Institución, Logs, Administrador (solo Admin General)
+  2. Perfil de usuario — /perfil con edición de contacto para todos; edición de datos personales solo para roles nivel ≤ 40. Defaults Argentina/San Juan para domicilio.
+  3. Geografía — Tablas paises/estados/ciudades, partial _ubicacion_select.blade.php con selects en cascada AJAX. Domicilio en usuarios e instituciones.
+  4. Avisos — CRUD completo. Separación de fecha_aviso (notificación) y fecha_evento (ocurrencia). Tipos: ausencia (con tipo_licencia) / tardanza (con hora estimada). Acceso por nivel jerárquico.
+  5. Cargos — Globales (sin institución), 32 cargos "Art. 4 Preuniversitario" con horas_semanales e indice. Sin tipo ni id_institucion.
+  6. Calendario / Paros — Tipo paro en eventos. CalendarioService evalúa si el paro aplica al empleado. InformeService marca ausencia como tipo_novedad='paro' si corresponde.
+  7. Jerarquía de roles — Columna nivel en roles_institucion. Niveles: Dir. Institución=10, Dir. Administrativo=20, Jefe Personal=30, Dep. Personal=40, Administrador=50, Auditor=60, Usuario Comun=100. Nadie puede gestionar roles
+   de nivel ≤ al propio. NIVEL_GESTION=40.
+  8. Lector de logs — /logs y /logs/{activity} usando registro_actividad. Visibilidad por rol: propio / institución (admin inst) / todos (admin general).
+  9. Tipos de licencia para avisos — Tabla pivot aviso_licencias_permitidas. Cada institución configura qué tipos se ofrecen en el formulario de aviso. Sin config → todos visibles. Configurable desde instituciones/show.
+
+  ---
+  Convenciones clave
+
+  - FKs en español: id_usuario, id_institucion, etc.
+  - session('institucion_activa_id') filtra todo el contenido mostrado
+  - RolInstitucion::nivelMinimoDeUsuario($uid, $instId) en lugar de nombres hardcodeados
+  - Todos los modelos extienden BaseModel → logs automáticos (excepto Usuario que usa el trait directamente)
+  - scopeEnFecha() y scopeEnRango() en Aviso filtran por fecha_evento

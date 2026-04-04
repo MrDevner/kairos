@@ -12,30 +12,26 @@ class Cargo extends BaseModel
 
     protected $fillable = [
         'nombre',
-        'descripcion',
         'horas_semanales',
-        'horas_mensuales',
-        'tipo',
-        'id_institucion',
+        'indice',
+        'id_categoria',
         'activo',
     ];
-
-    // ── Casts ──────────────────────────────────────────────────────────────
 
     protected function casts(): array
     {
         return [
-            'horas_semanales'  => 'decimal:2',
-            'horas_mensuales'  => 'decimal:2',
-            'activo'           => 'boolean',
+            'horas_semanales' => 'decimal:2',
+            'indice'          => 'decimal:4',
+            'activo'          => 'boolean',
         ];
     }
 
     // ── Relaciones ─────────────────────────────────────────────────────────
 
-    public function institucion(): BelongsTo
+    public function categoria(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion');
+        return $this->belongsTo(CategoriaCargo::class, 'id_categoria');
     }
 
     public function designaciones(): HasMany
@@ -48,15 +44,5 @@ class Cargo extends BaseModel
     public function scopeActivos(Builder $query): Builder
     {
         return $query->where('activo', true);
-    }
-
-    public function scopeDeInstitucion(Builder $query, int $idInstitucion): Builder
-    {
-        return $query->where('id_institucion', $idInstitucion);
-    }
-
-    public function scopeTipo(Builder $query, string $tipo): Builder
-    {
-        return $query->where('tipo', $tipo);
     }
 }

@@ -4,7 +4,10 @@ use App\Http\Controllers\Auth\AutenticacionController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\AsignacionRolController;
 use App\Http\Controllers\AvisoController;
+use App\Http\Controllers\CargoController;
+use App\Http\Controllers\CategoriaCargoController;
 use App\Http\Controllers\MarcaWebController;
 use App\Http\Controllers\BancoHorasController;
 use App\Http\Controllers\CalendarioController;
@@ -14,9 +17,15 @@ use App\Http\Controllers\DesignacionController;
 use App\Http\Controllers\DispositivoController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InformeController;
+use App\Http\Controllers\InstitucionActivaController;
 use App\Http\Controllers\InstitucionController;
 use App\Http\Controllers\LicenciaController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\RolInstitucionController;
+use App\Http\Controllers\TipoLicenciaController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,18 +56,43 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+    // Perfil del usuario autenticado
+    Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
+    Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+
+    // Ubicación geográfica (cascading selects)
+    Route::get('/ubicacion/estados',  [UbicacionController::class, 'estados'])->name('ubicacion.estados');
+    Route::get('/ubicacion/ciudades', [UbicacionController::class, 'ciudades'])->name('ubicacion.ciudades');
+
+    // Selección de institución activa
+    Route::post('/institucion-activa', [InstitucionActivaController::class, 'cambiar'])->name('institucion-activa.cambiar');
+
     // Instituciones
     Route::resource('instituciones', InstitucionController::class)
         ->parameters(['instituciones' => 'institucion']);
+    Route::post('instituciones/{institucion}/aviso-licencias',
+        [InstitucionController::class, 'guardarAvisoLicencias'])
+        ->name('instituciones.aviso-licencias');
+    Route::post('instituciones/{institucion}/autorizadores-licencias',
+        [InstitucionController::class, 'guardarAutorizadoresLicencias'])
+        ->name('instituciones.autorizadores-licencias');
 
     // Dependencias
     Route::resource('dependencias', DependenciaController::class)
         ->parameters(['dependencias' => 'dependencia']);
-    Route::post('dependencias/{dependencia}/jefe', [DependenciaController::class, 'asignarJefe'])
-        ->name('dependencias.jefe');
+    Route::post('dependencias/{dependencia}/jefe',          [DependenciaController::class, 'asignarJefe'])->name('dependencias.jefe');
+    Route::delete('dependencias/{dependencia}/jefe',        [DependenciaController::class, 'darDeBajaJefe'])->name('dependencias.jefe.baja');
 
     // Usuarios
+    Route::get('usuarios/buscar', [UsuarioController::class, 'buscar'])->name('usuarios.buscar');
     Route::resource('usuarios', UsuarioController::class);
+
+    // Gestión de roles de usuario
+    Route::post('usuarios/{usuario}/roles',          [AsignacionRolController::class, 'store'])->name('usuarios.roles.store');
+    Route::put('usuarios/roles/{asignacion}',        [AsignacionRolController::class, 'update'])->name('usuarios.roles.update');
+    Route::delete('usuarios/roles/{asignacion}',     [AsignacionRolController::class, 'destroy'])->name('usuarios.roles.destroy');
+    Route::post('usuarios/{usuario}/roles-global',   [AsignacionRolController::class, 'asignarGlobal'])->name('usuarios.roles.global.store');
+    Route::delete('usuarios/{usuario}/roles-global', [AsignacionRolController::class, 'revocarGlobal'])->name('usuarios.roles.global.destroy');
 
     // Designaciones
     Route::resource('designaciones', DesignacionController::class);
@@ -73,6 +107,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('calendario', CalendarioController::class);
 
     // Avisos
+    Route::get('avisos/designaciones-usuario', [AvisoController::class, 'designacionesPorUsuario'])->name('avisos.designaciones-usuario');
     Route::resource('avisos', AvisoController::class);
 
     // Licencias
@@ -101,6 +136,27 @@ Route::middleware('auth')->group(function () {
 
     // Dispositivos
     Route::resource('dispositivos', DispositivoController::class);
+
+    // Roles y permisos
+    Route::resource('roles', RolInstitucionController::class);
+
+    // Tipos de licencia
+    Route::resource('tipos-licencia', TipoLicenciaController::class)
+        ->parameters(['tipos-licencia' => 'tipo']);
+
+    // Cargos
+    Route::resource('cargos', CargoController::class)
+        ->except(['show']);
+
+    // Categorías de cargo
+    Route::get('categorias-cargo',                          [CategoriaCargoController::class, 'index'])->name('categorias-cargo.index');
+    Route::post('categorias-cargo',                         [CategoriaCargoController::class, 'store'])->name('categorias-cargo.store');
+    Route::put('categorias-cargo/{categoriasCargo}',        [CategoriaCargoController::class, 'update'])->name('categorias-cargo.update');
+    Route::delete('categorias-cargo/{categoriasCargo}',     [CategoriaCargoController::class, 'destroy'])->name('categorias-cargo.destroy');
+
+    // Logs de actividad
+    Route::get('logs',          [LogController::class, 'index'])->name('logs.index');
+    Route::get('logs/{activity}',[LogController::class, 'show'])->name('logs.show');
 });
 
 // ── Terminal de marca web (sin auth, acceso por red local) ─────────────────

@@ -61,6 +61,60 @@
                     </select>
                     @error('sexo')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
+
+                {{-- Separador de sección --}}
+                <div class="col-12"><hr class="my-1"><p class="small text-muted mb-1">Domicilio</p></div>
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small">Dirección</label>
+                    <input type="text" name="domicilio"
+                           class="form-control form-control-sm @error('domicilio') is-invalid @enderror"
+                           value="{{ old('domicilio', $usuario->domicilio) }}" maxlength="255"
+                           placeholder="Calle, número">
+                    @error('domicilio')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Teléfono</label>
+                    <input type="text" name="telefono"
+                           class="form-control form-control-sm @error('telefono') is-invalid @enderror"
+                           value="{{ old('telefono', $usuario->telefono) }}" maxlength="30"
+                           placeholder="264-1234567">
+                    @error('telefono')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                @include('partials._ubicacion_select', [
+                    'paises'          => $paises,
+                    'prefijo'         => 'dom',
+                    'labelPais'       => 'País',
+                    'labelEstado'     => 'Provincia',
+                    'labelCiudad'     => 'Departamento',
+                    'namePais'        => 'id_pais_domicilio',
+                    'nameEstado'      => 'id_estado_domicilio',
+                    'nameCiudad'      => 'id_ciudad_domicilio',
+                    'idPaisActual'    => $usuario->ciudadDomicilio?->estado?->id_pais,
+                    'idEstadoActual'  => $usuario->ciudadDomicilio?->id_estado,
+                    'idCiudadActual'  => $usuario->id_ciudad_domicilio,
+                    'colPais'         => 'col-md-4',
+                    'colEstado'       => 'col-md-4',
+                    'colCiudad'       => 'col-md-4',
+                ])
+
+                <div class="col-12"><hr class="my-1"><p class="small text-muted mb-1">Nacimiento</p></div>
+                @include('partials._ubicacion_select', [
+                    'paises'          => $paises,
+                    'prefijo'         => 'nac',
+                    'labelPais'       => 'País de nacimiento',
+                    'labelEstado'     => 'Provincia de nacimiento',
+                    'labelCiudad'     => 'Departamento de nacimiento',
+                    'namePais'        => 'id_pais_nacimiento',
+                    'nameEstado'      => 'id_estado_nacimiento',
+                    'nameCiudad'      => 'id_ciudad_nacimiento',
+                    'idPaisActual'    => $usuario->id_pais_nacimiento,
+                    'idEstadoActual'  => $usuario->id_estado_nacimiento,
+                    'idCiudadActual'  => null,
+                    'colPais'         => 'col-md-4',
+                    'colEstado'       => 'col-md-4',
+                    'colCiudad'       => 'col-md-4',
+                ])
+
                 <div class="col-md-4 d-flex align-items-end">
                     <div class="form-check mb-1">
                         <input class="form-check-input" type="checkbox" name="activo" id="activo" value="1"

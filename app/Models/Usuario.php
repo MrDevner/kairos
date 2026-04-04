@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,6 +24,11 @@ class Usuario extends Authenticatable
         'nombres',
         'documento',
         'email',
+        'telefono',
+        'domicilio',
+        'id_ciudad_domicilio',
+        'id_estado_nacimiento',
+        'id_pais_nacimiento',
         'sexo',
         'foto',
         'password',
@@ -48,6 +54,23 @@ class Usuario extends Authenticatable
     public function getRememberTokenName(): string
     {
         return 'token_recuerdo';
+    }
+
+    // --- Relaciones de ubicación ---
+
+    public function ciudadDomicilio(): BelongsTo
+    {
+        return $this->belongsTo(Ciudad::class, 'id_ciudad_domicilio');
+    }
+
+    public function estadoNacimiento(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'id_estado_nacimiento');
+    }
+
+    public function paisNacimiento(): BelongsTo
+    {
+        return $this->belongsTo(Pais::class, 'id_pais_nacimiento');
     }
 
     // --- Relaciones ---

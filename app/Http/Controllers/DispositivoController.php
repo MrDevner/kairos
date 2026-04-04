@@ -12,14 +12,25 @@ class DispositivoController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Dispositivo::with('institucion')->orderBy('nombre');
+        $instId = (int) session('institucion_activa_id', 0);
+        $query  = Dispositivo::with('institucion')->orderBy('nombre');
 
-        if ($request->filled('institucion')) {
+        if ($instId && !$request->filled('institucion')) {
+            $query->deInstitucion($instId);
+        } elseif ($request->filled('institucion')) {
             $query->deInstitucion((int) $request->institucion);
         }
 
         if ($request->filled('tipo')) {
             $query->tipo($request->tipo);
+        }
+
+        if ($request->filled('buscar')) {
+            $b = $request->buscar;
+            $query->where(function ($q) use ($b) {
+                $q->where('nombre', 'like', "%{$b}%")
+                  ->orWhere('ubicacion', 'like', "%{$b}%");
+            });
         }
 
         $dispositivos = $query->paginate(25)->withQueryString();

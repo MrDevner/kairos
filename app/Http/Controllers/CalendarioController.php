@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cargo;
+use App\Models\CategoriaCargo;
+use App\Models\Dependencia;
 use App\Models\EventoCalendario;
 use App\Models\Institucion;
 use Illuminate\Http\RedirectResponse;
@@ -19,12 +22,22 @@ class CalendarioController extends Controller
         $mes  = $request->integer('mes',  now()->month);
         $anio = $request->integer('anio', now()->year);
 
-        $eventos = EventoCalendario::deInstitucion($instId)
-            ->whereYear('fecha', $anio)
-            ->whereMonth('fecha', $mes)
+        $inicioMes = \Carbon\Carbon::create($anio, $mes, 1)->startOfMonth();
+        $finMes    = $inicioMes->copy()->endOfMonth();
+
+        $query = EventoCalendario::query()
+            ->where('fecha_inicio', '<=', $finMes)
+            ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $inicioMes))
             ->with('condiciones')
-            ->orderBy('fecha')
-            ->get();
+            ->orderBy('fecha_inicio');
+
+        if ($instId) {
+            $query->visiblesParaInstitucion($instId);
+        } else {
+            $query->whereNull('id_institucion'); // sin filtro de inst: solo generales
+        }
+
+        $eventos = $query->get();
 
         $instituciones = Institucion::activas()->orderBy('nombre')->get();
 
@@ -34,22 +47,26 @@ class CalendarioController extends Controller
     public function create(Request $request): View
     {
         $instituciones = Institucion::activas()->orderBy('nombre')->get();
-        $fechaDefault  = $request->input('fecha', now()->toDateString());
-        return view('calendario.create', compact('instituciones', 'fechaDefault'));
+        $cargos        = Cargo::activos()->orderBy('nombre')->get();
+        $dependencias  = Dependencia::orderBy('nombre')->get();
+        $categorias    = CategoriaCargo::activas()->orderBy('nombre')->get();
+        $fechaDefault  = $request->input('fecha_inicio', $request->input('fecha', now()->toDateString()));
+        return view('calendario.create', compact('instituciones', 'cargos', 'dependencias', 'categorias', 'fechaDefault'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validar($request);
+        $data['afecta_computo'] = $request->boolean('afecta_computo');
+        if ($request->alcance === 'general') {
+            $data['id_institucion'] = null;
+        }
+        unset($data['alcance']);
         $evento = EventoCalendario::create($data);
 
-        if ($request->filled('condiciones')) {
-            foreach ($request->condiciones as $c) {
-                $evento->condiciones()->create($c);
-            }
-        }
+        $this->sincronizarCondiciones($evento, $request);
 
-        return redirect()->route('calendario.index')->with('success', 'Evento creado.');
+        return redirect()->route('calendario.show', $evento)->with('success', 'Evento creado.');
     }
 
     public function show(EventoCalendario $calendario): View
@@ -61,21 +78,24 @@ class CalendarioController extends Controller
     public function edit(EventoCalendario $calendario): View
     {
         $instituciones = Institucion::activas()->orderBy('nombre')->get();
+        $cargos        = Cargo::activos()->orderBy('nombre')->get();
+        $dependencias  = Dependencia::orderBy('nombre')->get();
+        $categorias    = CategoriaCargo::activas()->orderBy('nombre')->get();
         $calendario->load('condiciones');
-        return view('calendario.edit', compact('calendario', 'instituciones'));
+        return view('calendario.edit', compact('calendario', 'instituciones', 'cargos', 'dependencias', 'categorias'));
     }
 
     public function update(Request $request, EventoCalendario $calendario): RedirectResponse
     {
         $data = $this->validar($request);
-        $calendario->update($data);
-        $calendario->condiciones()->delete();
-
-        if ($request->filled('condiciones')) {
-            foreach ($request->condiciones as $c) {
-                $calendario->condiciones()->create($c);
-            }
+        $data['afecta_computo'] = $request->boolean('afecta_computo');
+        if ($request->alcance === 'general') {
+            $data['id_institucion'] = null;
         }
+        unset($data['alcance']);
+        $calendario->update($data);
+
+        $this->sincronizarCondiciones($calendario, $request);
 
         return redirect()->route('calendario.show', $calendario)->with('success', 'Evento actualizado.');
     }
@@ -90,14 +110,39 @@ class CalendarioController extends Controller
     private function validar(Request $request): array
     {
         return $request->validate([
-            'id_institucion' => ['required', 'integer', 'exists:instituciones,id'],
-            'titulo'         => ['required', 'string', 'max:255'],
-            'descripcion'    => ['nullable', 'string'],
-            'fecha'          => ['required', 'date'],
-            'tipo'           => ['required', 'in:feriado,suspension_total,suspension_parcial,evento_condicional,dia_no_laborable'],
-            'hora_desde'     => ['nullable', 'date_format:H:i', 'required_if:tipo,suspension_parcial'],
-            'hora_hasta'     => ['nullable', 'date_format:H:i', 'after:hora_desde'],
-            'afecta_computo' => ['boolean'],
+            'alcance'         => ['required', 'in:general,institucional'],
+            'id_institucion'  => ['nullable', 'integer', 'exists:instituciones,id', 'required_if:alcance,institucional'],
+            'titulo'          => ['required', 'string', 'max:255'],
+            'descripcion'     => ['nullable', 'string'],
+            'fecha_inicio'    => ['required', 'date'],
+            'fecha_fin'       => ['nullable', 'date', 'after_or_equal:fecha_inicio'],
+            'tipo'            => ['required', 'in:feriado,suspension_total,suspension_parcial,evento_condicional,dia_no_laborable,paro'],
+            'hora_desde'      => ['nullable', 'date_format:H:i', 'required_if:tipo,suspension_parcial'],
+            'hora_hasta'      => ['nullable', 'date_format:H:i', 'after:hora_desde'],
+            'afecta_computo'  => ['boolean'],
+            'condiciones'                     => ['nullable', 'array'],
+            'condiciones.*.tipo_condicion'    => ['required', 'string', 'max:50'],
+            'condiciones.*.valor_condicion'   => ['required', 'string', 'max:255'],
+            'condiciones.*.efecto'            => ['nullable', 'in:retiro_anticipado,ingreso_tardio,jornada_reducida,exencion'],
+            'condiciones.*.minutos_afectados' => ['nullable', 'integer', 'min:1'],
         ]);
+    }
+
+    private function sincronizarCondiciones(EventoCalendario $evento, Request $request): void
+    {
+        $evento->condiciones()->delete();
+
+        $tiposConCondiciones = ['evento_condicional', 'paro'];
+
+        if ($request->filled('condiciones') && in_array($request->tipo, $tiposConCondiciones)) {
+            foreach ($request->condiciones as $c) {
+                $evento->condiciones()->create([
+                    'tipo_condicion'    => $c['tipo_condicion'],
+                    'valor_condicion'   => $c['valor_condicion'],
+                    'efecto'            => $c['efecto'] ?? null,
+                    'minutos_afectados' => $c['minutos_afectados'] ?? null,
+                ]);
+            }
+        }
     }
 }

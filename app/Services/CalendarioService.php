@@ -146,6 +146,51 @@ class CalendarioService
     }
 
     /**
+     * Determina si hay un paro activo en la fecha que aplica al empleado dado.
+     *
+     * Un paro aplica si:
+     *  - Existe un evento tipo 'paro' visible para la institución en esa fecha.
+     *  - El evento no tiene filtros (condiciones) → aplica a todos.
+     *  - O el empleado cumple al menos uno de los filtros definidos.
+     */
+    public function paroAplicaAEmpleado(
+        Institucion $institucion,
+        string|Carbon $fecha,
+        Usuario $usuario,
+        Designacion $designacion
+    ): ?EventoCalendario {
+        $fecha = Carbon::parse($fecha)->toDateString();
+
+        $inst  = $institucion;
+        $ids   = $inst->idsAncestoresYPropio();
+
+        $paros = EventoCalendario::where('tipo', 'paro')
+            ->enFecha($fecha)
+            ->where(fn ($q) =>
+                $q->whereNull('id_institucion')
+                  ->orWhereIn('id_institucion', $ids)
+            )
+            ->with('condiciones')
+            ->get();
+
+        foreach ($paros as $paro) {
+            // Sin filtros → aplica a todos
+            if ($paro->condiciones->isEmpty()) {
+                return $paro;
+            }
+
+            // Con filtros → debe cumplir al menos uno
+            foreach ($paro->condiciones as $condicion) {
+                if ($condicion->aplicaA($usuario, $designacion)) {
+                    return $paro;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Cuenta los días hábiles entre dos fechas (inclusive) para una institución.
      */
     public function diasHabilesEntre(

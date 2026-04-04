@@ -61,6 +61,22 @@
                placeholder="Av. José I. de la Roza...">
         @error('direccion')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
+    @include('partials._ubicacion_select', [
+        'paises'          => $paises,
+        'prefijo'         => 'inst_dom',
+        'labelPais'       => 'País',
+        'labelEstado'     => 'Provincia',
+        'labelCiudad'     => 'Departamento',
+        'namePais'        => 'id_pais_domicilio',
+        'nameEstado'      => 'id_estado_domicilio',
+        'nameCiudad'      => 'id_ciudad_domicilio',
+        'idPaisActual'    => $m?->ciudadDomicilio?->estado?->id_pais,
+        'idEstadoActual'  => $m?->ciudadDomicilio?->id_estado,
+        'idCiudadActual'  => $m?->id_ciudad_domicilio,
+        'colPais'         => 'col-md-4',
+        'colEstado'       => 'col-md-4',
+        'colCiudad'       => 'col-md-4',
+    ])
     <div class="col-md-5">
         <label class="form-label fw-semibold small">Teléfono</label>
         <input type="text" name="telefono"
@@ -76,6 +92,42 @@
                value="{{ old('email', $m?->email) }}" maxlength="150"
                placeholder="info@unsj.edu.ar">
         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+</div>
+
+{{-- ── Logo ────────────────────────────────────────────────────── --}}
+<hr class="my-2">
+<p class="small fw-semibold text-muted mb-2">Logo institucional</p>
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label class="form-label fw-semibold small">Archivo de logo</label>
+        <input type="file" name="logo" id="logo-input"
+               class="form-control form-control-sm @error('logo') is-invalid @enderror"
+               accept="image/jpeg,image/png,image/gif,image/svg+xml">
+        <div class="form-text small">PNG, JPG o SVG. Máx. 2 MB.</div>
+        @error('logo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    </div>
+    <div class="col-md-6 d-flex align-items-start gap-3">
+        {{-- Preview del logo actual --}}
+        @if($m?->logo)
+            <div id="logo-actual" class="d-flex flex-column align-items-center gap-1">
+                <img src="{{ asset('storage/' . $m->logo) }}"
+                     alt="Logo actual" style="max-height:60px;max-width:120px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;padding:4px">
+                <div class="form-check mb-0">
+                    <input type="hidden" name="logo_eliminar" value="0">
+                    <input type="checkbox" name="logo_eliminar" value="1"
+                           class="form-check-input" id="logo-eliminar">
+                    <label class="form-check-label small text-danger" for="logo-eliminar">
+                        Eliminar logo
+                    </label>
+                </div>
+            </div>
+        @else
+            <div id="logo-preview-nuevo" class="d-none">
+                <img id="logo-preview-img" src="" alt="Vista previa"
+                     style="max-height:60px;max-width:120px;object-fit:contain;border:1px solid #dee2e6;border-radius:4px;padding:4px">
+            </div>
+        @endif
     </div>
 </div>
 
@@ -121,3 +173,24 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    var input   = document.getElementById('logo-input');
+    var preview = document.getElementById('logo-preview-nuevo');
+    var img     = document.getElementById('logo-preview-img');
+    if (input && preview && img) {
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) { img.src = e.target.result; preview.classList.remove('d-none'); };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                preview.classList.add('d-none');
+            }
+        });
+    }
+})();
+</script>
+@endpush

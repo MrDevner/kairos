@@ -124,7 +124,26 @@ class InformeService
             ->first();
 
         if (!$marca) {
-            // Verificar si hay aviso de ausencia
+            // ── Verificar si hay paro que aplica al empleado ───────────────
+            $paro = $this->calendarioService->paroAplicaAEmpleado(
+                $institucion, $fecha, $usuario, $designacion
+            );
+
+            if ($paro) {
+                ItemInforme::create([
+                    'id_informe_diario'  => $informe->id,
+                    'id_usuario'         => $usuario->id,
+                    'id_designacion'     => $designacion->id,
+                    'tipo_novedad'       => 'paro',
+                    'detalle'            => "Adhirió al paro: {$paro->titulo}",
+                    'razon_ausencia'     => 'paro',
+                    'minutos_trabajados' => 0,
+                    'requiere_atencion'  => false,
+                ]);
+                return;
+            }
+
+            // ── Verificar si hay aviso de ausencia ─────────────────────────
             $aviso = $usuario->avisos()
                 ->where('id_designacion', $designacion->id)
                 ->enFecha($fecha->toDateString())
@@ -268,6 +287,16 @@ class InformeService
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         $pdf->AddPage();
+
+        // Logo institucional
+        $logoRelativo = $informe->institucion?->logoEfectivo();
+        if ($logoRelativo) {
+            $logoPath = \Illuminate\Support\Facades\Storage::disk('public')->path($logoRelativo);
+            if (file_exists($logoPath)) {
+                $pdf->Image($logoPath, 10, 8, 30, 0, '', '', 'T', false, 300);
+            }
+        }
+
         $pdf->SetFont('helvetica', 'B', 14);
         $pdf->Cell(0, 10, 'Informe Diario — ' . $informe->institucion->nombre, 0, 1, 'C');
         $pdf->SetFont('helvetica', '', 10);

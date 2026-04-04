@@ -21,7 +21,23 @@
       "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000000_create_users_table.php)",
       "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000001_create_cache_table.php)",
       "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/0001_01_01_000002_create_jobs_table.php)",
-      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/2026_03_30_195927_create_permission_tables.php)"
+      "Bash(rm D:/xampp/htdocs/kairos/kairos/database/migrations/2026_03_30_195927_create_permission_tables.php)",
+      "Bash(php -l D:\\\\xampp\\\\htdocs\\\\kairos\\\\kairos\\\\app\\\\Http\\\\Controllers\\\\LicenciaController.php)",
+      "Bash(php -r \"require 'vendor/autoload.php'; echo 'OK';\")",
+      "Bash(move \"2026_04_03_115704_create_ciudades_table.php\" \"2026_04_03_115706_create_ciudades_table.php\")",
+      "Bash(move \"2026_04_03_115705_add_ubicacion_to_usuarios_table.php\" \"2026_04_03_115707_add_ubicacion_to_usuarios_table.php\")",
+      "Bash(move \"2026_04_03_115705_add_ciudad_domicilio_to_instituciones_table.php\" \"2026_04_03_115708_add_ciudad_domicilio_to_instituciones_table.php\")",
+      "Bash(mv \"2026_04_03_115704_create_ciudades_table.php\" \"2026_04_03_115706_create_ciudades_table.php\")",
+      "Bash(mv \"2026_04_03_115705_add_ubicacion_to_usuarios_table.php\" \"2026_04_03_115707_add_ubicacion_to_usuarios_table.php\")",
+      "Bash(mv \"2026_04_03_115705_add_ciudad_domicilio_to_instituciones_table.php\" \"2026_04_03_115708_add_ciudad_domicilio_to_instituciones_table.php\")",
+      "Bash(sed -i \"s/'iso_numerico' => ''\\\\]/'iso_numerico' => null]/g\" database/seeders/UbicacionSeeder.php)",
+      "Bash(sed -i \"s/'iso3' => ''\\\\,/'iso3' => null,/g\" database/seeders/UbicacionSeeder.php)",
+      "Bash(php -l app/Http/Controllers/AvisoController.php)",
+      "Bash(php -l app/Http/Controllers/CargoController.php)",
+      "Bash(php -l app/Models/Cargo.php)",
+      "Bash(php -l app/Services/CalendarioService.php)",
+      "Bash(php -l app/Services/InformeService.php)",
+      "Bash(php -l app/Http/Controllers/CalendarioController.php)"
     ]
   }
 }

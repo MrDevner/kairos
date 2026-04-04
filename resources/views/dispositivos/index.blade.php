@@ -21,6 +21,10 @@
     <div class="card-body py-2">
         <form method="GET" action="{{ route('dispositivos.index') }}" class="row g-2 align-items-end">
             <div class="col-sm-4">
+                <input type="text" name="buscar" value="{{ request('buscar') }}"
+                       class="form-control form-control-sm" placeholder="Buscar por nombre o ubicación…">
+            </div>
+            <div class="col-sm-3">
                 <select name="institucion" class="form-select form-select-sm">
                     <option value="">— Todas las instituciones —</option>
                     @foreach($instituciones as $inst)

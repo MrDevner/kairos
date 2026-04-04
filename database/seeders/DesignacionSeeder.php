@@ -17,7 +17,9 @@ class DesignacionSeeder extends Seeder
         $eco  = Institucion::where('sigla', 'ECO')->first();
         $rect = Institucion::where('nombre', 'like', '%Rectorado%')->first();
 
-        if (!$fing || !$eco || !$rect) return;
+        if (! $fing || ! $eco || ! $rect) {
+            return;
+        }
 
         // Dependencias de FING
         $dinf  = Dependencia::where('sigla', 'DINF')->first();
@@ -32,62 +34,54 @@ class DesignacionSeeder extends Seeder
         $drrh   = Dependencia::where('sigla', 'DRRH')->first();
         $secgen = Dependencia::where('sigla', 'SECGEN')->first();
 
-        // Cargos
-        $cargos = Cargo::all()->groupBy(fn($c) => $c->id_institucion . '_' . $c->nombre);
+        // Helper: busca cargo sólo por nombre (ahora son globales)
+        $cargo = fn (string $nombre) => Cargo::where('nombre', $nombre)->first();
 
-        $cargoFing = fn(string $nombre) => Cargo::where('nombre', $nombre)
-            ->where('id_institucion', $fing->id)->first();
-        $cargoEco  = fn(string $nombre) => Cargo::where('nombre', $nombre)
-            ->where('id_institucion', $eco->id)->first();
-        $cargoRect = fn(string $nombre) => Cargo::where('nombre', $nombre)
-            ->where('id_institucion', $rect->id)->first();
-
-        // Usuarios (documentos asignados en UsuarioSeeder)
-        $usuarios = Usuario::whereNotIn('documento', ['99999999'])
-            ->orderBy('id')->get();
-
-        if ($usuarios->isEmpty()) return;
-
+        // [documento, cargo_nombre, institución, dependencia]
         $asignaciones = [
-            // [usuario_doc, cargo_nombre, institucion, dependencia]
-            ['30111222', 'Profesor Titular',        $fing, $dinf],
-            ['28333444', 'Profesor Adjunto',         $fing, $dinf],
-            ['32555666', 'Jefe de Trabajos Prácticos',$fing, $dele],
-            ['27777888', 'Personal Administrativo',  $fing, $sacad],
-            ['33999000', 'Profesor Titular',         $eco,  $dce],
-            ['26100200', 'Profesor Asociado',         $eco,  $dce],
-            ['34300400', 'Personal Administrativo',  $eco,  $sadm],
-            ['29500600', 'Personal No Docente',      $rect, $drrh],
-            ['31700800', 'Secretario',               $rect, $secgen],
-            ['35900001', 'Director',                 $rect, $secgen],
-            ['28001002', 'Profesor Adjunto',         $fing, $dinf],
-            ['30003004', 'Ayudante de Primera',      $fing, $dinf],
-            ['33005006', 'Personal No Docente',      $fing, $sacad],
-            ['27007008', 'Profesor Titular',         $eco,  $dce],
-            ['32009010', 'Personal Administrativo',  $eco,  $sadm],
-            ['29011012', 'Personal No Docente',      $rect, $drrh],
-            ['31013014', 'Personal Administrativo',  $rect, $secgen],
-            ['28015016', 'Profesor Asociado',         $fing, $dele],
-            ['34017018', 'Jefe de Trabajos Prácticos',$fing, $dele],
-            ['30019020', 'Ayudante de Primera',      $eco,  $dce],
+            ['30111222', 'Profesor/a 12 hs Nivel Superior',       $fing, $dinf],
+            ['28333444', 'Profesor/a 15 hs Nivel Medio',          $fing, $dinf],
+            ['32555666', 'JTP Nivel Medio',                       $fing, $dele],
+            ['27777888', 'No Docente',                            $fing, $sacad],
+            ['33999000', 'Jefe/Director/Coord. Depto',            $eco,  $dce],
+            ['26100200', 'Profesor/a 12 hs Nivel Superior',       $eco,  $dce],
+            ['34300400', 'No Docente',                            $eco,  $sadm],
+            ['29500600', 'No Docente',                            $rect, $drrh],
+            ['31700800', 'Secretario/a',                          $rect, $secgen],
+            ['35900001', 'Rector/a / Director/a',                 $rect, $secgen],
+            ['28001002', 'Profesor/a 15 hs Nivel Medio',          $fing, $dinf],
+            ['30003004', 'Ayud. Clases Prácticas Nivel Superior', $fing, $dinf],
+            ['33005006', 'No Docente',                            $fing, $sacad],
+            ['27007008', 'Jefe/Director/Coord. Depto',            $eco,  $dce],
+            ['32009010', 'No Docente',                            $eco,  $sadm],
+            ['29011012', 'No Docente',                            $rect, $drrh],
+            ['31013014', 'No Docente',                            $rect, $secgen],
+            ['28015016', 'JTP Nivel Superior',                    $fing, $dele],
+            ['34017018', 'JTP Nivel Medio',                       $fing, $dele],
+            ['30019020', 'Ayud. Clases Prácticas Nivel Superior', $eco,  $dce],
         ];
 
         foreach ($asignaciones as [$doc, $nombreCargo, $inst, $dep]) {
-            $usuario = Usuario::where('documento', $doc)->first();
-            $cargo   = Cargo::where('nombre', $nombreCargo)
-                ->where('id_institucion', $inst->id)->first();
+            $usuario     = Usuario::where('documento', $doc)->first();
+            $cargoModel  = $cargo($nombreCargo);
 
-            if (!$usuario || !$cargo || !$dep) continue;
+            if (! $usuario || ! $cargoModel || ! $dep) {
+                continue;
+            }
 
             Designacion::firstOrCreate(
-                ['id_usuario' => $usuario->id, 'id_cargo' => $cargo->id, 'id_institucion' => $inst->id],
                 [
-                    'id_dependencia'             => $dep->id,
-                    'fecha_inicio'               => '2026-01-01',
-                    'fecha_fin'                  => null,
-                    'resolucion'                 => 'RES-' . rand(100, 999) . '-2026',
-                    'horas_semanales_efectivas'  => null,
-                    'activa'                     => true,
+                    'id_usuario'     => $usuario->id,
+                    'id_cargo'       => $cargoModel->id,
+                    'id_institucion' => $inst->id,
+                ],
+                [
+                    'id_dependencia'            => $dep->id,
+                    'fecha_inicio'              => '2026-01-01',
+                    'fecha_fin'                 => null,
+                    'resolucion'                => 'RES-' . rand(100, 999) . '-2026',
+                    'horas_semanales_efectivas' => null,
+                    'activa'                    => true,
                 ]
             );
         }

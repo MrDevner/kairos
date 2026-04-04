@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -20,6 +21,7 @@ class Institucion extends BaseModel
         'id_institucion_padre',
         'logo',
         'direccion',
+        'id_ciudad_domicilio',
         'telefono',
         'email',
         'configuracion',
@@ -30,11 +32,15 @@ class Institucion extends BaseModel
      * Valores por defecto para el campo configuracion.
      */
     private const CONFIG_DEFAULTS = [
-        'umbral_jornada_minima'   => 60,       // minutos
-        'banco_horas_por'         => 'usuario', // 'usuario' | 'designacion'
-        'permite_avisos_usuario'  => false,
-        'horas_extra_autorizadas' => false,
+        'umbral_jornada_minima'      => 60,       // minutos
+        'banco_horas_por'            => 'usuario', // 'usuario' | 'designacion'
+        'permite_avisos_usuario'     => false,
+        'horas_extra_autorizadas'    => false,
+        'roles_autorizan_licencias'  => [],        // IDs de RolInstitucion adicionales
     ];
+
+    /** Roles que siempre pueden autorizar licencias, sin configuración adicional. */
+    public const ROLES_AUTORIZAN_DEFAULT = ['Director Administrativo', 'Jefe de Personal'];
 
     // ── Casts ──────────────────────────────────────────────────────────────
 
@@ -65,6 +71,25 @@ class Institucion extends BaseModel
 
     // ── Relaciones ─────────────────────────────────────────────────────────
 
+    public function ciudadDomicilio(): BelongsTo
+    {
+        return $this->belongsTo(Ciudad::class, 'id_ciudad_domicilio');
+    }
+
+    /**
+     * Tipos de licencia habilitados para avisos en esta institución.
+     * Si la colección está vacía → se permiten todos los visibles.
+     */
+    public function tiposLicenciaAviso(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TipoLicencia::class,
+            'aviso_licencias_permitidas',
+            'id_institucion',
+            'id_tipo_licencia'
+        );
+    }
+
     /** Institución padre (null si es raíz). */
     public function padre(): BelongsTo
     {
@@ -83,12 +108,6 @@ class Institucion extends BaseModel
         return $this->hasMany(Dependencia::class, 'id_institucion');
     }
 
-    /** Cargos definidos en esta institución. */
-    public function cargos(): HasMany
-    {
-        return $this->hasMany(Cargo::class, 'id_institucion');
-    }
-
     /** Designaciones activas en esta institución. */
     public function designaciones(): HasMany
     {
@@ -99,6 +118,12 @@ class Institucion extends BaseModel
     public function eventosCalendario(): HasMany
     {
         return $this->hasMany(EventoCalendario::class, 'id_institucion');
+    }
+
+    /** Tipos de licencia asignados directamente a esta institución. */
+    public function tiposLicencia(): HasMany
+    {
+        return $this->hasMany(TipoLicencia::class, 'id_institucion');
     }
 
     /**
@@ -196,6 +221,34 @@ class Institucion extends BaseModel
         return $ids;
     }
 
+    /**
+     * Devuelve una lista plana ordenada por jerarquía (DFS preorden).
+     * Cada elemento es ['institucion' => Institucion, 'nivel' => int].
+     * Si se pasa $soloIds, solo incluye los nodos cuyo id esté en esa lista.
+     *
+     * @param  array<int>|null $soloIds
+     * @return array<int, array{institucion: static, nivel: int}>
+     */
+    public static function listaJerarquica(?array $soloIds = null): array
+    {
+        $arbol = static::activas()->raices()->with('hijasRecursivas')->orderBy('nombre')->get();
+        $lista = [];
+        self::aplanarArbol($arbol, 0, $soloIds, $lista);
+        return $lista;
+    }
+
+    private static function aplanarArbol(Collection $nodos, int $nivel, ?array $soloIds, array &$lista): void
+    {
+        foreach ($nodos as $nodo) {
+            if ($soloIds === null || in_array($nodo->id, $soloIds)) {
+                $lista[] = ['institucion' => $nodo, 'nivel' => $nivel];
+            }
+            if ($nodo->hijasRecursivas->isNotEmpty()) {
+                self::aplanarArbol($nodo->hijasRecursivas, $nivel + 1, $soloIds, $lista);
+            }
+        }
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     public function esRaiz(): bool
@@ -203,8 +256,82 @@ class Institucion extends BaseModel
         return is_null($this->id_institucion_padre);
     }
 
+    /**
+     * Verifica si un usuario puede autorizar (aprobar/rechazar) licencias
+     * en esta institución.
+     *
+     * Regla: Admin General siempre puede. Director Administrativo y Jefe de
+     * Personal siempre pueden. Cualquier rol adicional configurado en
+     * `configuracion.roles_autorizan_licencias` también puede.
+     */
+    public function puedeAutorizarLicencias(Usuario $user): bool
+    {
+        if ($user->hasRole('Administrador General')) {
+            return true;
+        }
+
+        foreach (self::ROLES_AUTORIZAN_DEFAULT as $rol) {
+            if ($user->tieneRolEnInstitucion($rol, $this->id)) {
+                return true;
+            }
+        }
+
+        $adicionales = $this->configuracion['roles_autorizan_licencias'] ?? [];
+        if (!empty($adicionales)) {
+            return $user->rolesInstitucion()
+                ->vigente()
+                ->deInstitucion($this->id)
+                ->whereIn('id_rol_institucion', $adicionales)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * IDs de esta institución y todos sus ancestros hasta la raíz.
+     * Útil para resolver visibilidad de tipos de licencia heredados.
+     *
+     * @return array<int>
+     */
+    public function idsAncestoresYPropio(): array
+    {
+        $ids    = [$this->id];
+        $actual = $this;
+
+        while ($actual->id_institucion_padre !== null) {
+            $actual = $actual->padre;
+            if ($actual) {
+                $ids[] = $actual->id;
+            }
+        }
+
+        return $ids;
+    }
+
     public function getConfig(string $clave): mixed
     {
         return $this->configuracion[$clave] ?? self::CONFIG_DEFAULTS[$clave] ?? null;
+    }
+
+    /**
+     * Devuelve la ruta del logo efectivo: el propio, o el del primer ancestro que tenga uno.
+     * Retorna null si ninguno en la jerarquía tiene logo.
+     */
+    public function logoEfectivo(): ?string
+    {
+        if ($this->logo) {
+            return $this->logo;
+        }
+
+        $actual = $this;
+        while ($actual->id_institucion_padre !== null) {
+            $actual = $actual->padre;
+            if ($actual && $actual->logo) {
+                return $actual->logo;
+            }
+        }
+
+        return null;
     }
 }

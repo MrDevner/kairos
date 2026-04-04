@@ -14,7 +14,8 @@ class EventoCalendario extends BaseModel
         'id_institucion',
         'titulo',
         'descripcion',
-        'fecha',
+        'fecha_inicio',
+        'fecha_fin',
         'tipo',
         'hora_desde',
         'hora_hasta',
@@ -24,9 +25,22 @@ class EventoCalendario extends BaseModel
     protected function casts(): array
     {
         return [
-            'fecha'          => 'date',
+            'fecha_inicio'   => 'date',
+            'fecha_fin'      => 'date',
             'afecta_computo' => 'boolean',
         ];
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+
+    public function esGeneral(): bool
+    {
+        return is_null($this->id_institucion);
+    }
+
+    public function esMultiDia(): bool
+    {
+        return $this->fecha_fin && !$this->fecha_inicio->isSameDay($this->fecha_fin);
     }
 
     // ── Relaciones ─────────────────────────────────────────────────────────
@@ -43,14 +57,34 @@ class EventoCalendario extends BaseModel
 
     // ── Scopes ─────────────────────────────────────────────────────────────
 
+    /**
+     * Eventos propios de una institución (sin herencia ni generales).
+     */
     public function scopeDeInstitucion(Builder $query, int $idInstitucion): Builder
     {
         return $query->where('id_institucion', $idInstitucion);
     }
 
+    /**
+     * Eventos visibles para una institución:
+     *  - generales (id_institucion IS NULL)
+     *  - asignados a esta institución o a cualquiera de sus ancestros
+     */
+    public function scopeVisiblesParaInstitucion(Builder $query, int $instId): Builder
+    {
+        $inst = \App\Models\Institucion::find($instId);
+        $ids  = $inst ? $inst->idsAncestoresYPropio() : [$instId];
+
+        return $query->where(fn ($q) =>
+            $q->whereNull('id_institucion')
+              ->orWhereIn('id_institucion', $ids)
+        );
+    }
+
     public function scopeEnFecha(Builder $query, string $fecha): Builder
     {
-        return $query->whereDate('fecha', $fecha);
+        return $query->where('fecha_inicio', '<=', $fecha)
+            ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $fecha));
     }
 
     public function scopeTipo(Builder $query, string $tipo): Builder
@@ -62,8 +96,6 @@ class EventoCalendario extends BaseModel
     {
         return $query->where('afecta_computo', true);
     }
-
-    // ── Helpers ────────────────────────────────────────────────────────────
 
     public function esSuspensionTotal(): bool
     {
@@ -78,5 +110,10 @@ class EventoCalendario extends BaseModel
     public function esCondicional(): bool
     {
         return $this->tipo === 'evento_condicional';
+    }
+
+    public function esParo(): bool
+    {
+        return $this->tipo === 'paro';
     }
 }

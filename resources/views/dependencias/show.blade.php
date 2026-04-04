@@ -121,7 +121,7 @@
                                     font-weight:700;font-size:1.1rem;flex-shrink:0">
                             {{ strtoupper(substr($jefeActual->usuario->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($jefeActual->usuario->apellidos ?? '', 0, 1)) }}
                         </div>
-                        <div>
+                        <div class="flex-grow-1">
                             <div class="fw-semibold">
                                 <a href="{{ route('usuarios.show', $jefeActual->usuario) }}" class="text-decoration-none">
                                     {{ $jefeActual->usuario->nombre_completo }}
@@ -137,6 +137,14 @@
                                 @endif
                             </div>
                         </div>
+                        <form method="POST"
+                              action="{{ route('dependencias.jefe.baja', $dependencia) }}"
+                              onsubmit="return confirm('¿Dar de baja a {{ addslashes($jefeActual->usuario->nombre_completo) }} como jefe de esta dependencia?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Dar de baja">
+                                <i class="bi bi-person-dash me-1"></i> Dar de baja
+                            </button>
+                        </form>
                     </div>
                 @else
                     <p class="text-muted mb-0 text-center py-2">
@@ -214,14 +222,16 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
-                        <select name="id_usuario" class="form-select form-select-sm" required>
-                            <option value="">— Seleccione un usuario —</option>
-                            @foreach($usuarios as $u)
-                                <option value="{{ $u->id }}" @selected(old('id_usuario') == $u->id)>
-                                    {{ $u->nombre_completo }}
-                                    @if($u->documento) ({{ $u->documento }}) @endif
+                        @php
+                            $oldUidJefe  = old('id_usuario');
+                            $oldUserJefe = $oldUidJefe ? \App\Models\Usuario::find($oldUidJefe) : null;
+                        @endphp
+                        <select id="sel-usuario-jefe" name="id_usuario" required>
+                            @if($oldUserJefe)
+                                <option value="{{ $oldUserJefe->id }}" selected>
+                                    {{ $oldUserJefe->apellidos }}, {{ $oldUserJefe->nombres }}{{ $oldUserJefe->documento ? ' ('.$oldUserJefe->documento.')' : '' }}
                                 </option>
-                            @endforeach
+                            @endif
                         </select>
                         @error('id_usuario')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                     </div>
@@ -261,3 +271,15 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Select2 dentro del modal: inicializar cuando el modal esté visible
+// para que dropdownParent resuelva correctamente el z-index
+document.getElementById('modalAsignarJefe').addEventListener('shown.bs.modal', function () {
+    initSelect2Usuario('#sel-usuario-jefe', {
+        dropdownParent: $('#modalAsignarJefe'),
+    });
+});
+</script>
+@endpush

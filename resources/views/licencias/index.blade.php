@@ -16,11 +16,28 @@
     </a>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 {{-- Filtros --}}
 <div class="card mb-3">
     <div class="card-body py-2">
         <form method="GET" action="{{ route('licencias.index') }}" class="row g-2 align-items-end">
             <div class="col-sm-3">
+                <input type="text" name="buscar" value="{{ request('buscar') }}"
+                       class="form-control form-control-sm" placeholder="Buscar por apellido o nombre…">
+            </div>
+            <div class="col-sm-2">
                 <select name="estado" class="form-select form-select-sm">
                     <option value="">— Todos los estados —</option>
                     <option value="pendiente"  @selected(request('estado') === 'pendiente')>Pendiente</option>
@@ -37,17 +54,19 @@
                 </select>
             </div>
             <div class="col-sm-2">
-                <input type="date" name="desde" value="{{ request('desde') }}" class="form-control form-control-sm" placeholder="Desde">
+                <input type="date" name="desde" value="{{ request('desde') }}"
+                       class="form-control form-control-sm" placeholder="Desde">
             </div>
             <div class="col-sm-2">
-                <input type="date" name="hasta" value="{{ request('hasta') }}" class="form-control form-control-sm" placeholder="Hasta">
+                <input type="date" name="hasta" value="{{ request('hasta') }}"
+                       class="form-control form-control-sm" placeholder="Hasta">
             </div>
             <div class="col-sm-auto">
                 <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
-                    <i class="bi bi-search"></i> Filtrar
+                    <i class="bi bi-search"></i>
                 </button>
                 <a href="{{ route('licencias.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
-                    <i class="bi bi-x"></i> Limpiar
+                    <i class="bi bi-x"></i>
                 </a>
             </div>
         </form>
@@ -76,11 +95,8 @@
                 <tbody>
                     @forelse($licencias as $lic)
                         @php
-                            $estadoBadge = [
-                                'pendiente' => 'warning',
-                                'aprobada'  => 'success',
-                                'rechazada' => 'danger',
-                            ][$lic->estado] ?? 'secondary';
+                            $badgeColor = ['pendiente'=>'warning','aprobada'=>'success','rechazada'=>'danger'][$lic->estado] ?? 'secondary';
+                            $textColor  = $lic->estado === 'pendiente' ? 'dark' : 'white';
                         @endphp
                         <tr>
                             <td>
@@ -89,30 +105,41 @@
                                 </a>
                             </td>
                             <td class="small">{{ $lic->tipoLicencia->nombre ?? '—' }}</td>
-                            <td class="small">
-                                {{ $lic->fecha_inicio ? \Carbon\Carbon::parse($lic->fecha_inicio)->format('d/m/Y') : '—' }}
-                                — {{ $lic->fecha_fin ? \Carbon\Carbon::parse($lic->fecha_fin)->format('d/m/Y') : '—' }}
+                            <td class="small font-monospace">
+                                {{ $lic->fecha_inicio?->format('d/m/Y') ?? '—' }}
+                                @if($lic->fecha_fin)
+                                    → {{ $lic->fecha_fin->format('d/m/Y') }}
+                                @else
+                                    → ∞
+                                @endif
                             </td>
-                            <td class="text-center small">{{ $lic->dias_solicitados ?? '—' }}</td>
-                            <td class="text-center">
-                                <span class="badge bg-{{ $estadoBadge }}">{{ ucfirst($lic->estado) }}</span>
+                            <td class="text-center small">
+                                {{ $lic->dias_computados ?? '—' }}
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('licencias.show', $lic) }}" class="btn btn-sm btn-outline-primary py-0 px-1" title="Ver">
+                                <span class="badge bg-{{ $badgeColor }} text-{{ $textColor }}">
+                                    {{ ucfirst($lic->estado) }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ route('licencias.show', $lic) }}"
+                                   class="btn btn-sm btn-outline-primary py-0 px-1" title="Ver">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                @if($lic->estado === 'pendiente')
-                                    <a href="{{ route('licencias.edit', $lic) }}" class="btn btn-sm btn-outline-secondary py-0 px-1" title="Editar">
+                                @if($lic->estaPendiente())
+                                    <a href="{{ route('licencias.edit', $lic) }}"
+                                       class="btn btn-sm btn-outline-secondary py-0 px-1" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    <form method="POST" action="{{ route('licencias.destroy', $lic) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar esta licencia pendiente?')">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 @endif
-                                <form method="POST" action="{{ route('licencias.destroy', $lic) }}" class="d-inline"
-                                      onsubmit="return confirm('¿Eliminar esta licencia?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
                             </td>
                         </tr>
                     @empty

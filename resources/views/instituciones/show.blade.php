@@ -15,9 +15,11 @@
         @endif
     </h5>
     <div>
-        <a href="{{ route('instituciones.edit', $institucion) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
-            <i class="bi bi-pencil me-1"></i> Editar
-        </a>
+        @if(auth()->user()->hasRole('Administrador General'))
+            <a href="{{ route('instituciones.edit', $institucion) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+        @endif
         <a href="{{ route('instituciones.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
             <i class="bi bi-arrow-left me-1"></i> Volver
         </a>
@@ -145,6 +147,148 @@
                     </li>
                 @endforelse
             </ul>
+        </div>
+
+        {{-- Autorización de licencias --}}
+        @php
+            $rolesAdicionalesIds = $institucion->configuracion['roles_autorizan_licencias'] ?? [];
+            $rolesDefault        = \App\Models\Institucion::ROLES_AUTORIZAN_DEFAULT;
+            $rolesExtra          = $rolesInst->whereIn('id', $rolesAdicionalesIds);
+            $rolesOpcionales     = $rolesInst->whereNotIn('nombre', $rolesDefault);
+        @endphp
+        <div class="card mt-3">
+            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+                <i class="bi bi-shield-check me-1"></i> Autorización de licencias
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                <p class="small text-muted mb-2">
+                    Roles que pueden aprobar o rechazar licencias en esta institución:
+                </p>
+
+                {{-- Roles fijos --}}
+                <div class="mb-2 small">
+                    <span class="fw-semibold me-1">Siempre:</span>
+                    @foreach($rolesDefault as $nombre)
+                        <span class="badge bg-secondary me-1">{{ $nombre }}</span>
+                    @endforeach
+                </div>
+
+                {{-- Roles adicionales configurados --}}
+                @if($rolesExtra->isNotEmpty())
+                    <div class="mb-3 small">
+                        <span class="fw-semibold me-1">Adicionales:</span>
+                        @foreach($rolesExtra as $r)
+                            <span class="badge bg-primary me-1">{{ $r->nombre }}</span>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if(auth()->user()->hasRole('Administrador General'))
+                    <form method="POST"
+                          action="{{ route('instituciones.autorizadores-licencias', $institucion) }}">
+                        @csrf
+                        <div class="mb-2 small fw-semibold">Roles adicionales habilitados:</div>
+                        @forelse($rolesOpcionales as $rol)
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input"
+                                       name="roles_autorizan_licencias[]"
+                                       value="{{ $rol->id }}"
+                                       id="auth-rol-{{ $rol->id }}"
+                                       @checked(in_array($rol->id, $rolesAdicionalesIds))>
+                                <label class="form-check-label small" for="auth-rol-{{ $rol->id }}">
+                                    {{ $rol->nombre }}
+                                </label>
+                            </div>
+                        @empty
+                            <p class="text-muted small">No hay otros roles disponibles.</p>
+                        @endforelse
+                        <button type="submit" class="btn btn-sm mt-2"
+                                style="background:var(--azul);color:#fff">
+                            <i class="bi bi-save me-1"></i> Guardar
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
+        {{-- Tipos de licencia para avisos --}}
+        @php
+            $puedeConfigAviso = auth()->user()->hasRole('Administrador General')
+                || (\App\Models\RolInstitucion::nivelMinimoDeUsuario(auth()->id(), $institucion->id) <= \App\Models\RolInstitucion::NIVEL_GESTION);
+        @endphp
+        <div class="card mt-3">
+            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+                <i class="bi bi-megaphone-fill me-1"></i> Licencias disponibles para avisos
+                @if($tiposLicenciaAvisoIds->isEmpty())
+                    <span class="badge bg-light text-dark ms-2 small fw-normal">Todas</span>
+                @else
+                    <span class="badge bg-warning text-dark ms-2 small fw-normal">{{ $tiposLicenciaAvisoIds->count() }} seleccionadas</span>
+                @endif
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-2">
+                    Tipos de licencia que aparecen en el formulario de aviso de ausencia.
+                    Si no se selecciona ninguno, se muestran todos los tipos visibles.
+                </p>
+
+                @if($tiposLicenciaAvisoIds->isNotEmpty())
+                    <div class="mb-2 small">
+                        <span class="fw-semibold me-1">Habilitados:</span>
+                        @foreach($tiposLicenciaDisponibles->whereIn('id', $tiposLicenciaAvisoIds->all()) as $tl)
+                            <span class="badge bg-primary me-1">{{ $tl->nombre }}</span>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if($puedeConfigAviso)
+                    <form method="POST"
+                          action="{{ route('instituciones.aviso-licencias', $institucion) }}">
+                        @csrf
+                        <div class="mb-2 small fw-semibold">Seleccionar tipos permitidos:</div>
+                        @forelse($tiposLicenciaDisponibles as $tl)
+                            <div class="form-check">
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       name="tipos_licencia_aviso[]"
+                                       value="{{ $tl->id }}"
+                                       id="aviso-tl-{{ $tl->id }}"
+                                       @checked($tiposLicenciaAvisoIds->contains($tl->id))>
+                                <label class="form-check-label small" for="aviso-tl-{{ $tl->id }}">
+                                    {{ $tl->nombre }}
+                                    @if($tl->id_institucion)
+                                        <span class="text-muted">(propio)</span>
+                                    @else
+                                        <span class="text-muted">(global)</span>
+                                    @endif
+                                </label>
+                            </div>
+                        @empty
+                            <p class="text-muted small">No hay tipos de licencia disponibles.</p>
+                        @endforelse
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="submit" class="btn btn-sm"
+                                    style="background:var(--azul);color:#fff">
+                                <i class="bi bi-save me-1"></i> Guardar
+                            </button>
+                            @if($tiposLicenciaAvisoIds->isNotEmpty())
+                                <button type="submit" name="tipos_licencia_aviso" value=""
+                                        class="btn btn-sm btn-outline-secondary"
+                                        onclick="document.querySelectorAll('[name=\'tipos_licencia_aviso[]\']').forEach(c=>c.checked=false)"
+                                        title="Quitar restricción — mostrar todos">
+                                    <i class="bi bi-x-circle me-1"></i> Sin restricción
+                                </button>
+                            @endif
+                        </div>
+                    </form>
+                @endif
+            </div>
         </div>
 
         {{-- Dependencias --}}

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Aviso extends BaseModel
 {
@@ -14,16 +15,19 @@ class Aviso extends BaseModel
         'id_designacion',
         'id_institucion',
         'tipo',
-        'fecha',
+        'fecha_aviso',
+        'fecha_evento',
         'hora_estimada_llegada',
         'motivo',
+        'id_tipo_licencia',
         'id_registrado_por',
     ];
 
     protected function casts(): array
     {
         return [
-            'fecha' => 'date',
+            'fecha_aviso'  => 'date',
+            'fecha_evento' => 'date',
         ];
     }
 
@@ -49,6 +53,11 @@ class Aviso extends BaseModel
         return $this->belongsTo(Usuario::class, 'id_registrado_por');
     }
 
+    public function tipoLicencia(): BelongsTo
+    {
+        return $this->belongsTo(TipoLicencia::class, 'id_tipo_licencia');
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────
 
     public function scopeDeUsuario(Builder $query, int $idUsuario): Builder
@@ -71,12 +80,12 @@ class Aviso extends BaseModel
 
     public function scopeEnFecha(Builder $query, string $fecha): Builder
     {
-        return $query->whereDate('fecha', $fecha);
+        return $query->whereDate('fecha_evento', $fecha);
     }
 
     public function scopeEnRango(Builder $query, string $desde, string $hasta): Builder
     {
-        return $query->whereBetween('fecha', [$desde, $hasta]);
+        return $query->whereBetween('fecha_evento', [$desde, $hasta]);
     }
 
     public function scopeTipo(Builder $query, string $tipo): Builder

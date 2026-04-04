@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-header"><i class="bi bi-building me-2"></i>Nueva institución</div>
             <div class="card-body">
-                <form method="POST" action="{{ route('instituciones.store') }}">
+                <form method="POST" action="{{ route('instituciones.store') }}" enctype="multipart/form-data">
                     @csrf
                     @include('instituciones._form', ['padres' => $padres])
                     <div class="d-flex gap-2 mt-3">

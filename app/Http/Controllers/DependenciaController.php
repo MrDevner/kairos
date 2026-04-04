@@ -14,11 +14,15 @@ class DependenciaController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Dependencia::with(['institucion', 'padre'])->orderBy('nombre');
+        $instId = (int) session('institucion_activa_id', 0);
+        $query  = Dependencia::with(['institucion', 'padre'])->orderBy('nombre');
 
-        if ($request->filled('institucion')) {
+        if ($instId && !$request->filled('institucion')) {
+            $query->deInstitucion($instId);
+        } elseif ($request->filled('institucion')) {
             $query->deInstitucion((int) $request->institucion);
         }
+
         if ($request->filled('buscar')) {
             $b = $request->buscar;
             $query->where(function ($q) use ($b) {
@@ -101,6 +105,20 @@ class DependenciaController extends Controller
         ]));
 
         return redirect()->route('dependencias.show', $dependencia)->with('success', 'Jefatura asignada.');
+    }
+
+    public function darDeBajaJefe(Dependencia $dependencia): RedirectResponse
+    {
+        $afectadas = Jefatura::where('id_dependencia', $dependencia->id)
+            ->where('activa', true)
+            ->update(['activa' => false, 'fecha_hasta' => now()->toDateString()]);
+
+        if ($afectadas === 0) {
+            return back()->with('warning', 'No hay jefatura activa para dar de baja.');
+        }
+
+        return redirect()->route('dependencias.show', $dependencia)
+            ->with('success', 'Jefatura dada de baja correctamente.');
     }
 
     private function validar(Request $request): array

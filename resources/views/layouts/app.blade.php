@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -63,6 +65,33 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             padding: 0 1rem;
+        }
+        #kairos-header .institucion-activa-dropdown {
+            flex: 1;
+            text-align: center;
+            padding: 0 .5rem;
+        }
+        #kairos-header .institucion-activa-dropdown .dropdown-toggle {
+            color: var(--azul) !important;
+            font-size: .9rem;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #kairos-header .institucion-activa-dropdown .dropdown-toggle::after {
+            color: var(--azul);
+        }
+        #kairos-header .institucion-activa-dropdown .dropdown-menu {
+            background: #fff;
+            border: 1px solid var(--gris-borde);
+        }
+        #kairos-header .institucion-activa-dropdown .dropdown-item {
+            color: var(--gris-texto);
+            font-size: .85rem;
+        }
+        #kairos-header .institucion-activa-dropdown .dropdown-item:hover {
+            background: rgba(27,79,114,.08);
         }
         #kairos-header .header-acciones {
             display: flex;
@@ -241,14 +270,63 @@
         KAIROS
     </a>
 
-    <span class="institucion-activa">
-        @php
-            $instActiva = session('institucion_activa_id')
-                ? \App\Models\Institucion::find(session('institucion_activa_id'))
-                : null;
-        @endphp
-        {{ $instActiva?->nombre ?? 'Sin institución seleccionada' }}
-    </span>
+    @php
+        $instActiva  = session('institucion_activa_id')
+            ? \App\Models\Institucion::find(session('institucion_activa_id'))
+            : null;
+        $authUser    = auth()->user();
+        $soloIds     = $authUser->hasRole('Administrador General')
+            ? null
+            : $authUser->rolesInstitucion()->vigente()->pluck('id_institucion')->map(fn($v) => (int)$v)->toArray();
+        $listaInst   = \App\Models\Institucion::listaJerarquica($soloIds);
+    @endphp
+
+    @if(count($listaInst) > 1)
+        <div class="dropdown institucion-activa-dropdown" style="flex:1;text-align:center;">
+            <button class="btn btn-link dropdown-toggle text-decoration-none fw-semibold"
+                    style="color:var(--azul);font-size:.9rem;padding:.25rem .5rem"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-building me-1"></i>
+                {{ $instActiva?->nombre ?? 'Seleccionar institución' }}
+            </button>
+            <ul class="dropdown-menu shadow" style="min-width:280px;max-height:400px;overflow-y:auto">
+                <li><h6 class="dropdown-header small">Cambiar institución</h6></li>
+                @foreach($listaInst as $item)
+                    @php $inst = $item['institucion']; $nivel = $item['nivel']; @endphp
+                    <li>
+                        <form method="POST" action="{{ route('institucion-activa.cambiar') }}">
+                            @csrf
+                            <input type="hidden" name="id_institucion" value="{{ $inst->id }}">
+                            <button type="submit"
+                                    class="dropdown-item d-flex align-items-center gap-1 {{ $instActiva?->id === $inst->id ? 'fw-bold' : '' }}"
+                                    style="padding-left: {{ 1 + $nivel * 1.25 }}rem">
+                                @if($instActiva?->id === $inst->id)
+                                    <i class="bi bi-check2 text-success flex-shrink-0"></i>
+                                @elseif($nivel === 0)
+                                    <i class="bi bi-building text-muted flex-shrink-0"></i>
+                                @else
+                                    <i class="bi bi-diagram-2 text-muted flex-shrink-0" style="font-size:.75rem"></i>
+                                @endif
+                                {{ $inst->nombre }}
+                            </button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @else
+        <span class="institucion-activa">
+            <i class="bi bi-building me-1"></i>
+            {{ $instActiva?->nombre ?? ($listaInst[0]['institucion']->nombre ?? 'Sin institución') }}
+        </span>
+        @if(count($listaInst) === 1 && !$instActiva)
+            <form method="POST" action="{{ route('institucion-activa.cambiar') }}" id="form-inst-auto" class="d-none">
+                @csrf
+                <input type="hidden" name="id_institucion" value="{{ $listaInst[0]['institucion']->id }}">
+            </form>
+            <script>document.getElementById('form-inst-auto').submit();</script>
+        @endif
+    @endif
 
     <div class="header-acciones">
         <button class="btn-notif" title="Notificaciones">
@@ -269,8 +347,7 @@
                 <i class="bi bi-chevron-down" style="font-size:.7rem;"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"></i> Perfil</a></li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Configuración</a></li>
+                <li><a class="dropdown-item {{ request()->routeIs('perfil') ? 'active' : '' }}" href="{{ route('perfil') }}"><i class="bi bi-person-circle"></i> Mi perfil</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
@@ -289,23 +366,7 @@
 <nav id="kairos-nav">
 <div id="kairos-nav-scroll">
     <ul class="nav">
-        @php $user = auth()->user(); $instId = (int) session('institucion_activa_id', 0); @endphp
-
-        @if($user->hasRole('Administrador General'))
-            @include('layouts._nav_admin_general')
-        @elseif($user->tieneRolEnInstitucion('Administrador', $instId))
-            @include('layouts._nav_admin_institucion')
-        @elseif($user->tieneRolEnInstitucion('Jefe de Personal', $instId))
-            @include('layouts._nav_jefe_personal')
-        @elseif($user->tieneRolEnInstitucion('Departamento Personal', $instId))
-            @include('layouts._nav_depto_personal')
-        @elseif($user->tieneRolEnInstitucion('Director Administrativo', $instId))
-            @include('layouts._nav_director')
-        @elseif($user->tieneRolEnInstitucion('Auditor', $instId))
-            @include('layouts._nav_director')
-        @else
-            @include('layouts._nav_usuario')
-        @endif
+        @include('layouts._nav')
     </ul>
 </div>
 </nav>
@@ -365,8 +426,41 @@
     <a href="#">Documentación</a>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+/**
+ * Inicializa un <select> como Select2 con búsqueda AJAX de usuarios.
+ * @param {string|Element} selector  – selector CSS o elemento DOM
+ * @param {object}         opts      – opciones extra (dropdownParent, etc.)
+ */
+function initSelect2Usuario(selector, opts) {
+    opts = opts || {};
+    $(selector).select2($.extend({
+        theme:              'bootstrap-5',
+        width:              '100%',
+        placeholder:        'Buscar por apellido, nombre o documento…',
+        allowClear:         true,
+        minimumInputLength: 3,
+        language: {
+            inputTooShort:  function () { return 'Ingrese al menos 3 caracteres'; },
+            searching:      function () { return 'Buscando…'; },
+            noResults:      function () { return 'Sin resultados'; },
+            errorLoading:   function () { return 'Error al cargar'; },
+        },
+        ajax: {
+            url:     '{{ route("usuarios.buscar") }}',
+            dataType:'json',
+            delay:   300,
+            data:    function (p) { return { q: p.term }; },
+            processResults: function (d) { return { results: d.results }; },
+            cache:   true,
+        },
+    }, opts));
+}
+</script>
 <script>
     // Dropdowns del nav: strategy fixed para que ignoren el overflow-x del contenedor
     document.querySelectorAll('#kairos-nav .dropdown-toggle').forEach(function (el) {

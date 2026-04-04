@@ -15,12 +15,17 @@ class DesignacionController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Designacion::with(['usuario', 'cargo', 'institucion', 'dependencia'])
+        $instId = (int) session('institucion_activa_id', 0);
+        $query  = Designacion::with(['usuario', 'cargo', 'institucion', 'dependencia'])
             ->orderByDesc('fecha_inicio');
 
-        if ($request->filled('institucion')) {
+        // Filtro automático por institución activa (salvo que el request lo sobreescriba)
+        if ($instId && !$request->filled('institucion')) {
+            $query->porInstitucion($instId);
+        } elseif ($request->filled('institucion')) {
             $query->porInstitucion((int) $request->institucion);
         }
+
         if ($request->filled('dependencia')) {
             $query->where('id_dependencia', (int) $request->dependencia);
         }

@@ -15,15 +15,23 @@
 
 {{-- Header --}}
 <div class="d-flex justify-content-between align-items-start mb-3">
-    <div>
-        <h5 class="fw-bold mb-1" style="color:var(--azul)">
-            <i class="bi bi-file-earmark-bar-graph me-1"></i>
-            Informe de asistencia
-            <span class="badge bg-{{ $estadoBadge }} ms-1">{{ ucfirst($informe->estado) }}</span>
-        </h5>
-        <div class="small text-muted">
-            {{ $informe->institucion->nombre ?? '—' }} —
-            {{ $informe->fecha ? \Carbon\Carbon::parse($informe->fecha)->format('d \d\e F \d\e Y') : '—' }}
+    <div class="d-flex align-items-center gap-3">
+        @php $logoPath = $informe->institucion?->logoEfectivo(); @endphp
+        @if($logoPath)
+            <img src="{{ asset('storage/' . $logoPath) }}"
+                 alt="Logo {{ $informe->institucion->nombre }}"
+                 style="max-height:56px;max-width:120px;object-fit:contain">
+        @endif
+        <div>
+            <h5 class="fw-bold mb-1" style="color:var(--azul)">
+                <i class="bi bi-file-earmark-bar-graph me-1"></i>
+                Informe de asistencia
+                <span class="badge bg-{{ $estadoBadge }} ms-1">{{ ucfirst($informe->estado) }}</span>
+            </h5>
+            <div class="small text-muted">
+                {{ $informe->institucion->nombre ?? '—' }} —
+                {{ $informe->fecha ? \Carbon\Carbon::parse($informe->fecha)->format('d \d\e F \d\e Y') : '—' }}
+            </div>
         </div>
     </div>
     <div class="d-flex gap-2">

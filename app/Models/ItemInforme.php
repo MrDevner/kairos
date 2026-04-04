@@ -70,11 +70,12 @@ class ItemInforme extends BaseModel
     public function colorClase(): string
     {
         return match ($this->tipo_novedad) {
-            'error_atencion_urgente'  => 'danger',   // rojo
-            'tardanza'                => 'warning',  // amarillo
-            'presente'                => 'success',  // verde
-            'licencia', 'feriado', 'suspension' => 'info', // azul
-            default                   => 'secondary',
+            'error_atencion_urgente'              => 'danger',
+            'tardanza'                            => 'warning',
+            'presente'                            => 'success',
+            'licencia', 'feriado', 'suspension'   => 'info',
+            'paro'                                => 'orange', // naranja custom
+            default                               => 'secondary',
         };
     }
 }

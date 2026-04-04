@@ -6,6 +6,7 @@ use App\Http\Requests\DDJJRequest;
 use App\Models\DeclaracionJurada;
 use App\Models\Designacion;
 use App\Models\HorarioDdjj;
+use App\Models\RolInstitucion;
 use App\Services\DDJJService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,10 +25,12 @@ class DDJJController extends Controller
             ->orderByDesc('fecha_inicio');
 
         // Usuario común solo ve las suyas
-        if (!$user->hasRole('Administrador General')
-            && !$user->tieneRolEnInstitucion('Jefe de Personal', (int) session('institucion_activa_id', 0))
-            && !$user->tieneRolEnInstitucion('Departamento Personal', (int) session('institucion_activa_id', 0))
-        ) {
+        $instId     = (int) session('institucion_activa_id', 0);
+        $nivelActor = $user->hasRole('Administrador General')
+            ? 0
+            : RolInstitucion::nivelMinimoDeUsuario($user->id, $instId);
+
+        if ($nivelActor > RolInstitucion::NIVEL_GESTION) {
             $query->deUsuario($user->id);
         }
 

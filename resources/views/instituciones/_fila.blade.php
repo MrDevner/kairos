@@ -23,12 +23,14 @@
     </td>
     <td class="text-end">
         <a href="{{ route('instituciones.show', $inst) }}" class="btn btn-sm btn-outline-secondary btn-sm" title="Ver"><i class="bi bi-eye"></i></a>
-        <a href="{{ route('instituciones.edit', $inst) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
-        <form method="POST" action="{{ route('instituciones.destroy', $inst) }}" class="d-inline"
-              onsubmit="return confirm('¿Eliminar esta institución?')">
-            @csrf @method('DELETE')
-            <button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
-        </form>
+        @if(auth()->user()->hasRole('Administrador General'))
+            <a href="{{ route('instituciones.edit', $inst) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
+            <form method="POST" action="{{ route('instituciones.destroy', $inst) }}" class="d-inline"
+                  onsubmit="return confirm('¿Eliminar esta institución?')">
+                @csrf @method('DELETE')
+                <button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>
+            </form>
+        @endif
     </td>
 </tr>
 

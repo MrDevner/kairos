@@ -28,13 +28,17 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
-                    <select name="id_usuario" class="form-select form-select-sm @error('id_usuario') is-invalid @enderror" required>
-                        <option value="">— Seleccione un usuario —</option>
-                        @foreach($usuarios as $u)
-                            <option value="{{ $u->id }}" @selected(old('id_usuario') == $u->id)>
-                                {{ $u->apellidos }}, {{ $u->nombres }}
+                    @php
+                        $oldUid  = old('id_usuario');
+                        $oldUser = $oldUid ? \App\Models\Usuario::find($oldUid) : null;
+                    @endphp
+                    <select id="sel-usuario-desig" name="id_usuario"
+                            class="@error('id_usuario') is-invalid @enderror" required>
+                        @if($oldUser)
+                            <option value="{{ $oldUser->id }}" selected>
+                                {{ $oldUser->apellidos }}, {{ $oldUser->nombres }}{{ $oldUser->documento ? ' ('.$oldUser->documento.')' : '' }}
                             </option>
-                        @endforeach
+                        @endif
                     </select>
                     @error('id_usuario')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
@@ -135,6 +139,8 @@
 
 @push('scripts')
 <script>
+    initSelect2Usuario('#sel-usuario-desig');
+
     // Mostrar horas del cargo seleccionado
     document.getElementById('id_cargo').addEventListener('change', function () {
         const opt = this.options[this.selectedIndex];

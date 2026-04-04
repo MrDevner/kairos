@@ -80,6 +80,7 @@
     <span class="badge bg-info text-dark">Suspensión parcial</span>
     <span class="badge bg-primary">Evento condicional</span>
     <span class="badge bg-secondary">Día no laborable</span>
+    <span class="badge text-white" style="background:#e67e22">Paro del personal</span>
 </div>
 
 {{-- Cabecera del mes --}}
@@ -110,19 +111,27 @@
                         $cursor = $inicio->copy();
                         $hoy    = \Carbon\Carbon::today();
 
-                        // Mapear eventos por fecha
+                        // Mapear eventos por fecha (multi-día: aparece en cada día del rango)
                         $eventosPorFecha = [];
                         foreach($eventos as $ev) {
-                            $evFecha = \Carbon\Carbon::parse($ev->fecha)->format('Y-m-d');
-                            $eventosPorFecha[$evFecha][] = $ev;
+                            $d   = $ev->fecha_inicio->copy();
+                            $fin = $ev->fecha_fin ? $ev->fecha_fin->copy() : $ev->fecha_inicio->copy();
+                            while ($d <= $fin) {
+                                $eventosPorFecha[$d->format('Y-m-d')][] = $ev;
+                                $d->addDay();
+                            }
                         }
 
                         $colorMap = [
-                            'feriado'             => 'danger',
-                            'suspension_total'    => 'warning',
-                            'suspension_parcial'  => 'info',
-                            'evento_condicional'  => 'primary',
-                            'dia_no_laborable'    => 'secondary',
+                            'feriado'             => ['bg-danger',             ''],
+                            'suspension_total'    => ['bg-warning',            'text-dark'],
+                            'suspension_parcial'  => ['bg-info',               'text-dark'],
+                            'evento_condicional'  => ['bg-primary',            ''],
+                            'dia_no_laborable'    => ['bg-secondary',          ''],
+                            'paro'                => ['text-white',            ''],
+                        ];
+                        $styleMap = [
+                            'paro' => 'background:#e67e22',
                         ];
                     @endphp
                     @while($cursor <= $fin)
@@ -138,15 +147,21 @@
                                 <td class="{{ $clases }}">
                                     <div class="cal-day-num">{{ $cursor->day }}</div>
                                     @foreach($evsDia as $ev)
-                                        @php $color = $colorMap[$ev->tipo] ?? 'secondary'; @endphp
+                                        @php
+                                            [$cls, $txtCls] = $colorMap[$ev->tipo] ?? ['bg-secondary', ''];
+                                            $style = $styleMap[$ev->tipo] ?? '';
+                                        @endphp
                                         <a href="{{ route('calendario.show', $ev) }}"
-                                           class="cal-event badge bg-{{ $color }} text-decoration-none"
-                                           title="{{ $ev->descripcion ?? $ev->tipo }}">
-                                            {{ Str::limit($ev->descripcion ?? ucfirst(str_replace('_',' ',$ev->tipo)), 22) }}
+                                           class="cal-event badge {{ $cls }} {{ $txtCls }} text-decoration-none"
+                                           style="{{ $style }}"
+                                           title="{{ $ev->titulo }}{{ $ev->esGeneral() ? ' (General)' : '' }}">
+                                            @if($ev->esGeneral())<i class="bi bi-globe me-1"></i>@endif
+                                            @if($ev->esParo())<i class="bi bi-person-fill-slash me-1"></i>@endif
+                                            {{ Str::limit($ev->titulo, 20) }}
                                         </a>
                                     @endforeach
                                     @if(!$esOtroMes)
-                                        <a href="{{ route('calendario.create', ['fecha' => $fKey]) }}"
+                                        <a href="{{ route('calendario.create', ['fecha_inicio' => $fKey]) }}"
                                            class="text-muted text-decoration-none" style="font-size:.65rem" title="Agregar evento">+</a>
                                     @endif
                                 </td>

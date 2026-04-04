@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-header"><i class="bi bi-pencil me-2"></i>Editar: {{ $institucion->nombre }}</div>
             <div class="card-body">
-                <form method="POST" action="{{ route('instituciones.update', $institucion) }}">
+                <form method="POST" action="{{ route('instituciones.update', $institucion) }}" enctype="multipart/form-data">
                     @csrf @method('PUT')
                     @include('instituciones._form', ['padres' => $padres, 'model' => $institucion])
                     <div class="d-flex gap-2 mt-3">

@@ -38,11 +38,12 @@ class CondicionEvento extends BaseModel
     public function aplicaA(Usuario $usuario, Designacion $designacion): bool
     {
         return match ($this->tipo_condicion) {
-            'sexo'        => $usuario->sexo === $this->valor_condicion,
-            'cargo'       => (string) $designacion->id_cargo === $this->valor_condicion,
-            'dependencia' => (string) $designacion->id_dependencia === $this->valor_condicion,
-            'custom'      => false, // extensible por lógica de negocio específica
-            default       => false,
+            'sexo'            => $usuario->sexo === $this->valor_condicion,
+            'cargo'           => (string) $designacion->id_cargo === $this->valor_condicion,
+            'dependencia'     => (string) $designacion->id_dependencia === $this->valor_condicion,
+            'categoria_cargo' => (string) $designacion->cargo?->id_categoria === $this->valor_condicion,
+            'custom'          => false, // extensible por lógica de negocio específica
+            default           => false,
         };
     }
 }

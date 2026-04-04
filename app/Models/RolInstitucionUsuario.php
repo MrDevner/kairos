@@ -10,6 +10,8 @@ class RolInstitucionUsuario extends BaseModel
 {
     protected $table = 'roles_institucion_usuario';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_usuario',
         'id_rol_institucion',
