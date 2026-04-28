@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function () {
     // Perfil del usuario autenticado
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');
     Route::put('/perfil', [PerfilController::class, 'update'])->name('perfil.update');
+    Route::get('/perfil/google/vincular',    [GoogleController::class, 'vincular'])->name('perfil.google.vincular');
+    Route::post('/perfil/google/desvincular',[GoogleController::class, 'desvincular'])->name('perfil.google.desvincular');
 
     // Ubicación geográfica (cascading selects)
     Route::get('/ubicacion/estados',  [UbicacionController::class, 'estados'])->name('ubicacion.estados');
@@ -115,19 +117,20 @@ Route::middleware('auth')->group(function () {
     Route::post('licencias/{licencia}/aprobar',  [LicenciaController::class, 'aprobar'])->name('licencias.aprobar');
     Route::post('licencias/{licencia}/rechazar', [LicenciaController::class, 'rechazar'])->name('licencias.rechazar');
 
-    // Marcas
-    Route::get('marcas',                  [MarcaController::class, 'index'])->name('marcas.index');
-    Route::get('marcas/importar',         [MarcaController::class, 'importar'])->name('marcas.importar');
-    Route::post('marcas/importar',        [MarcaController::class, 'procesarImportacion'])->name('marcas.importar.post');
-    Route::post('marcas/procesar',        [MarcaController::class, 'procesar'])->name('marcas.procesar');
-    Route::get('marcas/{usuario}/{fecha}',[MarcaController::class, 'show'])->name('marcas.show');
+    // Marcas — rutas estáticas antes del resource para evitar colisión con {marca}
+    Route::get('marcas/importar',  [MarcaController::class, 'importar'])->name('marcas.importar');
+    Route::post('marcas/importar', [MarcaController::class, 'procesarImportacion'])->name('marcas.importar.post');
+    Route::post('marcas/procesar', [MarcaController::class, 'procesar'])->name('marcas.procesar');
+    Route::resource('marcas', MarcaController::class)->parameters(['marcas' => 'marca']);
 
     // Informes
-    Route::get('informes',          [InformeController::class, 'index'])->name('informes.index');
-    Route::get('informes/generar',  [InformeController::class, 'generar'])->name('informes.generar');
-    Route::get('informes/{informe}',[InformeController::class, 'show'])->name('informes.show');
-    Route::get('informes/{informe}/excel', [InformeController::class, 'exportarExcel'])->name('informes.excel');
-    Route::get('informes/{informe}/pdf',   [InformeController::class, 'exportarPdf'])->name('informes.pdf');
+    Route::get('informes',                     [InformeController::class, 'index'])->name('informes.index');
+    Route::get('informes/marcas',              [MarcaController::class, 'computadas'])->name('informes.marcas');
+    Route::get('informes/generar',             [InformeController::class, 'generar'])->name('informes.generar');
+    Route::get('informes/resumen-dependencia', [InformeController::class, 'resumenDependencia'])->name('informes.resumen-dependencia');
+    Route::get('informes/{informe}',           [InformeController::class, 'show'])->name('informes.show');
+    Route::get('informes/{informe}/excel',     [InformeController::class, 'exportarExcel'])->name('informes.excel');
+    Route::get('informes/{informe}/pdf',       [InformeController::class, 'exportarPdf'])->name('informes.pdf');
 
     // Banco de horas
     Route::get('banco-horas',          [BancoHorasController::class, 'index'])->name('banco-horas.index');
@@ -136,6 +139,10 @@ Route::middleware('auth')->group(function () {
 
     // Dispositivos
     Route::resource('dispositivos', DispositivoController::class);
+    Route::post('dispositivos/{dispositivo}/computadores/{computador}/autorizar',
+        [DispositivoController::class, 'autorizarComputador'])->name('dispositivos.computadores.autorizar');
+    Route::delete('dispositivos/{dispositivo}/computadores/{computador}',
+        [DispositivoController::class, 'eliminarComputador'])->name('dispositivos.computadores.eliminar');
 
     // Roles y permisos
     Route::resource('roles', RolInstitucionController::class);
@@ -160,6 +167,8 @@ Route::middleware('auth')->group(function () {
 });
 
 // ── Terminal de marca web (sin auth, acceso por red local) ─────────────────
-Route::get('/terminal',           [MarcaWebController::class, 'terminal'])->name('marca-web.terminal');
-Route::post('/terminal/marcar',   [MarcaWebController::class, 'marcar'])->name('marca-web.marcar');
-Route::post('/terminal/solicitar',[MarcaWebController::class, 'solicitarAutorizacion'])->name('marca-web.solicitar');
+Route::get('/terminal',                [MarcaWebController::class, 'terminal'])->name('marca-web.terminal');
+Route::post('/terminal/marcar',        [MarcaWebController::class, 'marcar'])->name('marca-web.marcar');
+Route::post('/terminal/identificar',   [MarcaWebController::class, 'identificar'])->name('marca-web.identificar');
+Route::post('/terminal/confirmar',     [MarcaWebController::class, 'confirmar'])->name('marca-web.confirmar');
+Route::post('/terminal/solicitar',     [MarcaWebController::class, 'solicitarAutorizacion'])->name('marca-web.solicitar');

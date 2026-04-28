@@ -135,9 +135,122 @@
             </div>
         </div>
 
-        <button type="submit" class="btn w-100" style="background:var(--azul);color:#fff">
+        {{-- PIN de marca --}}
+        <div class="card mb-3">
+            <div class="card-header" style="background:var(--azul);color:#fff">
+                <i class="bi bi-123 me-1"></i> PIN de marca
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    PIN numérico de 4 dígitos para registrar marcas en los terminales web.
+                    Dejá en blanco para no cambiar.
+                </p>
+                @if(session('success') && str_contains(session('success'), 'PIN'))
+                    <div class="alert alert-success py-2 small mb-3">{{ session('success') }}</div>
+                @endif
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Nuevo PIN</label>
+                    <input type="password"
+                           name="pin_marca"
+                           class="form-control form-control-sm @error('pin_marca') is-invalid @enderror"
+                           inputmode="numeric"
+                           maxlength="4"
+                           placeholder="4 dígitos"
+                           autocomplete="off">
+                    @error('pin_marca')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="mb-1">
+                    <label class="form-label fw-semibold small">Confirmar PIN</label>
+                    <input type="password"
+                           name="pin_marca_confirmation"
+                           class="form-control form-control-sm"
+                           inputmode="numeric"
+                           maxlength="4"
+                           placeholder="Repetir PIN"
+                           autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn w-100 mb-3" style="background:var(--azul);color:#fff">
             <i class="bi bi-check-lg me-1"></i> Guardar cambios
         </button>
+
+        {{-- Métodos de acceso --}}
+        <div class="card" id="metodos-login">
+            <div class="card-header" style="background:var(--azul);color:#fff">
+                <i class="bi bi-key me-1"></i> Métodos de acceso
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                {{-- Contraseña --}}
+                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                    <div class="small">
+                        <i class="bi bi-shield-lock me-1 text-secondary"></i>
+                        <span class="fw-semibold">Contraseña del sistema</span>
+                    </div>
+                    @if($usuario->tienePassword())
+                        <span class="badge bg-success">Configurada</span>
+                    @else
+                        <span class="badge bg-secondary">No configurada</span>
+                    @endif
+                </div>
+
+                {{-- PIN de marca --}}
+                <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                    <div class="small">
+                        <i class="bi bi-123 me-1 text-secondary"></i>
+                        <span class="fw-semibold">PIN de marca</span>
+                        <div class="text-muted" style="font-size:.72rem">Terminales web</div>
+                    </div>
+                    @if($usuario->tienePinMarca())
+                        <span class="badge bg-success">Configurado</span>
+                    @else
+                        <span class="badge bg-warning text-dark">Sin configurar</span>
+                    @endif
+                </div>
+
+                {{-- Google --}}
+                <div class="d-flex align-items-center justify-content-between py-2">
+                    <div class="small">
+                        <i class="bi bi-google me-1 text-secondary"></i>
+                        <span class="fw-semibold">Google</span>
+                        @if($usuario->google_id)
+                            <div class="text-muted" style="font-size:.75rem">{{ $usuario->email }}</div>
+                        @endif
+                    </div>
+                    @if($usuario->google_id)
+                        @if($usuario->password)
+                            <form method="POST" action="{{ route('perfil.google.desvincular') }}">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2"
+                                        onclick="return confirm('¿Desvincular tu cuenta de Google?')">
+                                    Desvincular
+                                </button>
+                            </form>
+                        @else
+                            <span class="badge bg-success">Vinculado</span>
+                        @endif
+                    @else
+                        <a href="{{ route('perfil.google.vincular') }}" class="btn btn-sm btn-outline-secondary py-0 px-2">
+                            Vincular
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- ══ Columna derecha: datos personales + info laboral ══════════════════ --}}

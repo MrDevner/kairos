@@ -91,14 +91,14 @@
                                     <a href="{{ route('ddjj.edit', $ddjj) }}" class="btn btn-sm btn-outline-secondary py-0 px-1" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
+                                    <form method="POST" action="{{ route('ddjj.destroy', $ddjj) }}" class="d-inline"
+                                          onsubmit="return confirm('¿Eliminar esta declaración jurada?')">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 @endif
-                                <form method="POST" action="{{ route('ddjj.destroy', $ddjj) }}" class="d-inline"
-                                      onsubmit="return confirm('¿Eliminar esta declaración jurada?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
                             </td>
                         </tr>
                     @empty

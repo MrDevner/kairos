@@ -16,11 +16,22 @@ class BancoHorasController extends Controller
 
     public function index(Request $request): View
     {
-        $query = BancoHoras::with(['usuario', 'designacion.cargo'])
+        $instId = (int) session('institucion_activa_id', 0);
+
+        $query = BancoHoras::with(['usuario', 'designacion.cargo', 'designacion.dependencia'])
             ->orderBy('saldo_minutos');
 
-        if ($request->filled('usuario')) {
-            $query->where('id_usuario', (int) $request->usuario);
+        if ($instId) {
+            $query->whereHas('designacion', fn ($q) => $q->where('id_institucion', $instId));
+        }
+
+        if ($request->filled('buscar')) {
+            $b = $request->buscar;
+            $query->whereHas('usuario', fn ($q) =>
+                $q->where('nombres', 'like', "%{$b}%")
+                  ->orWhere('apellidos', 'like', "%{$b}%")
+                  ->orWhere('documento', 'like', "%{$b}%")
+            );
         }
 
         $bancos = $query->paginate(25)->withQueryString();

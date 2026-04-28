@@ -19,9 +19,34 @@ class GoogleController extends Controller
     }
 
     /**
+     * Inicia el flujo OAuth para vincular Google a la cuenta ya autenticada.
+     */
+    public function vincular(): RedirectResponse
+    {
+        session(['vincular_para_usuario' => auth()->id()]);
+        return Socialite::driver('google')->redirect();
+    }
+
+    /**
+     * Desvincula Google de la cuenta del usuario autenticado.
+     */
+    public function desvincular(): RedirectResponse
+    {
+        $usuario = auth()->user();
+
+        if (! $usuario->password) {
+            return back()->with('error', 'No podés desvincular Google sin tener una contraseña configurada.');
+        }
+
+        $usuario->update(['google_id' => null]);
+        return back()->with('success', 'Cuenta de Google desvinculada correctamente.');
+    }
+
+    /**
      * Maneja el callback de Google OAuth.
      *
      * Orden de resolución:
+     *  0. Si hay sesión "vincular_para_usuario" → solo vincular a la cuenta actual.
      *  1. google_id ya vinculado → login directo.
      *  2. Email coincide con cuenta existente → vincular y hacer login.
      *  3. Usuario nuevo → crear con datos de Google y hacer login.
@@ -33,6 +58,16 @@ class GoogleController extends Controller
         } catch (\Throwable $e) {
             return redirect()->route('login')
                 ->withErrors(['email' => 'No se pudo autenticar con Google. Intentá de nuevo.']);
+        }
+
+        // 0. Modo vinculación desde perfil
+        $vincularParaId = session()->pull('vincular_para_usuario');
+        if ($vincularParaId && auth()->check() && auth()->id() === $vincularParaId) {
+            if (Usuario::where('google_id', $gUser->getId())->where('id', '!=', $vincularParaId)->exists()) {
+                return redirect()->route('perfil')->with('error', 'Esa cuenta de Google ya está vinculada a otro usuario.');
+            }
+            auth()->user()->update(['google_id' => $gUser->getId()]);
+            return redirect()->route('perfil')->with('success', 'Cuenta de Google vinculada correctamente.');
         }
 
         // 1. Buscar por google_id existente

@@ -60,7 +60,12 @@
                                     {{ $banco->usuario->nombre_completo ?? '—' }}
                                 </a>
                             </td>
-                            <td class="small">{{ $banco->designacion->cargo->nombre ?? '—' }}</td>
+                            <td class="small">
+                                {{ $banco->designacion->cargo->nombre ?? '—' }}
+                                @if($banco->designacion->dependencia)
+                                    <div class="text-muted" style="font-size:.72rem">{{ $banco->designacion->dependencia->nombre }}</div>
+                                @endif
+                            </td>
                             <td class="text-center fw-bold">
                                 @php $saldo = $banco->saldo_minutos ?? 0; @endphp
                                 <span class="{{ $saldo >= 0 ? 'text-success' : 'text-danger' }}">

@@ -14,14 +14,14 @@
     </a>
     <ul class="dropdown-menu">
         <li><a class="dropdown-item {{ request()->routeIs('perfil') ? 'active' : '' }}" href="{{ route('perfil') }}"><i class="bi bi-person-fill"></i> Perfil</a></li>
-        <li><a class="dropdown-item" href="#"><i class="bi bi-key-fill"></i> Métodos de login</a></li>
+        <li><a class="dropdown-item" href="{{ route('perfil') }}#metodos-login"><i class="bi bi-key-fill"></i> Métodos de login</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('informes.*') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Informes personales</a></li>
     </ul>
 </li>
 
 {{-- Personal --}}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('avisos.*','designaciones.*','ddjj.*','licencias.*','usuarios.*') ? 'active' : '' }}"
+    <a class="nav-link dropdown-toggle {{ request()->routeIs('avisos.*','designaciones.*','ddjj.*','licencias.*','usuarios.*','marcas.*') ? 'active' : '' }}"
        href="#" data-bs-toggle="dropdown">
         <i class="bi bi-people-fill"></i> Personal
     </a>
@@ -30,20 +30,21 @@
         <li><a class="dropdown-item {{ request()->routeIs('designaciones.*') ? 'active' : '' }}" href="{{ route('designaciones.index') }}"><i class="bi bi-briefcase-fill"></i> Designaciones</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('ddjj.*') ? 'active' : '' }}" href="{{ route('ddjj.index') }}"><i class="bi bi-file-text-fill"></i> DDJJ</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('licencias.*') ? 'active' : '' }}" href="{{ route('licencias.index') }}"><i class="bi bi-calendar-check-fill"></i> Licencias & Permisos</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('marcas.*') ? 'active' : '' }}" href="{{ route('marcas.index') }}"><i class="bi bi-fingerprint"></i> Marcas del personal</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('usuarios.*') ? 'active' : '' }}" href="{{ route('usuarios.index') }}"><i class="bi bi-person-badge-fill"></i> Usuarios</a></li>
     </ul>
 </li>
 
 {{-- Informes --}}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('marcas.*') ? 'active' : '' }}"
+    <a class="nav-link dropdown-toggle {{ request()->routeIs('informes.*') ? 'active' : '' }}"
        href="#" data-bs-toggle="dropdown">
         <i class="bi bi-bar-chart-fill"></i> Informes
     </a>
     <ul class="dropdown-menu">
-        <li><a class="dropdown-item {{ request()->routeIs('marcas.*') ? 'active' : '' }}" href="{{ route('marcas.index') }}"><i class="bi bi-clock-history"></i> Mensual de marcas</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('informes.*') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-person-lines-fill"></i> General del usuario</a></li>
-        <li><a class="dropdown-item" href="#"><i class="bi bi-diagram-3-fill"></i> Resumen por dependencia</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('informes.marcas') ? 'active' : '' }}" href="{{ route('informes.marcas') }}"><i class="bi bi-clock-history"></i> Mensual de marcas</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('informes.index') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-person-lines-fill"></i> General del usuario</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('informes.resumen-dependencia') ? 'active' : '' }}" href="{{ route('informes.resumen-dependencia') }}"><i class="bi bi-diagram-3-fill"></i> Resumen por dependencia</a></li>
     </ul>
 </li>
 
@@ -87,6 +88,12 @@
             </a>
         </li>
         <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item {{ request()->routeIs('usuarios.*') && request()->boolean('todos') ? 'active' : '' }}"
+               href="{{ route('usuarios.index', ['todos' => 1]) }}">
+                <i class="bi bi-people-fill"></i> Todos los usuarios
+            </a>
+        </li>
         <li><a class="dropdown-item {{ request()->routeIs('instituciones.*') ? 'active' : '' }}" href="{{ route('instituciones.index') }}"><i class="bi bi-building-fill-gear"></i> Instituciones</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="{{ route('cargos.index') }}"><i class="bi bi-briefcase-fill"></i> Cargos</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><i class="bi bi-shield-fill-check"></i> Roles & permisos</a></li>

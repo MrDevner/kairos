@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\EstablecerInstitucionPorDefecto;
 use App\Services\BancoHorasService;
 use App\Services\CalendarioService;
 use App\Services\DDJJService;
@@ -9,6 +10,8 @@ use App\Services\InformeService;
 use App\Services\LicenciaService;
 use App\Services\MarcaService;
 use App\Models\RolInstitucionUsuario;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,5 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::bind('asignacion', fn ($value) => RolInstitucionUsuario::findOrFail($value));
+
+        Event::listen(Login::class, EstablecerInstitucionPorDefecto::class);
     }
 }

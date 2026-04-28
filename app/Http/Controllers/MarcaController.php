@@ -17,60 +17,95 @@ class MarcaController extends Controller
 {
     public function __construct(private readonly MarcaService $service) {}
 
+    // ── CRUD marcas_originales ─────────────────────────────────────────────
+
     public function index(Request $request): View
     {
-        $fecha     = $request->input('fecha', now()->toDateString());
-        $instId    = (int) session('institucion_activa_id', 0);
+        $desde = $request->input('desde', today()->toDateString());
+        $hasta = $request->input('hasta', today()->toDateString());
 
-        $query = MarcaComputada::enFecha($fecha)
-            ->with(['usuario', 'designacion.cargo'])
-            ->orderBy('id_usuario');
+        $query = MarcaOriginal::enRango($desde, $hasta)
+            ->with(['usuario', 'dispositivo'])
+            ->orderByDesc('fecha_hora');
 
-        if ($instId) {
-            $query->whereHas('designacion', fn ($q) => $q->porInstitucion($instId));
+        if ($request->filled('id_usuario')) {
+            $query->deUsuario((int) $request->id_usuario);
+        }
+        if ($request->filled('tipo_captura')) {
+            $query->where('tipo_captura', $request->tipo_captura);
+        }
+        if ($request->filled('procesada') && $request->procesada !== '') {
+            $query->where('procesada', (bool) $request->procesada);
         }
 
-        if ($request->filled('usuario')) {
-            $query->deUsuario((int) $request->usuario);
-        }
-        if ($request->filled('tipo')) {
-            $query->tipo($request->tipo);
-        }
+        $marcas   = $query->paginate(50)->withQueryString();
+        $usuarios = Usuario::orderBy('apellidos')->orderBy('nombres')
+            ->get(['id', 'nombres', 'apellidos', 'documento']);
 
-        $marcas = $query->paginate(30)->withQueryString();
-        return view('marcas.index', compact('marcas', 'fecha'));
+        return view('marcas.index', compact('marcas', 'desde', 'hasta', 'usuarios'));
     }
 
-    public function show(Usuario $usuario, string $fecha): View
+    public function create(): View
     {
-        $fechaCarbon = Carbon::parse($fecha);
-        $marcas = MarcaComputada::deUsuario($usuario->id)
-            ->enFecha($fechaCarbon)
-            ->with('designacion.cargo', 'marcaEntrada.dispositivo', 'marcaSalida.dispositivo')
-            ->get();
-
-        $originales = MarcaOriginal::deUsuario($usuario->id)
-            ->enFecha($fechaCarbon)
-            ->with('dispositivo')
-            ->orderBy('fecha_hora')
-            ->get();
-
-        return view('marcas.show', compact('usuario', 'fecha', 'marcas', 'originales'));
+        $dispositivos = Dispositivo::activos()->orderBy('nombre')->get();
+        $usuarios     = Usuario::orderBy('apellidos')->orderBy('nombres')
+            ->get(['id', 'nombres', 'apellidos', 'documento']);
+        return view('marcas.create', compact('dispositivos', 'usuarios'));
     }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $this->validar($request);
+        $data['tipo_captura'] = 'importada';
+        $data['procesada']    = false;
+        MarcaOriginal::create($data);
+        return redirect()->route('marcas.index')->with('success', 'Marca registrada correctamente.');
+    }
+
+    public function show(MarcaOriginal $marca): View
+    {
+        $marca->load('usuario', 'dispositivo');
+        $computadas = MarcaComputada::deUsuario($marca->id_usuario)
+            ->enFecha($marca->fecha_hora->toDateString())
+            ->with('designacion.cargo')
+            ->get();
+        return view('marcas.show', compact('marca', 'computadas'));
+    }
+
+    public function edit(MarcaOriginal $marca): View
+    {
+        $dispositivos = Dispositivo::activos()->orderBy('nombre')->get();
+        $usuarios     = Usuario::orderBy('apellidos')->orderBy('nombres')
+            ->get(['id', 'nombres', 'apellidos', 'documento']);
+        return view('marcas.edit', compact('marca', 'dispositivos', 'usuarios'));
+    }
+
+    public function update(Request $request, MarcaOriginal $marca): RedirectResponse
+    {
+        $data = $this->validar($request);
+        $data['procesada'] = false;
+        $marca->update($data);
+        return redirect()->route('marcas.index')->with('success', 'Marca actualizada y marcada para reprocesar.');
+    }
+
+    public function destroy(MarcaOriginal $marca): RedirectResponse
+    {
+        $marca->delete();
+        return back()->with('success', 'Marca eliminada.');
+    }
+
+    // ── Importación ────────────────────────────────────────────────────────
 
     public function importar(): View
     {
-        $dispositivos = Dispositivo::activos()
-            ->where('modo_conexion', 'importacion')
-            ->with('institucion')
-            ->get();
+        $dispositivos = Dispositivo::activos()->with('institucion')->orderBy('nombre')->get();
         return view('marcas.importar', compact('dispositivos'));
     }
 
     public function procesarImportacion(Request $request): RedirectResponse
     {
         $request->validate([
-            'archivo'        => ['required', 'file', 'mimes:txt,csv', 'max:10240'],
+            'archivo'        => ['required', 'file', 'mimes:txt,csv,dat', 'max:10240'],
             'id_dispositivo' => ['required', 'integer', 'exists:dispositivos,id'],
         ]);
 
@@ -83,14 +118,16 @@ class MarcaController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        $msg = "Importación completada: {$resultado['importadas']} marcas procesadas.";
+        $msg = "Importación completada: {$resultado['importadas']} marcas importadas.";
         if (!empty($resultado['errores'])) {
-            $msg .= ' Errores: ' . count($resultado['errores']);
+            $msg .= ' Líneas con error: ' . count($resultado['errores']);
             return back()->with('warning', $msg)->with('errores_importacion', $resultado['errores']);
         }
 
         return redirect()->route('marcas.index')->with('success', $msg);
     }
+
+    // ── Procesamiento ──────────────────────────────────────────────────────
 
     public function procesar(Request $request): RedirectResponse
     {
@@ -105,7 +142,46 @@ class MarcaController extends Controller
 
         $this->service->procesarMarcasOriginales($request->fecha, $institucion);
 
-        return redirect()->route('marcas.index', ['fecha' => $request->fecha])
+        return redirect()->route('marcas.index', ['desde' => $request->fecha, 'hasta' => $request->fecha])
             ->with('success', 'Marcas procesadas correctamente.');
+    }
+
+    // ── Vista computadas (desde Informes) ──────────────────────────────────
+
+    public function computadas(Request $request): View
+    {
+        $fecha  = $request->input('fecha', today()->toDateString());
+        $instId = (int) session('institucion_activa_id', 0);
+
+        $query = MarcaComputada::enFecha($fecha)
+            ->with(['usuario', 'designacion.cargo'])
+            ->orderBy('id_usuario');
+
+        if ($instId) {
+            $query->whereHas('designacion', fn ($q) => $q->porInstitucion($instId));
+        }
+        if ($request->filled('id_usuario')) {
+            $query->deUsuario((int) $request->id_usuario);
+        }
+        if ($request->filled('tipo')) {
+            $query->tipo($request->tipo);
+        }
+
+        $marcas   = $query->paginate(30)->withQueryString();
+        $usuarios = Usuario::orderBy('apellidos')->orderBy('nombres')
+            ->get(['id', 'nombres', 'apellidos']);
+
+        return view('marcas.computadas', compact('marcas', 'fecha', 'usuarios'));
+    }
+
+    // ── Validación común ──────────────────────────────────────────────────
+
+    private function validar(Request $request): array
+    {
+        return $request->validate([
+            'id_usuario'     => ['required', 'integer', 'exists:usuarios,id'],
+            'id_dispositivo' => ['required', 'integer', 'exists:dispositivos,id'],
+            'fecha_hora'     => ['required', 'date'],
+        ]);
     }
 }

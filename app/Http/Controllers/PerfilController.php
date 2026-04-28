@@ -70,6 +70,9 @@ class PerfilController extends Controller
         if ($request->filled('password')) {
             $rules['password'] = ['string', 'min:8', 'confirmed'];
         }
+        if ($request->filled('pin_marca')) {
+            $rules['pin_marca'] = ['digits:4', 'confirmed'];
+        }
 
         $data = $request->validate($rules);
 
@@ -91,6 +94,13 @@ class PerfilController extends Controller
         // Cambio de contraseña (disponible para todos)
         if ($request->filled('password')) {
             $data['password'] = $request->password;
+        }
+
+        // PIN de marca (disponible para todos — el cast 'hashed' lo hashea automáticamente)
+        if ($request->filled('pin_marca')) {
+            $data['pin_marca'] = $request->pin_marca;
+        } else {
+            unset($data['pin_marca']);
         }
 
         $usuario->update($data);

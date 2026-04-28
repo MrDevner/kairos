@@ -78,8 +78,26 @@
                 <i class="bi bi-sliders me-1"></i> Configuración
             </div>
             <div class="card-body">
-                @if(!empty($dispositivo->configuracion))
-                    <pre class="mb-0 small">{{ json_encode($dispositivo->configuracion, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+                @php $cfg = $dispositivo->configuracion ?? []; @endphp
+                @if(!empty($cfg))
+                    <dl class="row mb-0 small">
+                        @if(array_key_exists('solicitar_contrasena', $cfg))
+                            <dt class="col-7 text-muted">Solicitar contraseña al marcar</dt>
+                            <dd class="col-5">
+                                @if($dispositivo->requiereContrasena())
+                                    <span class="badge bg-success">Sí</span>
+                                @else
+                                    <span class="badge bg-secondary">No</span>
+                                @endif
+                            </dd>
+                        @endif
+                        @foreach($cfg as $k => $v)
+                            @if($k !== 'solicitar_contrasena')
+                                <dt class="col-7 text-muted font-monospace">{{ $k }}</dt>
+                                <dd class="col-5">{{ is_bool($v) ? ($v ? 'true' : 'false') : $v }}</dd>
+                            @endif
+                        @endforeach
+                    </dl>
                 @else
                     <p class="text-muted small mb-0 text-center py-3">
                         <i class="bi bi-sliders d-block mb-1 fs-5"></i>
@@ -90,4 +108,88 @@
         </div>
     </div>
 </div>
+
+{{-- ── Terminales web registrados ──────────────────────────────────────── --}}
+@if($dispositivo->esWeb() || $computadores->isNotEmpty())
+<div class="mt-4" style="max-width:820px">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             style="background:var(--azul);color:#fff">
+            <span><i class="bi bi-pc-display me-1"></i> Terminales web registrados</span>
+            <span class="badge bg-light text-dark">{{ $computadores->count() }}</span>
+        </div>
+
+        @if($computadores->isEmpty())
+            <div class="card-body text-center text-muted py-4 small">
+                <i class="bi bi-pc-display d-block mb-2 fs-4"></i>
+                Ningún equipo ha solicitado acceso todavía.<br>
+                Cuando un navegador acceda a <code>/terminal</code> y complete el formulario, aparecerá aquí.
+            </div>
+        @else
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Fingerprint</th>
+                            <th>Estado</th>
+                            <th>Registrado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($computadores as $comp)
+                        <tr>
+                            <td class="fw-semibold">
+                                <i class="bi bi-pc-display me-1 text-muted"></i>
+                                {{ $comp->nombre_equipo }}
+                            </td>
+                            <td class="font-monospace text-muted" style="font-size:.75rem">
+                                {{ Str::limit($comp->fingerprint, 24) }}
+                            </td>
+                            <td>
+                                @if($comp->autorizado)
+                                    <span class="badge bg-success">Autorizado</span>
+                                @else
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                @endif
+                            </td>
+                            <td class="text-muted">
+                                {{ $comp->created_at->format('d/m/Y H:i') }}
+                            </td>
+                            <td class="text-end">
+                                {{-- Autorizar / Revocar --}}
+                                <form method="POST"
+                                      action="{{ route('dispositivos.computadores.autorizar', [$dispositivo, $comp]) }}"
+                                      class="d-inline">
+                                    @csrf
+                                    <button type="submit"
+                                            class="btn btn-sm {{ $comp->autorizado ? 'btn-outline-warning' : 'btn-outline-success' }}"
+                                            title="{{ $comp->autorizado ? 'Revocar acceso' : 'Autorizar terminal' }}">
+                                        <i class="bi {{ $comp->autorizado ? 'bi-slash-circle' : 'bi-check-circle' }}"></i>
+                                        {{ $comp->autorizado ? 'Revocar' : 'Autorizar' }}
+                                    </button>
+                                </form>
+
+                                {{-- Eliminar --}}
+                                <form method="POST"
+                                      action="{{ route('dispositivos.computadores.eliminar', [$dispositivo, $comp]) }}"
+                                      class="d-inline"
+                                      onsubmit="return confirm('¿Eliminar el terminal «{{ $comp->nombre_equipo }}»? Tendrá que volver a solicitar acceso.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+</div>
+@endif
 @endsection

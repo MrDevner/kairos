@@ -11,33 +11,15 @@ class DependenciaSeeder extends Seeder
     public function run(): void
     {
         $mapa = [
-            'FING' => [
-                ['nombre' => 'Departamento de Informática',       'sigla' => 'DINF'],
-                ['nombre' => 'Departamento de Electrónica',        'sigla' => 'DELE'],
-                ['nombre' => 'Departamento de Civil',              'sigla' => 'DCIV'],
-                ['nombre' => 'Secretaría Académica',               'sigla' => 'SACAD'],
-                ['nombre' => 'Secretaría de Posgrado',             'sigla' => 'SPOSGRAD'],
-            ],
-            'ECO'  => [
-                ['nombre' => 'Departamento de Ciencias Económicas','sigla' => 'DCE'],
-                ['nombre' => 'Departamento de Administración',     'sigla' => 'DADM'],
-                ['nombre' => 'Secretaría Administrativa',          'sigla' => 'SADM'],
-            ],
-            'EIND' => [
-                ['nombre' => 'Departamento de Minería',            'sigla' => 'DMIN'],
-                ['nombre' => 'Departamento de Geología',           'sigla' => 'DGEO'],
-                ['nombre' => 'Secretaría Técnica',                 'sigla' => 'STEC'],
-            ],
-            'Rectorado' => [
-                ['nombre' => 'Dirección de Recursos Humanos',      'sigla' => 'DRRH'],
-                ['nombre' => 'Dirección de Tecnología',            'sigla' => 'DTI'],
-                ['nombre' => 'Dirección de Bienestar Estudiantil', 'sigla' => 'DBE'],
-                ['nombre' => 'Secretaría General',                 'sigla' => 'SECGEN'],
+            'POLI' => [
+                ['nombre' => 'Administración',      'sigla' => 'ADM'],
+                ['nombre' => 'Deportes',             'sigla' => 'DEP'],
+                ['nombre' => 'Mantenimiento',        'sigla' => 'MANT'],
             ],
         ];
 
         foreach ($mapa as $sigla => $deps) {
-            $inst = Institucion::where('sigla', $sigla)->orWhere('nombre', 'like', "%{$sigla}%")->first();
+            $inst = Institucion::where('sigla', $sigla)->first();
             if (!$inst) continue;
 
             foreach ($deps as $d) {

@@ -32,20 +32,23 @@ class Usuario extends Authenticatable
         'sexo',
         'foto',
         'password',
+        'pin_marca',
         'google_id',
         'activo',
     ];
 
     protected $hidden = [
         'password',
+        'pin_marca',
         'token_recuerdo',
     ];
 
     protected function casts(): array
     {
         return [
-            'activo'   => 'boolean',
-            'password' => 'hashed',
+            'activo'    => 'boolean',
+            'password'  => 'hashed',
+            'pin_marca' => 'hashed',
         ];
     }
 
@@ -152,6 +155,11 @@ class Usuario extends Authenticatable
     public function tienePassword(): bool
     {
         return ! is_null($this->getAttributes()['password'] ?? null);
+    }
+
+    public function tienePinMarca(): bool
+    {
+        return ! is_null($this->getAttributes()['pin_marca'] ?? null);
     }
 
     public function tieneGoogle(): bool

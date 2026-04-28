@@ -147,8 +147,11 @@ class DDJJController extends Controller
 
     public function rechazar(Request $request, DeclaracionJurada $ddjj): RedirectResponse
     {
-        $ddjj->update(['estado' => 'rechazada',
-            'observaciones' => ($ddjj->observaciones ?? '') . "\nRechazada: " . $request->input('motivo')]);
+        $request->validate(['observaciones_rechazo' => ['required', 'string', 'max:1000']]);
+        $ddjj->update([
+            'estado'        => 'rechazada',
+            'observaciones' => trim(($ddjj->observaciones ?? '') . "\nRechazada: " . $request->observaciones_rechazo),
+        ]);
         return back()->with('success', 'DDJJ rechazada.');
     }
 }

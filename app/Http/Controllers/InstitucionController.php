@@ -99,7 +99,10 @@ class InstitucionController extends Controller
     public function update(Request $request, Institucion $institucion): RedirectResponse
     {
         $data = $this->validar($request);
-        $data['configuracion'] = $this->extraerConfig($request);
+        $config = $this->extraerConfig($request);
+        // Preservar roles_autorizan_licencias porque se gestiona desde show(), no desde el form de edición
+        $config['roles_autorizan_licencias'] = $institucion->configuracion['roles_autorizan_licencias'] ?? [];
+        $data['configuracion'] = $config;
 
         if ($request->hasFile('logo')) {
             if ($institucion->logo) {

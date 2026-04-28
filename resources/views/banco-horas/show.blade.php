@@ -120,18 +120,20 @@
             <h6 class="fw-semibold small mb-2" style="color:var(--azul)">
                 <i class="bi bi-pencil-square me-1"></i> Ajuste manual
             </h6>
-            <form method="POST" action="{{ route('banco-horas.ajuste', ['usuario' => $usuario, 'banco' => $banco]) }}"
+            <form method="POST" action="{{ route('banco-horas.ajuste') }}"
                   class="row g-2 align-items-end">
                 @csrf
+                <input type="hidden" name="id_usuario" value="{{ $usuario->id }}">
+                <input type="hidden" name="id_designacion" value="{{ $banco->id_designacion }}">
                 <div class="col-sm-3">
                     <label class="form-label form-label-sm small mb-0">Minutos <span class="text-danger">*</span></label>
-                    <input type="number" name="minutos" class="form-control form-control-sm @error('minutos_'.$banco->id) is-invalid @enderror"
+                    <input type="number" name="minutos" class="form-control form-control-sm"
                            placeholder="Ej: 60 o -30" required>
                     <div class="form-text" style="font-size:.7rem">Positivo suma, negativo resta.</div>
                 </div>
                 <div class="col-sm-5">
                     <label class="form-label form-label-sm small mb-0">Motivo <span class="text-danger">*</span></label>
-                    <input type="text" name="motivo" class="form-control form-control-sm @error('motivo_'.$banco->id) is-invalid @enderror"
+                    <input type="text" name="motivo" class="form-control form-control-sm"
                            placeholder="Motivo del ajuste…" required maxlength="200">
                 </div>
                 <div class="col-sm-auto">

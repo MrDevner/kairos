@@ -48,10 +48,12 @@ class UsuarioController extends Controller
 
     public function index(Request $request): View
     {
-        $instId = (int) session('institucion_activa_id', 0);
-        $query  = Usuario::orderBy('apellidos');
+        $instId   = (int) session('institucion_activa_id', 0);
+        $esAdmin  = auth()->user()->hasRole('Administrador General');
+        $verTodos = $esAdmin && $request->boolean('todos');
+        $query    = Usuario::orderBy('apellidos');
 
-        if ($instId) {
+        if ($instId && ! $verTodos) {
             $query->whereHas('designaciones', fn ($q) =>
                 $q->vigente()->where('id_institucion', $instId)
             );
@@ -71,7 +73,7 @@ class UsuarioController extends Controller
         }
 
         $usuarios = $query->paginate(25)->withQueryString();
-        return view('usuarios.index', compact('usuarios'));
+        return view('usuarios.index', compact('usuarios', 'verTodos'));
     }
 
     public function create(): View

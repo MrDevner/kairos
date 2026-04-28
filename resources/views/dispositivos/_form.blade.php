@@ -76,4 +76,28 @@
                placeholder="192.168.1.100">
         @error('ip_address')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
+
+    <div class="col-12">
+        <label class="form-label fw-semibold small">Configuración del terminal web</label>
+        @php
+            $cfgOld = old('configuracion');
+            $checkedSolicitarPass = $cfgOld !== null
+                ? ($cfgOld['solicitar_contrasena'] ?? '0') === '1'
+                : (bool)(($m?->configuracion ?? [])['solicitar_contrasena'] ?? true);
+        @endphp
+        <div class="card border-0 bg-light rounded-2 p-3">
+            <div class="form-check">
+                <input type="hidden" name="configuracion[solicitar_contrasena]" value="0">
+                <input type="checkbox" name="configuracion[solicitar_contrasena]" value="1"
+                       class="form-check-input" id="cfg_solicitar_contrasena"
+                       @checked($checkedSolicitarPass)>
+                <label class="form-check-label small" for="cfg_solicitar_contrasena">
+                    Solicitar contraseña al marcar
+                </label>
+                <div class="form-text text-muted">
+                    Si está activo, el reloj web pedirá la contraseña del usuario antes de registrar la marca. Activado por defecto.
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

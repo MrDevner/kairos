@@ -9,17 +9,33 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold mb-0" style="color:var(--azul)">
-        <i class="bi bi-people-fill me-1"></i> Usuarios
+        <i class="bi bi-people-fill me-1"></i>
+        @if($verTodos ?? false)
+            Todos los usuarios del sistema
+        @else
+            Usuarios
+        @endif
     </h5>
     <a href="{{ route('usuarios.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
         <i class="bi bi-plus-lg me-1"></i> Nuevo usuario
     </a>
 </div>
 
+@if($verTodos ?? false)
+    <div class="alert alert-info py-2 small mb-3">
+        <i class="bi bi-info-circle me-1"></i>
+        Mostrando <strong>todos</strong> los usuarios del sistema, sin filtrar por institución.
+        <a href="{{ route('usuarios.index') }}" class="ms-2">Ver sólo mi institución</a>
+    </div>
+@endif
+
 {{-- Filtros --}}
 <div class="card mb-3">
     <div class="card-body py-2">
         <form method="GET" action="{{ route('usuarios.index') }}" class="row g-2 align-items-end">
+            @if($verTodos ?? false)
+                <input type="hidden" name="todos" value="1">
+            @endif
             <div class="col-sm-5">
                 <input type="text" name="buscar" value="{{ request('buscar') }}"
                        class="form-control form-control-sm" placeholder="Buscar por nombre, apellido o documento…">
@@ -35,7 +51,8 @@
                 <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
-                <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
+                <a href="{{ route('usuarios.index', ($verTodos ?? false) ? ['todos' => 1] : []) }}"
+                   class="btn btn-sm btn-outline-secondary ms-1">
                     <i class="bi bi-x"></i> Limpiar
                 </a>
             </div>

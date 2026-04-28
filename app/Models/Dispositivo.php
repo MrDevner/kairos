@@ -42,6 +42,11 @@ class Dispositivo extends BaseModel
         return $this->hasMany(MarcaOriginal::class, 'id_dispositivo');
     }
 
+    public function computadoresAutorizados(): HasMany
+    {
+        return $this->hasMany(ComputadorAutorizado::class, 'id_dispositivo');
+    }
+
     // ── Scopes ─────────────────────────────────────────────────────────────
 
     public function scopeActivos(Builder $query): Builder
@@ -64,4 +69,10 @@ class Dispositivo extends BaseModel
     public function esWeb(): bool        { return $this->tipo === 'web'; }
     public function esBiometrico(): bool { return $this->tipo === 'biometrico'; }
     public function requiereImportacion(): bool { return $this->modo_conexion === 'importacion'; }
+
+    /** Solicitar contraseña al marcar (activado por defecto). */
+    public function requiereContrasena(): bool
+    {
+        return (bool) (($this->configuracion ?? [])['solicitar_contrasena'] ?? true);
+    }
 }

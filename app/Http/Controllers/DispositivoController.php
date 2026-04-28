@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ComputadorAutorizado;
 use App\Models\Dispositivo;
 use App\Models\Institucion;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +59,32 @@ class DispositivoController extends Controller
     public function show(Dispositivo $dispositivo): View
     {
         $dispositivo->load('institucion');
-        return view('dispositivos.show', compact('dispositivo'));
+        $computadores = $dispositivo->computadoresAutorizados()
+            ->orderByDesc('autorizado')
+            ->orderBy('nombre_equipo')
+            ->get();
+
+        return view('dispositivos.show', compact('dispositivo', 'computadores'));
+    }
+
+    public function autorizarComputador(Dispositivo $dispositivo, ComputadorAutorizado $computador): RedirectResponse
+    {
+        abort_unless($computador->id_dispositivo === $dispositivo->id, 404);
+
+        $computador->update(['autorizado' => !$computador->autorizado]);
+
+        $accion = $computador->autorizado ? 'autorizado' : 'revocado';
+        return back()->with('success', "Terminal \"{$computador->nombre_equipo}\" {$accion}.");
+    }
+
+    public function eliminarComputador(Dispositivo $dispositivo, ComputadorAutorizado $computador): RedirectResponse
+    {
+        abort_unless($computador->id_dispositivo === $dispositivo->id, 404);
+
+        $nombre = $computador->nombre_equipo;
+        $computador->delete();
+
+        return back()->with('success', "Terminal \"{$nombre}\" eliminado.");
     }
 
     public function edit(Dispositivo $dispositivo): View

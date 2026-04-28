@@ -599,7 +599,6 @@
 
             <form method="POST" action="{{ route('login') }}" id="formLogin" novalidate>
                 @csrf
-
                 {{-- Campo documento --}}
                 <div class="campo-icono">
                     <i class="bi bi-person-vcard icono-prefijo"></i>

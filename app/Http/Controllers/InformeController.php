@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aviso;
+use App\Models\Dependencia;
+use App\Models\Designacion;
 use App\Models\InformeDiario;
 use App\Models\Institucion;
+use App\Models\Licencia;
 use App\Services\InformeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -66,6 +70,65 @@ class InformeController extends Controller
         ];
 
         return view('informes.show', compact('informe', 'resumen'));
+    }
+
+    public function resumenDependencia(Request $request): View
+    {
+        $instId = $request->filled('institucion')
+            ? (int) $request->institucion
+            : (int) session('institucion_activa_id', 0);
+
+        $mes  = max(1, min(12, (int) $request->input('mes', now()->month)));
+        $anio = max(2020, (int) $request->input('anio', now()->year));
+
+        $fechaDesde = Carbon::create($anio, $mes, 1)->startOfMonth();
+        $fechaHasta = $fechaDesde->copy()->endOfMonth();
+
+        $instituciones = Institucion::activas()->orderBy('nombre')->get();
+        $filas         = collect();
+
+        if ($instId) {
+            $dependencias = Dependencia::deInstitucion($instId)
+                ->dependenciasActivas()
+                ->orderBy('nombre')
+                ->get();
+
+            foreach ($dependencias as $dep) {
+                $empleados = Designacion::where('id_dependencia', $dep->id)
+                    ->where('activa', true)
+                    ->where('fecha_inicio', '<=', $fechaHasta)
+                    ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $fechaDesde))
+                    ->count();
+
+                $ausencias = Aviso::whereHas('designacion', fn ($q) => $q->where('id_dependencia', $dep->id))
+                    ->where('tipo', 'ausencia')
+                    ->whereBetween('fecha_evento', [$fechaDesde->toDateString(), $fechaHasta->toDateString()])
+                    ->count();
+
+                $tardanzas = Aviso::whereHas('designacion', fn ($q) => $q->where('id_dependencia', $dep->id))
+                    ->where('tipo', 'tardanza')
+                    ->whereBetween('fecha_evento', [$fechaDesde->toDateString(), $fechaHasta->toDateString()])
+                    ->count();
+
+                $licencias = Licencia::whereHas('designacion', fn ($q) => $q->where('id_dependencia', $dep->id))
+                    ->where('estado', 'aprobada')
+                    ->where('fecha_inicio', '<=', $fechaHasta)
+                    ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $fechaDesde))
+                    ->count();
+
+                $filas->push([
+                    'dep'       => $dep,
+                    'empleados' => $empleados,
+                    'ausencias' => $ausencias,
+                    'tardanzas' => $tardanzas,
+                    'licencias' => $licencias,
+                ]);
+            }
+        }
+
+        return view('informes.resumen-dependencia', compact(
+            'filas', 'instituciones', 'instId', 'mes', 'anio', 'fechaDesde', 'fechaHasta'
+        ));
     }
 
     public function exportarExcel(InformeDiario $informe): BinaryFileResponse

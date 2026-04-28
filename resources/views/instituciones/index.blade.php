@@ -112,7 +112,7 @@
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
+                <table class="table table-sm table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
                             <th style="width:40%">Nombre</th>

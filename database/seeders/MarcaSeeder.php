@@ -14,11 +14,11 @@ class MarcaSeeder extends Seeder
     public function run(): void
     {
         // Crear un dispositivo web de prueba si no existe
-        $unsj = Institucion::where('sigla', 'UNSJ')->first();
-        if (!$unsj) return;
+        $cph = Institucion::where('sigla', 'CPH')->first();
+        if (!$cph) return;
 
         $dispositivo = Dispositivo::firstOrCreate(
-            ['nombre' => 'Terminal Web Demo', 'id_institucion' => $unsj->id],
+            ['nombre' => 'Terminal Web Demo', 'id_institucion' => $cph->id],
             [
                 'ubicacion'      => 'Sistema de demostración',
                 'tipo'           => 'web',

@@ -13,13 +13,13 @@ class DatabaseSeeder extends Seeder
             RolesPermisosSeeder::class,
             // Roles institucionales
             RolesInstitucionSeeder::class,
-            // Instituciones (UNSJ + facultades)
+            // Instituciones (El Colegio Pérez Hernández + Polideportivo)
             InstitucionesSeeder::class,
             // Dependencias por institución
             DependenciaSeeder::class,
             // Cargos por institución
             CargoSeeder::class,
-            // Usuarios (admin + 20 personal)
+            // Usuarios (administrador general)
             UsuarioSeeder::class,
             // Designaciones (usuario + cargo + dependencia)
             DesignacionSeeder::class,
