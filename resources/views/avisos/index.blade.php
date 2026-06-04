@@ -37,12 +37,12 @@
         <form method="GET" action="{{ route('avisos.index') }}" class="row g-2 align-items-end">
             <div class="col-sm-2">
                 <label class="form-label form-label-sm mb-0">Evento desde</label>
-                <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
+                <input type="date" name="fecha_desde" value="{{ $fechaDesde }}"
                        class="form-control form-control-sm">
             </div>
             <div class="col-sm-2">
                 <label class="form-label form-label-sm mb-0">Evento hasta</label>
-                <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
+                <input type="date" name="fecha_hasta" value="{{ $fechaHasta }}"
                        class="form-control form-control-sm">
             </div>
             <div class="col-sm-2">

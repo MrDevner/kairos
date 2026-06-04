@@ -72,12 +72,15 @@ class AvisoController extends Controller
             });
         }
 
+        $fechaDesde = $request->input('fecha_desde', now()->subMonth()->toDateString());
+        $fechaHasta = $request->input('fecha_hasta', '');
+
         // Filtros de búsqueda (sobre fecha_evento, que es la fecha de la ausencia/tardanza)
-        if ($request->filled('fecha_desde')) {
-            $query->where('fecha_evento', '>=', $request->fecha_desde);
+        if ($fechaDesde) {
+            $query->where('fecha_evento', '>=', $fechaDesde);
         }
-        if ($request->filled('fecha_hasta')) {
-            $query->where('fecha_evento', '<=', $request->fecha_hasta);
+        if ($fechaHasta) {
+            $query->where('fecha_evento', '<=', $fechaHasta);
         }
         if ($request->filled('tipo')) {
             $query->tipo($request->tipo);
@@ -94,7 +97,7 @@ class AvisoController extends Controller
 
         $puedeCrear = $this->puedeCrearAvisos($auth, $instId);
 
-        return view('avisos.index', compact('avisos', 'dependencias', 'puedeCrear'));
+        return view('avisos.index', compact('avisos', 'dependencias', 'puedeCrear', 'fechaDesde', 'fechaHasta'));
     }
 
     public function create(): View
