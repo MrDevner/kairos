@@ -125,10 +125,11 @@ Route::middleware('auth')->group(function () {
 
     // Informes
     Route::get('informes',                     [InformeController::class, 'index'])->name('informes.index');
+    Route::post('informes',                    [InformeController::class, 'generar'])->name('informes.store');
     Route::get('informes/marcas',              [MarcaController::class, 'computadas'])->name('informes.marcas');
-    Route::get('informes/generar',             [InformeController::class, 'generar'])->name('informes.generar');
     Route::get('informes/resumen-dependencia', [InformeController::class, 'resumenDependencia'])->name('informes.resumen-dependencia');
     Route::get('informes/{informe}',           [InformeController::class, 'show'])->name('informes.show');
+    Route::delete('informes/{informe}',        [InformeController::class, 'destroy'])->name('informes.destroy');
     Route::get('informes/{informe}/excel',     [InformeController::class, 'exportarExcel'])->name('informes.excel');
     Route::get('informes/{informe}/pdf',       [InformeController::class, 'exportarPdf'])->name('informes.pdf');
 

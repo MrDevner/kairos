@@ -131,6 +131,15 @@ class InformeController extends Controller
         ));
     }
 
+    public function destroy(InformeDiario $informe): RedirectResponse
+    {
+        $informe->items()->delete();
+        $informe->delete();
+
+        return redirect()->route('informes.index')
+            ->with('success', 'Informe eliminado correctamente.');
+    }
+
     public function exportarExcel(InformeDiario $informe): BinaryFileResponse
     {
         $ruta = $this->service->exportarExcel($informe);
