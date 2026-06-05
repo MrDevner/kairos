@@ -81,7 +81,7 @@ class HomeController extends Controller
         $ventana7 = $hoy->copy()->addDays(7);
         $eventosProximosCount = EventoCalendario::visiblesParaInstitucion($instId)
             ->where('fecha_inicio', '<=', $ventana7)
-            ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $hoy))
+            ->where(fn ($q) => $q->where('fecha_inicio', '>=', $hoy)->orWhere('fecha_fin', '>=', $hoy))
             ->count();
 
         // Listados
@@ -95,7 +95,7 @@ class HomeController extends Controller
         $ventana30 = $hoy->copy()->addDays(30);
         $eventosProximos = EventoCalendario::visiblesParaInstitucion($instId)
             ->where('fecha_inicio', '<=', $ventana30)
-            ->where(fn ($q) => $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $hoy))
+            ->where(fn ($q) => $q->where('fecha_inicio', '>=', $hoy)->orWhere('fecha_fin', '>=', $hoy))
             ->orderBy('fecha_inicio')
             ->limit(10)
             ->get();
