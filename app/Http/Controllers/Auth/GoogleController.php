@@ -123,8 +123,6 @@ class GoogleController extends Controller
             'activo'    => true,
         ]);
 
-        $usuario->assignRole('usuario');
-
         return $usuario;
     }
 }

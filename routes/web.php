@@ -16,6 +16,7 @@ use App\Http\Controllers\DependenciaController;
 use App\Http\Controllers\DesignacionController;
 use App\Http\Controllers\DispositivoController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImpersonacionController;
 use App\Http\Controllers\InformeController;
 use App\Http\Controllers\InstitucionActivaController;
 use App\Http\Controllers\InstitucionController;
@@ -68,6 +69,10 @@ Route::middleware('auth')->group(function () {
 
     // Selección de institución activa
     Route::post('/institucion-activa', [InstitucionActivaController::class, 'cambiar'])->name('institucion-activa.cambiar');
+
+    // Personificación (solo Administrador General, vía comodín "*")
+    Route::post('usuarios/{usuario}/personificar', [ImpersonacionController::class, 'iniciar'])->name('usuarios.personificar');
+    Route::delete('personificacion', [ImpersonacionController::class, 'detener'])->name('personificacion.detener');
 
     // Instituciones
     Route::resource('instituciones', InstitucionController::class)

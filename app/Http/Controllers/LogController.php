@@ -44,7 +44,7 @@ class LogController extends Controller
     public function index(Request $request): View
     {
         $auth           = auth()->user();
-        $esAdminGeneral = $auth->hasRole('Administrador General');
+        $esAdminGeneral = $auth->permisos()->administrador()->tieneTodosLosPermisos();
         $instId         = (int) session('institucion_activa_id', 0);
         $esAdminInst    = $instId && $this->esAdminInstitucion($auth, $instId);
 
@@ -111,7 +111,7 @@ class LogController extends Controller
     public function show(Activity $activity): View
     {
         $auth           = auth()->user();
-        $esAdminGeneral = $auth->hasRole('Administrador General');
+        $esAdminGeneral = $auth->permisos()->administrador()->tieneTodosLosPermisos();
         $instId         = (int) session('institucion_activa_id', 0);
         $esAdminInst    = $instId && $this->esAdminInstitucion($auth, $instId);
 

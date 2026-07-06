@@ -13,12 +13,14 @@ return new class extends Migration
             $table->foreignId('id_rol_institucion')
                 ->constrained('roles_institucion')
                 ->cascadeOnDelete();
-            // Módulo/recurso del sistema (ej: 'usuarios', 'designaciones', 'licencias')
+            // Módulo/recurso del sistema (ej: 'usuarios', 'designaciones', 'licencias', o '*' comodín)
             $table->string('modulo');
             $table->boolean('puede_ver')->default(false);
             $table->boolean('puede_crear')->default(false);
             $table->boolean('puede_editar')->default(false);
             $table->boolean('puede_eliminar')->default(false);
+            // Hash/token de auditoría opcional.
+            $table->string('control')->nullable();
             $table->timestamps();
 
             $table->unique(['id_rol_institucion', 'modulo'], 'uq_permiso_rol_modulo');

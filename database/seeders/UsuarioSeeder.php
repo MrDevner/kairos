@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\RolInstitucion;
 use App\Models\Usuario;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,14 @@ class UsuarioSeeder extends Seeder
                 'activo'    => true,
             ]
         );
-        $admin->assignRole('Administrador General');
+
+        $rolAdminGeneral = RolInstitucion::where('nombre', 'Administrador General')->first();
+
+        if ($rolAdminGeneral) {
+            $admin->rolesInstitucion()->firstOrCreate(
+                ['id_rol_institucion' => $rolAdminGeneral->id, 'id_institucion' => null],
+                ['activo' => true, 'fecha_desde' => now()->toDateString()]
+            );
+        }
     }
 }

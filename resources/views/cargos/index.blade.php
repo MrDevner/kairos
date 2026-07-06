@@ -10,7 +10,7 @@
     <h5 class="fw-bold mb-0" style="color:var(--azul)">
         <i class="bi bi-briefcase me-1"></i> Cargos
     </h5>
-    @if(auth()->user()->hasRole('Administrador General'))
+    @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
     <div>
         <a href="{{ route('categorias-cargo.index') }}" class="btn btn-sm btn-outline-secondary me-1">
             <i class="bi bi-tags me-1"></i> Categorías
@@ -88,7 +88,7 @@
                         <th class="text-center">Hs/sem.</th>
                         <th class="text-center">Índice</th>
                         <th class="text-center">Estado</th>
-                        @if(auth()->user()->hasRole('Administrador General'))
+                        @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
                         <th class="text-center" style="width:90px">Acciones</th>
                         @endif
                     </tr>
@@ -115,7 +115,7 @@
                                     {{ $c->activo ? 'Activo' : 'Inactivo' }}
                                 </span>
                             </td>
-                            @if(auth()->user()->hasRole('Administrador General'))
+                            @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
                             <td class="text-center">
                                 <a href="{{ route('cargos.edit', $c) }}"
                                    class="btn btn-sm btn-outline-secondary py-0 px-1" title="Editar">

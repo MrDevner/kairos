@@ -13,6 +13,11 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('descripcion')->nullable();
             $table->boolean('activo')->default(true);
+
+            // Nivel jerárquico: número más bajo = mayor autoridad.
+            // Un rol solo puede gestionar roles con nivel estrictamente mayor al propio.
+            $table->unsignedSmallInteger('nivel')->default(100);
+
             $table->timestamps();
 
             $table->unique('nombre');

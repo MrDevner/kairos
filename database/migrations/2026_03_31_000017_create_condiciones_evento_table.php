@@ -15,7 +15,8 @@ return new class extends Migration
                 ->constrained('eventos_calendario')
                 ->cascadeOnDelete();
 
-            $table->enum('tipo_condicion', ['sexo', 'cargo', 'dependencia', 'custom']);
+            // String (no enum) para permitir nuevos tipos sin migraciones
+            $table->string('tipo_condicion', 50);
             $table->string('valor_condicion');
 
             $table->enum('efecto', [
@@ -23,7 +24,7 @@ return new class extends Migration
                 'ingreso_tardio',
                 'jornada_reducida',
                 'exencion',
-            ]);
+            ])->nullable();
 
             $table->integer('minutos_afectados')->nullable();
             $table->timestamps();

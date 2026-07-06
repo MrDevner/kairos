@@ -22,6 +22,7 @@ return new class extends Migration
 
             $table->string('logo')->nullable();
             $table->string('direccion')->nullable();
+            $table->foreignId('id_ciudad_domicilio')->nullable()->constrained('ciudades')->nullOnDelete();
             $table->string('telefono')->nullable();
             $table->string('email')->nullable();
 

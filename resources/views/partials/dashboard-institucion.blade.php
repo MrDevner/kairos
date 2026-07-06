@@ -1,7 +1,7 @@
 @php
     $user   = auth()->user();
     $instId = $instActiva->id;
-    $esAdmin = $user->hasRole('Administrador General');
+    $esAdmin = $user->permisos()->administrador()->tieneTodosLosPermisos();
     $tipoMap = [
         'feriado'             => ['Feriado',           'danger'],
         'dia_no_laborable'    => ['No laborable',       'secondary'],

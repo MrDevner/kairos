@@ -17,6 +17,17 @@ return new class extends Migration
             $table->integer('dias_maximos')->nullable();
             $table->boolean('requiere_documentacion')->default(false);
             $table->boolean('activo')->default(true);
+
+            $table->foreignId('id_institucion')
+                ->nullable()
+                ->constrained('instituciones')
+                ->nullOnDelete();
+
+            $table->foreignId('id_categoria_cargo')
+                ->nullable()
+                ->constrained('categorias_cargo')
+                ->nullOnDelete();
+
             $table->timestamps();
         });
     }

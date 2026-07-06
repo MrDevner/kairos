@@ -8,7 +8,6 @@ use App\Models\RolInstitucionUsuario;
 use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 
 class AsignacionRolController extends Controller
 {
@@ -28,7 +27,7 @@ class AsignacionRolController extends Controller
         $this->verificarJerarquia($nivelActor, $rol);
 
         // No-Admin General solo puede asignar en su institución activa
-        if (! $actor->hasRole('Administrador General')) {
+        if (! $this->esAdminGeneral($actor)) {
             $data['id_institucion'] = $instId;
         }
 
@@ -41,7 +40,8 @@ class AsignacionRolController extends Controller
             return back()->with('error', "El usuario ya tiene el rol «{$rol->nombre}» en esa institución.");
         }
 
-        $data['activo'] = $request->boolean('activo');
+        $data['activo']          = $request->boolean('activo');
+        $data['id_asignado_por'] = $actor->id;
 
         $usuario->rolesInstitucion()->create($data);
 
@@ -56,7 +56,7 @@ class AsignacionRolController extends Controller
         $nivelActor = $this->nivelActor($actor, $instId);
         $this->autorizarGestion($nivelActor);
 
-        if (! $actor->hasRole('Administrador General') && $asignacion->id_institucion !== $instId) {
+        if (! $this->esAdminGeneral($actor) && $asignacion->id_institucion !== $instId) {
             abort(403, 'Solo puede gestionar roles de la institución activa.');
         }
 
@@ -71,7 +71,7 @@ class AsignacionRolController extends Controller
             $this->verificarJerarquia($nivelActor, $rolActual);
         }
 
-        if (! $actor->hasRole('Administrador General')) {
+        if (! $this->esAdminGeneral($actor)) {
             $data['id_institucion'] = $asignacion->id_institucion;
         }
 
@@ -89,7 +89,7 @@ class AsignacionRolController extends Controller
         $nivelActor = $this->nivelActor($actor, $instId);
         $this->autorizarGestion($nivelActor);
 
-        if (! $actor->hasRole('Administrador General') && $asignacion->id_institucion !== $instId) {
+        if (! $this->esAdminGeneral($actor) && $asignacion->id_institucion !== $instId) {
             abort(403, 'Solo puede gestionar roles de la institución activa.');
         }
 
@@ -106,30 +106,39 @@ class AsignacionRolController extends Controller
             ->with('success', "Rol «{$rolNombre}» revocado.");
     }
 
-    // ── Roles globales (solo Administrador General) ────────────────────────
+    // ── Roles globales (solo Administrador General, vía comodín "*") ───────
 
     public function asignarGlobal(Request $request, Usuario $usuario): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('Administrador General'), 403);
+        abort_unless($this->esAdminGeneral($request->user()), 403);
 
         $data = $request->validate([
-            'rol' => ['required', 'string', 'exists:roles,name'],
+            'rol' => ['required', 'string'],
         ]);
 
-        $usuario->assignRole($data['rol']);
+        $rol = $this->rolesGlobales()->firstWhere('nombre', $data['rol']);
+        abort_unless($rol, 422, 'Rol global inválido.');
 
-        return back()->with('success', "Rol global «{$data['rol']}» asignado.");
+        $usuario->rolesInstitucion()->firstOrCreate(
+            ['id_rol_institucion' => $rol->id, 'id_institucion' => null],
+            ['activo' => true, 'fecha_desde' => now()->toDateString(), 'id_asignado_por' => $request->user()->id]
+        );
+
+        return back()->with('success', "Rol global «{$rol->nombre}» asignado.");
     }
 
     public function revocarGlobal(Request $request, Usuario $usuario): RedirectResponse
     {
-        abort_unless($request->user()->hasRole('Administrador General'), 403);
+        abort_unless($this->esAdminGeneral($request->user()), 403);
 
         $data = $request->validate([
-            'rol' => ['required', 'string', 'exists:roles,name'],
+            'rol' => ['required', 'string'],
         ]);
 
-        $usuario->removeRole($data['rol']);
+        $usuario->rolesInstitucion()
+            ->whereNull('id_institucion')
+            ->whereHas('rolInstitucion', fn ($q) => $q->where('nombre', $data['rol']))
+            ->delete();
 
         return back()->with('success', "Rol global «{$data['rol']}» revocado.");
     }
@@ -141,13 +150,26 @@ class AsignacionRolController extends Controller
         return (int) session('institucion_activa_id', 0);
     }
 
+    private function esAdminGeneral(Usuario $usuario): bool
+    {
+        return $usuario->permisos()->administrador()->tieneTodosLosPermisos();
+    }
+
+    /** Catálogo de roles asignables de forma global (los que tienen permiso comodín "*"). */
+    private function rolesGlobales()
+    {
+        return RolInstitucion::whereHas('permisos', fn ($q) => $q->where('modulo', '*'))
+            ->orderBy('nombre')
+            ->get();
+    }
+
     /**
      * Devuelve el nivel jerárquico más alto (número menor) del actor.
      * El Administrador General obtiene nivel 0 (puede todo).
      */
     private function nivelActor(Usuario $actor, int $instId): int
     {
-        if ($actor->hasRole('Administrador General')) {
+        if ($this->esAdminGeneral($actor)) {
             return 0;
         }
 

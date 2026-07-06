@@ -110,7 +110,7 @@ class LicenciaController extends Controller
         $inst          = $this->institucionDeLicencia($licencia);
         $puedeAutorizar = $inst
             ? $inst->puedeAutorizarLicencias(auth()->user())
-            : auth()->user()->hasRole('Administrador General');
+            : auth()->user()->permisos()->administrador()->tieneTodosLosPermisos();
 
         return view('licencias.show', compact('licencia', 'puedeAutorizar'));
     }
@@ -190,7 +190,7 @@ class LicenciaController extends Controller
 
         $puede = $inst
             ? $inst->puedeAutorizarLicencias($request->user())
-            : $request->user()->hasRole('Administrador General');
+            : $request->user()->permisos()->administrador()->tieneTodosLosPermisos();
 
         abort_unless($puede, 403, 'No tiene permiso para autorizar licencias en esta institución.');
     }

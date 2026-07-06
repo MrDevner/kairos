@@ -11,14 +11,13 @@ return new class extends Migration
         Schema::create('cargos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->text('descripcion')->nullable();
             $table->decimal('horas_semanales', 5, 2);
-            $table->decimal('horas_mensuales', 6, 2)->nullable();
-            $table->enum('tipo', ['cargo', 'horas_catedra']);
+            $table->decimal('indice', 8, 4)->nullable()->comment('Índice salarial por hora reloj');
 
-            $table->foreignId('id_institucion')
-                ->constrained('instituciones')
-                ->cascadeOnDelete();
+            $table->foreignId('id_categoria')
+                ->nullable()
+                ->constrained('categorias_cargo')
+                ->nullOnDelete();
 
             $table->boolean('activo')->default(true);
             $table->timestamps();

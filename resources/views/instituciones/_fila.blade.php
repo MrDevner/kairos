@@ -23,7 +23,7 @@
     </td>
     <td class="text-end">
         <a href="{{ route('instituciones.show', $inst) }}" class="btn btn-sm btn-outline-secondary" title="Ver"><i class="bi bi-eye"></i></a>
-        @if(auth()->user()->hasRole('Administrador General'))
+        @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
             <a href="{{ route('instituciones.edit', $inst) }}" class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil"></i></a>
             <form method="POST" action="{{ route('instituciones.destroy', $inst) }}" class="d-inline"
                   onsubmit="return confirm('¿Eliminar esta institución?')">

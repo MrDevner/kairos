@@ -19,6 +19,8 @@ class RolInstitucionUsuario extends BaseModel
         'activo',
         'fecha_desde',
         'fecha_hasta',
+        'id_asignado_por',
+        'control',
     ];
 
     protected function casts(): array
@@ -47,6 +49,12 @@ class RolInstitucionUsuario extends BaseModel
         return $this->belongsTo(Institucion::class, 'id_institucion');
     }
 
+    /** Usuario que otorgó esta asignación de rol (auditoría). */
+    public function asignadoPor(): BelongsTo
+    {
+        return $this->belongsTo(Usuario::class, 'id_asignado_por');
+    }
+
     // --- Scopes ---
 
     /**
@@ -67,6 +75,21 @@ class RolInstitucionUsuario extends BaseModel
     public function scopeDeInstitucion(Builder $query, int $institucionId): Builder
     {
         return $query->where('id_institucion', $institucionId);
+    }
+
+    /**
+     * Asignaciones globales (id_institucion null, aplican a cualquier institución,
+     * ej. el comodín administrador) o de la institución indicada.
+     */
+    public function scopeGlobalODeInstitucion(Builder $query, ?int $institucionId): Builder
+    {
+        return $query->where(function (Builder $q) use ($institucionId) {
+            $q->whereNull('id_institucion');
+
+            if ($institucionId !== null) {
+                $q->orWhere('id_institucion', $institucionId);
+            }
+        });
     }
 
     // --- Helpers ---

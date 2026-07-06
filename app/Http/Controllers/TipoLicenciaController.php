@@ -14,7 +14,7 @@ class TipoLicenciaController extends Controller
     public function index(Request $request): View
     {
         $instId  = (int) session('institucion_activa_id', 0);
-        $esAdmin = auth()->user()->hasRole('Administrador General');
+        $esAdmin = auth()->user()->permisos()->administrador()->tieneTodosLosPermisos();
 
         abort_unless($esAdmin || $instId, 403);
 
@@ -58,7 +58,7 @@ class TipoLicenciaController extends Controller
 
     public function create(): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $listaInstituciones = Institucion::listaJerarquica();
         $categorias         = CategoriaCargo::activas()->orderBy('nombre')->get();
@@ -67,7 +67,7 @@ class TipoLicenciaController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $this->validar($request);
         $data['requiere_documentacion'] = $request->boolean('requiere_documentacion');
@@ -79,7 +79,7 @@ class TipoLicenciaController extends Controller
 
     public function show(TipoLicencia $tipo): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $tipo->load(['institucion', 'categoriaCargo']);
         return view('tipos-licencia.show', compact('tipo'));
@@ -87,7 +87,7 @@ class TipoLicenciaController extends Controller
 
     public function edit(TipoLicencia $tipo): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $listaInstituciones = Institucion::listaJerarquica();
         $categorias         = CategoriaCargo::activas()->orderBy('nombre')->get();
@@ -96,7 +96,7 @@ class TipoLicenciaController extends Controller
 
     public function update(Request $request, TipoLicencia $tipo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $this->validar($request, $tipo);
         $data['requiere_documentacion'] = $request->boolean('requiere_documentacion');
@@ -108,7 +108,7 @@ class TipoLicenciaController extends Controller
 
     public function destroy(TipoLicencia $tipo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         if ($tipo->licencias()->exists()) {
             return back()->with('error', 'No se puede eliminar: hay licencias asociadas a este tipo.');

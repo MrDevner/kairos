@@ -29,8 +29,8 @@ class CheckInstitutionRole
             abort(401);
         }
 
-        // Administrador General tiene acceso irrestricto
-        if ($usuario->hasRole('Administrador General')) {
+        // Administrador General (comodín "*") tiene acceso irrestricto
+        if ($usuario->permisos()->administrador()->tieneTodosLosPermisos()) {
             return $next($request);
         }
 

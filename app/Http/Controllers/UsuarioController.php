@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 
 class UsuarioController extends Controller
 {
@@ -49,7 +48,7 @@ class UsuarioController extends Controller
     public function index(Request $request): View
     {
         $instId   = (int) session('institucion_activa_id', 0);
-        $esAdmin  = auth()->user()->hasRole('Administrador General');
+        $esAdmin  = auth()->user()->permisos()->administrador()->tieneTodosLosPermisos();
         $verTodos = $esAdmin && $request->boolean('todos');
         $query    = Usuario::orderBy('apellidos');
 
@@ -78,7 +77,7 @@ class UsuarioController extends Controller
 
     public function create(): View
     {
-        $roles = Role::orderBy('name')->get();
+        $roles = $this->rolesGlobales();
         return view('usuarios.create', compact('roles'));
     }
 
@@ -92,7 +91,7 @@ class UsuarioController extends Controller
         $usuario = Usuario::create($data);
 
         if ($request->filled('roles')) {
-            $usuario->syncRoles($request->roles);
+            $this->sincronizarRolesGlobales($usuario, $request->roles);
         }
 
         return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuario creado.');
@@ -111,7 +110,7 @@ class UsuarioController extends Controller
         $actor  = auth()->user();
         $instId = (int) session('institucion_activa_id', 0);
 
-        $esAdminGeneral = $actor->hasRole('Administrador General');
+        $esAdminGeneral = $actor->permisos()->administrador()->tieneTodosLosPermisos();
         $nivelActor     = $esAdminGeneral ? 0 : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
         $puedeGestionar = $esAdminGeneral || $nivelActor <= RolInstitucion::NIVEL_GESTION;
 
@@ -130,7 +129,7 @@ class UsuarioController extends Controller
 
             if ($esAdminGeneral) {
                 $listaInstituciones = Institucion::listaJerarquica();
-                $rolesGlobales      = Role::orderBy('name')->get();
+                $rolesGlobales      = $this->rolesGlobales();
             } else {
                 $instActiva = Institucion::find($instId);
             }
@@ -145,7 +144,7 @@ class UsuarioController extends Controller
     public function edit(Usuario $usuario): View
     {
         $usuario->load('ciudadDomicilio.estado');
-        $roles  = Role::orderBy('name')->get();
+        $roles  = $this->rolesGlobales();
         $paises = Pais::orderBy('nombre')->get(['id', 'nombre']);
         return view('usuarios.edit', compact('usuario', 'roles', 'paises'));
     }
@@ -160,7 +159,7 @@ class UsuarioController extends Controller
         $usuario->update($data);
 
         if ($request->filled('roles')) {
-            $usuario->syncRoles($request->roles);
+            $this->sincronizarRolesGlobales($usuario, $request->roles);
         }
 
         return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuario actualizado.');
@@ -210,5 +209,46 @@ class UsuarioController extends Controller
             unset($data['password']);
         }
         return $data;
+    }
+
+    /** Catálogo de roles asignables de forma global (los que tienen permiso comodín "*"). */
+    private function rolesGlobales()
+    {
+        return RolInstitucion::whereHas('permisos', fn ($q) => $q->where('modulo', '*'))
+            ->orderBy('nombre')
+            ->get();
+    }
+
+    /**
+     * Sincroniza las asignaciones globales (id_institucion null) del usuario contra
+     * la lista de nombres de rol seleccionada, dentro del catálogo de roles globales.
+     */
+    private function sincronizarRolesGlobales(Usuario $usuario, array $nombresRoles): void
+    {
+        $idsSeleccionados = $this->rolesGlobales()
+            ->whereIn('nombre', $nombresRoles)
+            ->pluck('id');
+
+        $asignacionesActuales = $usuario->rolesInstitucion()->whereNull('id_institucion')->get();
+
+        foreach ($asignacionesActuales as $asignacion) {
+            if (! $idsSeleccionados->contains($asignacion->id_rol_institucion)) {
+                $asignacion->delete();
+            }
+        }
+
+        $idsExistentes = $asignacionesActuales->pluck('id_rol_institucion');
+
+        foreach ($idsSeleccionados as $idRol) {
+            if (! $idsExistentes->contains($idRol)) {
+                $usuario->rolesInstitucion()->create([
+                    'id_rol_institucion' => $idRol,
+                    'id_institucion'     => null,
+                    'activo'             => true,
+                    'fecha_desde'        => now()->toDateString(),
+                    'id_asignado_por'    => auth()->id(),
+                ]);
+            }
+        }
     }
 }

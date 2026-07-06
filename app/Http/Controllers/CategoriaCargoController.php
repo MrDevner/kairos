@@ -11,7 +11,7 @@ class CategoriaCargoController extends Controller
 {
     public function index(): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $categorias = CategoriaCargo::withCount('cargos')->orderBy('nombre')->get();
         return view('categorias-cargo.index', compact('categorias'));
@@ -19,7 +19,7 @@ class CategoriaCargoController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $request->validate([
             'nombre' => ['required', 'string', 'max:100', 'unique:categorias_cargo,nombre'],
@@ -31,7 +31,7 @@ class CategoriaCargoController extends Controller
 
     public function update(Request $request, CategoriaCargo $categoriasCargo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $request->validate([
             'nombre' => ['required', 'string', 'max:100',
@@ -46,7 +46,7 @@ class CategoriaCargoController extends Controller
 
     public function destroy(CategoriaCargo $categoriasCargo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         if ($categoriasCargo->cargos()->exists()) {
             return back()->with('error', 'No se puede eliminar: hay cargos asignados a esta categoría.');

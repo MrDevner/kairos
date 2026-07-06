@@ -34,7 +34,7 @@ class AvisoController extends Controller
         }
 
         // Visibilidad según rol
-        if (! $auth->hasRole('Administrador General')) {
+        if (! $auth->permisos()->administrador()->tieneTodosLosPermisos()) {
             $query->where(function ($q) use ($auth) {
                 // El propio usuario ve sus propios avisos
                 $q->where('id_usuario', $auth->id);
@@ -228,7 +228,7 @@ class AvisoController extends Controller
 
     private function puedeCrearAvisos($auth, int $instId): bool
     {
-        if ($auth->hasRole('Administrador General')) {
+        if ($auth->permisos()->administrador()->tieneTodosLosPermisos()) {
             return true;
         }
 
@@ -250,7 +250,7 @@ class AvisoController extends Controller
 
     private function institucionesPermitidas($auth)
     {
-        if ($auth->hasRole('Administrador General')) {
+        if ($auth->permisos()->administrador()->tieneTodosLosPermisos()) {
             return Institucion::activas()->orderBy('nombre')->get();
         }
 

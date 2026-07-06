@@ -72,7 +72,7 @@
 </li>
 
 {{-- Administrador (solo Administrador General) --}}
-@if($user->hasRole('Administrador General'))
+@if($user->permisos()->administrador()->tieneTodosLosPermisos())
 <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle {{ request()->routeIs('instituciones.*') ? 'active' : '' }}"
        href="#" data-bs-toggle="dropdown">

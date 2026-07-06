@@ -275,7 +275,7 @@
             ? \App\Models\Institucion::find(session('institucion_activa_id'))
             : null;
         $authUser    = auth()->user();
-        $soloIds     = $authUser->hasRole('Administrador General')
+        $soloIds     = $authUser->permisos()->administrador()->tieneTodosLosPermisos()
             ? null
             : $authUser->rolesInstitucion()->vigente()->pluck('id_institucion')->map(fn($v) => (int)$v)->toArray();
         $listaInst   = \App\Models\Institucion::listaJerarquica($soloIds);

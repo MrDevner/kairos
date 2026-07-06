@@ -13,7 +13,7 @@ class CargoController extends Controller
     public function index(Request $request): View
     {
         abort_unless(
-            auth()->user()->hasRole('Administrador General') || session('institucion_activa_id'),
+            auth()->user()->permisos()->administrador()->tieneTodosLosPermisos() || session('institucion_activa_id'),
             403
         );
 
@@ -37,7 +37,7 @@ class CargoController extends Controller
 
     public function create(): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $categorias = CategoriaCargo::activas()->orderBy('nombre')->get();
         return view('cargos.create', compact('categorias'));
@@ -45,7 +45,7 @@ class CargoController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $this->validar($request);
         $data['activo'] = $request->boolean('activo');
@@ -56,7 +56,7 @@ class CargoController extends Controller
 
     public function edit(Cargo $cargo): View
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $categorias = CategoriaCargo::activas()->orderBy('nombre')->get();
         return view('cargos.edit', compact('cargo', 'categorias'));
@@ -64,7 +64,7 @@ class CargoController extends Controller
 
     public function update(Request $request, Cargo $cargo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $data = $this->validar($request);
         $data['activo'] = $request->boolean('activo');
@@ -75,7 +75,7 @@ class CargoController extends Controller
 
     public function destroy(Cargo $cargo): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         if ($cargo->designaciones()->exists()) {
             return back()->with('error', 'No se puede eliminar: hay designaciones asociadas a este cargo.');

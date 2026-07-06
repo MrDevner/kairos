@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Permisos\ContenedorDePermisos;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -85,5 +86,11 @@ class RolInstitucion extends BaseModel
             ['modulo' => $modulo],
             array_merge(['puede_ver' => false, 'puede_crear' => false, 'puede_editar' => false, 'puede_eliminar' => false], $permisos)
         );
+    }
+
+    /** Agrega los permisos de este rol en un ContenedorDePermisos. */
+    public function contenedorDePermisos(): ContenedorDePermisos
+    {
+        return ContenedorDePermisos::crearDesdePermisos($this->permisos);
     }
 }

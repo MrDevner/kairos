@@ -113,7 +113,7 @@ class PerfilController extends Controller
         $user   = auth()->user();
         $instId = (int) session('institucion_activa_id', 0);
 
-        if ($user->hasRole('Administrador General')) {
+        if ($user->permisos()->administrador()->tieneTodosLosPermisos()) {
             return true;
         }
 

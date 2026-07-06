@@ -13,7 +13,6 @@
         "laravel/ui": "^4.6",
         "phpoffice/phpspreadsheet": "^5.5",
         "spatie/laravel-activitylog": "^4.12",
-        "spatie/laravel-permission": "^6.25",
         "tecnickcom/tcpdf": "^6.11"
     },
     "require-dev": {

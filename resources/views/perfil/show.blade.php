@@ -423,7 +423,7 @@
 
                     {{-- Roles vigentes --}}
                     <div class="tab-pane fade" id="pane-roles" role="tabpanel">
-                        @php $rolesGlobal = $usuario->getRoleNames(); @endphp
+                        @php $rolesGlobal = $usuario->nombresRolesGlobales(); @endphp
 
                         @if($rolesGlobal->isNotEmpty())
                             <p class="small fw-semibold text-muted mb-1">Roles globales</p>

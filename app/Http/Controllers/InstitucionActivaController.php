@@ -18,7 +18,7 @@ class InstitucionActivaController extends Controller
         $user = $request->user();
 
         // Verifica que el usuario tenga acceso a esa institución
-        $tieneAcceso = $user->hasRole('Administrador General')
+        $tieneAcceso = $user->permisos()->administrador()->tieneTodosLosPermisos()
             || $user->rolesInstitucion()->vigente()->where('id_institucion', $id)->exists();
 
         abort_unless($tieneAcceso, 403, 'No tenés acceso a esa institución.');

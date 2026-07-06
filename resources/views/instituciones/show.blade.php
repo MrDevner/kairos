@@ -15,7 +15,7 @@
         @endif
     </h5>
     <div>
-        @if(auth()->user()->hasRole('Administrador General'))
+        @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
             <a href="{{ route('instituciones.edit', $institucion) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
                 <i class="bi bi-pencil me-1"></i> Editar
             </a>
@@ -190,7 +190,7 @@
                     </div>
                 @endif
 
-                @if(auth()->user()->hasRole('Administrador General'))
+                @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
                     <form method="POST"
                           action="{{ route('instituciones.autorizadores-licencias', $institucion) }}">
                         @csrf
@@ -220,7 +220,7 @@
 
         {{-- Tipos de licencia para avisos --}}
         @php
-            $puedeConfigAviso = auth()->user()->hasRole('Administrador General')
+            $puedeConfigAviso = auth()->user()->permisos()->administrador()->tieneTodosLosPermisos()
                 || (\App\Models\RolInstitucion::nivelMinimoDeUsuario(auth()->id(), $institucion->id) <= \App\Models\RolInstitucion::NIVEL_GESTION);
         @endphp
         <div class="card mt-3">

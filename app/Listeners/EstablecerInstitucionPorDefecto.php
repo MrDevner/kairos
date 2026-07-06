@@ -11,7 +11,7 @@ class EstablecerInstitucionPorDefecto
     {
         $user = $event->user;
 
-        if ($user->hasRole('Administrador General')) {
+        if ($user->permisos()->administrador()->tieneTodosLosPermisos()) {
             // Admin General: primera institución raíz activa
             $inst = Institucion::activas()->raices()->orderBy('nombre')->first();
         } else {

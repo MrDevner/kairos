@@ -23,10 +23,21 @@ return new class extends Migration
                 ->constrained('instituciones')
                 ->cascadeOnDelete();
 
+            // Fecha en la que se dio el aviso (puede diferir de la fecha del evento)
+            $table->date('fecha_aviso');
+
             $table->enum('tipo', ['ausencia', 'tardanza']);
-            $table->date('fecha');
+
+            // Fecha en la que ocurre la ausencia/tardanza
+            $table->date('fecha_evento');
+
             $table->time('hora_estimada_llegada')->nullable();
             $table->text('motivo')->nullable();
+
+            $table->foreignId('id_tipo_licencia')
+                ->nullable()
+                ->constrained('tipos_licencia')
+                ->nullOnDelete();
 
             $table->foreignId('id_registrado_por')
                 ->constrained('usuarios')

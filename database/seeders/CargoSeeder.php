@@ -15,6 +15,10 @@ class CargoSeeder extends Seeder
             ['nombre' => 'Docente'],
             ['activo' => true]
         );
+        CategoriaCargo::firstOrCreate(
+            ['nombre' => 'No docente'],
+            ['activo' => true]
+        );
 
         $cargos = [
             ['nombre' => 'Preceptor/a',                           'horas_semanales' => 25, 'indice' => 0.4800],

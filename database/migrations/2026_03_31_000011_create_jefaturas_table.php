@@ -19,7 +19,7 @@ return new class extends Migration
                 ->constrained('usuarios')
                 ->cascadeOnDelete();
 
-            $table->string('cargo')->default('Jefe');
+            $table->string('cargo', 100)->nullable();
             $table->date('fecha_desde');
             $table->date('fecha_hasta')->nullable();
             $table->boolean('activa')->default(true);

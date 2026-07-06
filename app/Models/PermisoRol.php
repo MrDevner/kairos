@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Permisos\PermisoCRUD;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PermisoRol extends BaseModel
@@ -15,6 +16,7 @@ class PermisoRol extends BaseModel
         'puede_crear',
         'puede_editar',
         'puede_eliminar',
+        'control',
     ];
 
     protected function casts(): array
@@ -45,5 +47,22 @@ class PermisoRol extends BaseModel
             'eliminar' => $this->puede_eliminar,
             default    => false,
         };
+    }
+
+    /** Envuelve las 4 columnas booleanas en el value object PermisoCRUD. */
+    public function permisoCRUD(): PermisoCRUD
+    {
+        return PermisoCRUD::desdeArray([
+            'create' => $this->puede_crear,
+            'read'   => $this->puede_ver,
+            'update' => $this->puede_editar,
+            'delete' => $this->puede_eliminar,
+        ]);
+    }
+
+    /** Fusiona (OR) este permiso con otro del mismo módulo. */
+    public function unir(self $otro): PermisoCRUD
+    {
+        return $this->permisoCRUD()->unir($otro->permisoCRUD());
     }
 }

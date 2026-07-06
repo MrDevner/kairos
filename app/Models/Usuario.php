@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Permisos\ContenedorDePermisos;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,11 +12,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Permission\Traits\HasRoles;
 
 class Usuario extends Authenticatable
 {
-    use HasFactory, Notifiable, LogsActivity, HasRoles;
+    use HasFactory, Notifiable, LogsActivity;
 
     protected $table = 'usuarios';
 
@@ -132,6 +132,23 @@ class Usuario extends Authenticatable
     }
 
     /**
+     * Nombres de los roles globales vigentes del usuario (id_institucion null).
+     *
+     * @return \Illuminate\Support\Collection<int, string>
+     */
+    public function nombresRolesGlobales(): \Illuminate\Support\Collection
+    {
+        return $this->rolesInstitucion()
+            ->vigente()
+            ->whereNull('id_institucion')
+            ->with('rolInstitucion')
+            ->get()
+            ->pluck('rolInstitucion.nombre')
+            ->filter()
+            ->values();
+    }
+
+    /**
      * Verifica si el usuario puede realizar una acción sobre un módulo en la institución.
      */
     public function puedeEnInstitucion(string $accion, string $modulo, int $institucionId): bool
@@ -143,6 +160,32 @@ class Usuario extends Authenticatable
                 $q->where('modulo', $modulo)->where("puede_{$accion}", true)
             )
             ->exists();
+    }
+
+    /**
+     * Permisos efectivos del usuario: unión (OR) de los ContenedorDePermisos de
+     * todos sus roles vigentes, globales (comodín administrador incluido) más
+     * los de la institución indicada (por defecto, la institución activa en sesión).
+     */
+    public function permisos(?int $institucionId = null): ContenedorDePermisos
+    {
+        $institucionId ??= session('institucion_activa_id') ? (int) session('institucion_activa_id') : null;
+
+        $asignaciones = $this->rolesInstitucion()
+            ->vigente()
+            ->globalODeInstitucion($institucionId)
+            ->with('rolInstitucion.permisos')
+            ->get();
+
+        $contenedor = ContenedorDePermisos::vacio();
+
+        foreach ($asignaciones as $asignacion) {
+            if ($asignacion->rolInstitucion) {
+                $contenedor->unirPermisos($asignacion->rolInstitucion->contenedorDePermisos());
+            }
+        }
+
+        return $contenedor;
     }
 
     // --- Helpers ---

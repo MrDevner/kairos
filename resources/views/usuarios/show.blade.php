@@ -174,7 +174,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <p class="fw-semibold small text-muted mb-0">Roles globales</p>
                             </div>
-                            @php $rolesGlobal = $usuario->getRoleNames(); @endphp
+                            @php $rolesGlobal = $usuario->nombresRolesGlobales(); @endphp
                             <div class="mb-2 d-flex flex-wrap gap-1 align-items-center">
                                 @forelse($rolesGlobal as $rg)
                                     <span class="badge d-inline-flex align-items-center gap-1" style="background:var(--azul)">
@@ -198,8 +198,8 @@
                                     <select name="rol" class="form-select form-select-sm" style="width:auto" required>
                                         <option value="">+ Asignar rol global…</option>
                                         @foreach($rolesGlobales as $rg)
-                                            @if(!$rolesGlobal->contains($rg->name))
-                                                <option value="{{ $rg->name }}">{{ $rg->name }}</option>
+                                            @if(!$rolesGlobal->contains($rg->nombre))
+                                                <option value="{{ $rg->nombre }}">{{ $rg->nombre }}</option>
                                             @endif
                                         @endforeach
                                     </select>

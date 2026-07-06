@@ -17,7 +17,7 @@
     @include('partials.dashboard-institucion')
 
 {{-- ══ ADMINISTRADOR GENERAL (sin institución) ════════════════════════════ --}}
-@elseif($user->hasRole('Administrador General'))
+@elseif($user->permisos()->administrador()->tieneTodosLosPermisos())
     <h5 class="fw-bold mb-4">
         <i class="bi bi-speedometer2 me-2" style="color:var(--azul)"></i>
         Dashboard — Administrador General
@@ -317,7 +317,7 @@
 
 @push('scripts')
 <script>
-@if(!isset($instActiva) && $user->hasRole('Administrador General'))
+@if(!isset($instActiva) && $user->permisos()->administrador()->tieneTodosLosPermisos())
 const ctxAct = document.getElementById('chartActividad');
 if (ctxAct) {
     new Chart(ctxAct, {

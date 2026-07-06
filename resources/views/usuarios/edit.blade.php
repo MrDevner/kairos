@@ -170,16 +170,16 @@
                 @if(isset($roles) && $roles->count())
                 <div class="col-12">
                     <label class="form-label fw-semibold small">Roles globales</label>
-                    @php $userRoles = old('roles', $usuario->getRoleNames()->toArray()); @endphp
+                    @php $userRoles = old('roles', $usuario->nombresRolesGlobales()->toArray()); @endphp
                     <div class="row g-1">
                         @foreach($roles as $rol)
                             <div class="col-sm-4 col-md-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="roles[]"
-                                           id="rol_{{ $rol->id }}" value="{{ $rol->name }}"
-                                           @checked(in_array($rol->name, $userRoles))>
+                                           id="rol_{{ $rol->id }}" value="{{ $rol->nombre }}"
+                                           @checked(in_array($rol->nombre, $userRoles))>
                                     <label class="form-check-label small" for="rol_{{ $rol->id }}">
-                                        {{ $rol->name }}
+                                        {{ $rol->nombre }}
                                     </label>
                                 </div>
                             </div>

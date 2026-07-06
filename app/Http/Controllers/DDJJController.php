@@ -26,7 +26,7 @@ class DDJJController extends Controller
 
         // Usuario común solo ve las suyas
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $user->hasRole('Administrador General')
+        $nivelActor = $user->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($user->id, $instId);
 

@@ -30,7 +30,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -53,7 +53,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -64,7 +64,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -88,7 +88,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -111,7 +111,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -135,7 +135,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
@@ -163,7 +163,7 @@ class RolInstitucionController extends Controller
     {
         $actor      = auth()->user();
         $instId     = (int) session('institucion_activa_id', 0);
-        $nivelActor = $actor->hasRole('Administrador General')
+        $nivelActor = $actor->permisos()->administrador()->tieneTodosLosPermisos()
             ? 0
             : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 

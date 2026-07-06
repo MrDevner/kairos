@@ -266,7 +266,7 @@ class Institucion extends BaseModel
      */
     public function puedeAutorizarLicencias(Usuario $user): bool
     {
-        if ($user->hasRole('Administrador General')) {
+        if ($user->permisos()->administrador()->tieneTodosLosPermisos()) {
             return true;
         }
 

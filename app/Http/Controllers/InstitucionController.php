@@ -16,7 +16,7 @@ class InstitucionController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            abort_unless(auth()->user()?->hasRole('Administrador General'), 403);
+            abort_unless(auth()->user()?->permisos()->administrador()->tieneTodosLosPermisos(), 403);
             return $next($request);
         })->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
@@ -134,7 +134,7 @@ class InstitucionController extends Controller
         $actor  = auth()->user();
         $instId = $institucion->id;
 
-        $esAdminGeneral = $actor->hasRole('Administrador General');
+        $esAdminGeneral = $actor->permisos()->administrador()->tieneTodosLosPermisos();
         $nivelActor     = $esAdminGeneral ? 0 : RolInstitucion::nivelMinimoDeUsuario($actor->id, $instId);
 
         abort_unless($esAdminGeneral || $nivelActor <= RolInstitucion::NIVEL_GESTION, 403);
@@ -158,7 +158,7 @@ class InstitucionController extends Controller
      */
     public function guardarAutorizadoresLicencias(Request $request, Institucion $institucion): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Administrador General'), 403);
+        abort_unless(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos(), 403);
 
         $ids = collect($request->input('roles_autorizan_licencias', []))
             ->map('intval')

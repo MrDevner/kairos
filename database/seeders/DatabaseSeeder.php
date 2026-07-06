@@ -9,10 +9,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Roles y permisos globales (Spatie)
-            RolesPermisosSeeder::class,
             // Roles institucionales
             RolesInstitucionSeeder::class,
+            // Roles globales del motor de permisos (comodín *)
+            PermisosGlobalesSeeder::class,
             // Instituciones (El Colegio Pérez Hernández + Polideportivo)
             InstitucionesSeeder::class,
             // Dependencias por institución

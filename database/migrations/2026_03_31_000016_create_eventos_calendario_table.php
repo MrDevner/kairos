@@ -12,12 +12,14 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('id_institucion')
+                ->nullable()
                 ->constrained('instituciones')
                 ->cascadeOnDelete();
 
             $table->string('titulo');
             $table->text('descripcion')->nullable();
-            $table->date('fecha');
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin')->nullable();
 
             $table->enum('tipo', [
                 'feriado',
@@ -25,6 +27,7 @@ return new class extends Migration
                 'suspension_parcial',
                 'evento_condicional',
                 'dia_no_laborable',
+                'paro',
             ]);
 
             $table->time('hora_desde')->nullable();

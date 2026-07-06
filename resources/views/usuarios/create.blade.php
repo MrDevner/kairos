@@ -111,10 +111,10 @@
                             <div class="col-sm-4 col-md-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="roles[]"
-                                           id="rol_{{ $rol->id }}" value="{{ $rol->name }}"
-                                           @checked(in_array($rol->name, old('roles', [])))>
+                                           id="rol_{{ $rol->id }}" value="{{ $rol->nombre }}"
+                                           @checked(in_array($rol->nombre, old('roles', [])))>
                                     <label class="form-check-label small" for="rol_{{ $rol->id }}">
-                                        {{ $rol->name }}
+                                        {{ $rol->nombre }}
                                     </label>
                                 </div>
                             </div>

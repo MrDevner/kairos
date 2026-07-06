@@ -31,7 +31,7 @@ class HomeController extends Controller
 
         // Si hay institución seleccionada y existe → dashboard institucional
         // (el Admin General puede forzar su propio dashboard con ?vista=admin)
-        $forzarAdmin = $user->hasRole('Administrador General')
+        $forzarAdmin = $user->permisos()->administrador()->tieneTodosLosPermisos()
                        && $request->get('vista') === 'admin';
 
         if ($instId > 0 && !$forzarAdmin) {
@@ -45,7 +45,7 @@ class HomeController extends Controller
         // Sin institución → dashboard según rol global
         $data = [];
 
-        if ($user->hasRole('Administrador General')) {
+        if ($user->permisos()->administrador()->tieneTodosLosPermisos()) {
             $data = $this->datosAdminGeneral($hoy);
         } elseif ($user->tieneRolEnInstitucion('Jefe de Personal', $instId)
                || $user->tieneRolEnInstitucion('Departamento Personal', $instId)) {
