@@ -64,6 +64,16 @@
     </ul>
 </li>
 
+{{-- Tickets de soporte --}}
+<li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('tickets.*') ? 'active' : '' }}" href="{{ route('tickets.index') }}">
+        <i class="bi bi-life-preserver"></i> Tickets
+        @if(($ticketsNoLeidos ?? 0) > 0)
+            <span class="badge bg-danger rounded-pill">{{ $ticketsNoLeidos }}</span>
+        @endif
+    </a>
+</li>
+
 {{-- Logs --}}
 <li class="nav-item">
     <a class="nav-link {{ request()->routeIs('logs.*') ? 'active' : '' }}" href="{{ route('logs.index') }}">
@@ -99,6 +109,9 @@
         <li><a class="dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><i class="bi bi-shield-fill-check"></i> Roles & permisos</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('tipos-licencia.*') ? 'active' : '' }}" href="{{ route('tipos-licencia.index') }}"><i class="bi bi-card-list"></i> Tipos de licencias</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('calendario.*') ? 'active' : '' }}" href="{{ route('calendario.index') }}"><i class="bi bi-calendar-event"></i> Calendario</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item {{ request()->routeIs('tickets.categorias.*') ? 'active' : '' }}" href="{{ route('tickets.categorias.index') }}"><i class="bi bi-tags-fill"></i> Categorías de tickets</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('admin.errores-servidor.*') ? 'active' : '' }}" href="{{ route('admin.errores-servidor.index') }}"><i class="bi bi-bug-fill"></i> Errores de servidor</a></li>
     </ul>
 </li>
 @endif

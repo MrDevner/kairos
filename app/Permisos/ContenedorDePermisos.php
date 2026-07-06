@@ -25,6 +25,7 @@ final class ContenedorDePermisos
     public const AVISOS = 'avisos';
     public const DISPOSITIVOS = 'dispositivos';
     public const ROLES = 'roles';
+    public const TICKETS = 'tickets';
 
     /** Comodín: si está presente, anula cualquier chequeo específico. */
     public const ADMINISTRADOR = '*';
@@ -161,6 +162,11 @@ final class ContenedorDePermisos
     public function roles(): PermisoCRUD
     {
         return $this->leerPermiso(self::ROLES);
+    }
+
+    public function tickets(): PermisoCRUD
+    {
+        return $this->leerPermiso(self::TICKETS);
     }
 
     public function administrador(): PermisoCRUD

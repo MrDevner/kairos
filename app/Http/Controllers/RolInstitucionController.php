@@ -24,6 +24,7 @@ class RolInstitucionController extends Controller
         'avisos'        => 'Avisos',
         'dispositivos'  => 'Dispositivos',
         'roles'         => 'Roles y permisos',
+        'tickets'       => 'Soporte (tickets)',
     ];
 
     public function index(Request $request): View

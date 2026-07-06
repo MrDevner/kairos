@@ -33,6 +33,8 @@ class DatabaseSeeder extends Seeder
             MarcaSeeder::class,
             // Informes diarios de la última semana
             InformeSeeder::class,
+            // Categorías por defecto del sistema de tickets
+            TicketCategoriaSeeder::class,
         ]);
     }
 }

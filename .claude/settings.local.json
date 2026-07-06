@@ -44,7 +44,8 @@
       "Bash(mv 2026_04_03_115704_create_estados_table.php 2026_03_31_000002_create_estados_table.php)",
       "Bash(mv 2026_04_03_115706_create_ciudades_table.php 2026_03_31_000003_create_ciudades_table.php)",
       "Bash(mv 2026_03_31_000007_create_dependencias_table.php 2026_03_31_000009_create_dependencias_table.php)",
-      "Bash(mv 2026_03_31_000010_create_designaciones_table.php 2026_03_31_000013_create_designaciones_table.php)"
+      "Bash(mv 2026_03_31_000010_create_designaciones_table.php 2026_03_31_000013_create_designaciones_table.php)",
+      "Bash(php -l app/Http/Controllers/TicketController.php)"
     ]
   }
 }
