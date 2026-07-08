@@ -1,0 +1,57 @@
+/*
+ * Kairos — Paleta institucional "Opción 1" (Azul + Verde-agua)
+ *
+ * Referencia canónica de las variables de color del sistema.
+ *
+ * IMPORTANTE: este archivo no está enlazado en ningún layout. El proyecto
+ * carga Bootstrap por CDN (ver resources/views/layouts/app.blade.php) y no
+ * usa @vite en ninguna vista, por lo que este CSS no se compila ni se sirve
+ * hoy. Las mismas variables están declaradas en el bloque <style> de
+ * app.blade.php, que es la fuente real que consume la aplicación.
+ *
+ * Se mantiene este archivo como documentación centralizada y como punto de
+ * partida si en el futuro se decide servir CSS vía Vite (@vite) o vincularlo
+ * con un <link rel="stylesheet"> estático.
+ */
+
+:root {
+    /* Primario (azul institucional) */
+    --bs-primary: #2E5EAA;
+    --bs-primary-rgb: 46, 94, 170;
+
+    /* Primario claro (fondos/cards) */
+    --kairos-primary-light: #E8F1FC;
+
+    /* Secundario (verde-agua, OK) */
+    --bs-secondary: #4CAF93;
+    --bs-secondary-rgb: 76, 175, 147;
+
+    /* Acento (naranja, alertas / tardanzas) */
+    --kairos-accent: #F2A65A;
+    --kairos-accent-rgb: 242, 166, 90;
+
+    /* Fondo general */
+    --bs-light: #F7F9FC;
+    --kairos-bg: #F7F9FC;
+
+    /* Texto principal */
+    --bs-dark: #2B2D42;
+    --kairos-text: #2B2D42;
+
+    /* Estado "ausente/error" — rojo estándar, sin cambios drásticos */
+    --bs-danger: #DC3545;
+    --bs-danger-rgb: 220, 53, 69;
+
+    /* Estados de asistencia mapeados sobre los semánticos de Bootstrap */
+    --bs-warning: var(--kairos-accent);
+    --bs-warning-rgb: var(--kairos-accent-rgb);
+    --bs-success: var(--bs-secondary);
+    --bs-success-rgb: var(--bs-secondary-rgb);
+
+    --bs-border-color: #DDE3EC;
+
+    /* Sombras y radios — estilo "claro y profesional" */
+    --kairos-shadow-sm: 0 2px 8px rgba(46, 94, 170, .08);
+    --kairos-shadow-md: 0 4px 16px rgba(46, 94, 170, .12);
+    --kairos-radius: .65rem;
+}

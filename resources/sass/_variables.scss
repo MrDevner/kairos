@@ -1,7 +1,27 @@
+// Paleta institucional Kairos (Opción 1: Azul + Verde-agua)
+// NOTA: este archivo alimenta el pipeline SCSS/Vite (resources/sass/app.scss),
+// que hoy NO está enlazado desde ningún layout (no hay @vite en las vistas;
+// Bootstrap se carga por CDN). Se mantiene actualizado para que, si el
+// proyecto migra a Bootstrap compilado, las variables ya coincidan con las
+// definidas inline en resources/views/layouts/app.blade.php.
+$primary:   #2E5EAA;
+$secondary: #4CAF93;
+$warning:   #F2A65A;
+$danger:    #DC3545;
+$light:     #F7F9FC;
+$dark:      #2B2D42;
+
 // Body
-$body-bg: #f8fafc;
+$body-bg:      $light;
+$body-color:   $dark;
+$border-color: #DDE3EC;
+
+// Border radius / sombras
+$border-radius:      .5rem;
+$border-radius-lg:   .65rem;
+$box-shadow-sm:      0 2px 8px rgba(46, 94, 170, .08);
 
 // Typography
-$font-family-sans-serif: 'Nunito', sans-serif;
+$font-family-sans-serif: 'Inter', 'Nunito', sans-serif;
 $font-size-base: 0.9rem;
 $line-height-base: 1.6;

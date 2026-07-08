@@ -15,14 +15,45 @@
 
     <style>
         :root {
-            --celeste:    #75AADB;
-            --azul:       #1B4F72;
-            --azul-light: #2471A3;
-            --dorado:     #D4A017;
+            /* ── Paleta institucional Kairos (Opción 1: Azul + Verde-agua) ── */
+            --bs-primary:      #2E5EAA;
+            --bs-primary-rgb:  46, 94, 170;
+            --kairos-primary-light: #E8F1FC;
+            --bs-secondary:     #4CAF93;
+            --bs-secondary-rgb: 76, 175, 147;
+            --kairos-accent:     #F2A65A;
+            --kairos-accent-rgb: 242, 166, 90;
+            --bs-light:    #F7F9FC;
+            --bs-light-rgb: 247, 249, 252;
+            --kairos-bg:   #F7F9FC;
+            --bs-dark:     #2B2D42;
+            --bs-dark-rgb: 43, 45, 66;
+            --kairos-text: #2B2D42;
+            --bs-danger:     #DC3545;
+            --bs-danger-rgb: 220, 53, 69;
+            --bs-warning:     var(--kairos-accent);
+            --bs-warning-rgb: var(--kairos-accent-rgb);
+            --bs-success:     var(--bs-secondary);
+            --bs-success-rgb: var(--bs-secondary-rgb);
+            --bs-body-bg:    var(--kairos-bg);
+            --bs-body-color: var(--kairos-text);
+            --bs-border-color: #DDE3EC;
+            --bs-link-color:       var(--bs-primary);
+            --bs-link-hover-color: #26518F;
+
+            --kairos-shadow-sm: 0 2px 8px rgba(46, 94, 170, .08);
+            --kairos-shadow-md: 0 4px 16px rgba(46, 94, 170, .12);
+            --kairos-radius:    .65rem;
+
+            /* Alias retro-compatibles: usados inline en ~80 vistas existentes */
+            --celeste:    #86AEE0;
+            --azul:       var(--bs-primary);
+            --azul-light: #3B6BC2;
+            --dorado:     var(--kairos-accent);
             --blanco:     #FFFFFF;
-            --gris-bg:    #F4F6F8;
-            --gris-texto: #495057;
-            --gris-borde: #DEE2E6;
+            --gris-bg:    var(--kairos-bg);
+            --gris-texto: var(--kairos-text);
+            --gris-borde: var(--bs-border-color);
         }
 
         body {
@@ -37,12 +68,12 @@
             position: fixed;
             top: 0; left: 0; right: 0;
             height: 56px;
-            background: var(--celeste);
+            background: var(--kairos-primary-light);
             z-index: 1030;
             display: flex;
             align-items: center;
             padding: 0 1.25rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,.15);
+            box-shadow: var(--kairos-shadow-sm);
         }
         #kairos-header .brand {
             display: flex;
@@ -91,7 +122,7 @@
             font-size: .85rem;
         }
         #kairos-header .institucion-activa-dropdown .dropdown-item:hover {
-            background: rgba(27,79,114,.08);
+            background: rgba(var(--bs-primary-rgb),.08);
         }
         #kairos-header .header-acciones {
             display: flex;
@@ -111,14 +142,15 @@
         .btn-notif .badge-notif {
             position: absolute;
             top: -2px; right: -4px;
-            background: var(--dorado);
-            color: #fff;
+            background: var(--kairos-accent);
+            color: var(--kairos-text);
             font-size: .6rem;
             padding: 2px 5px;
             border-radius: 10px;
             min-width: 18px;
             text-align: center;
             line-height: 1.2;
+            font-weight: 700;
         }
         .user-avatar {
             width: 36px; height: 36px;
@@ -151,7 +183,7 @@
             padding: .25rem .5rem;
             border-radius: .375rem;
         }
-        .dropdown-toggle-user:hover { background: rgba(27,79,114,.1); }
+        .dropdown-toggle-user:hover { background: rgba(var(--bs-primary-rgb),.1); }
         .dropdown-toggle-user::after { display: none; }
 
         /* ── Navbar ─────────────────────────────────────────────────── */
@@ -161,7 +193,7 @@
             height: 56px;
             background: var(--azul);
             z-index: 1029;
-            box-shadow: 0 2px 4px rgba(0,0,0,.2);
+            box-shadow: var(--kairos-shadow-sm);
             overflow: visible;
         }
         #kairos-nav-scroll {
@@ -192,8 +224,8 @@
         #kairos-nav .dropdown-menu {
             background: var(--azul-light);
             border: none;
-            border-radius: .375rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,.3);
+            border-radius: var(--kairos-radius);
+            box-shadow: var(--kairos-shadow-md);
             min-width: 200px;
         }
         #kairos-nav .dropdown-item {
@@ -228,12 +260,92 @@
         }
 
         /* ── Cards ──────────────────────────────────────────────────── */
-        .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+        .card {
+            border: 1px solid var(--gris-borde);
+            border-radius: var(--kairos-radius);
+            box-shadow: var(--kairos-shadow-sm);
+        }
         .card-header {
             background: var(--azul);
             color: #fff;
             font-weight: 600;
+            border-radius: var(--kairos-radius) var(--kairos-radius) 0 0;
         }
+
+        /* ── Botones ────────────────────────────────────────────────── */
+        .btn { border-radius: var(--kairos-radius); transition: all .2s ease; }
+        .btn-primary {
+            --bs-btn-bg: var(--bs-primary);
+            --bs-btn-border-color: var(--bs-primary);
+            --bs-btn-hover-bg: #26518F;
+            --bs-btn-hover-border-color: #26518F;
+            --bs-btn-active-bg: #204370;
+            --bs-btn-active-border-color: #204370;
+            --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+        }
+        .btn-outline-primary {
+            --bs-btn-color: var(--bs-primary);
+            --bs-btn-border-color: var(--bs-primary);
+            --bs-btn-hover-bg: var(--bs-primary);
+            --bs-btn-hover-border-color: var(--bs-primary);
+            --bs-btn-active-bg: var(--bs-primary);
+            --bs-btn-active-border-color: var(--bs-primary);
+            --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+        }
+        .btn-secondary {
+            --bs-btn-bg: var(--bs-secondary);
+            --bs-btn-border-color: var(--bs-secondary);
+            --bs-btn-hover-bg: #41957D;
+            --bs-btn-hover-border-color: #41957D;
+            --bs-btn-active-bg: #357E69;
+            --bs-btn-active-border-color: #357E69;
+            --bs-btn-focus-shadow-rgb: var(--bs-secondary-rgb);
+        }
+        .btn-outline-secondary {
+            --bs-btn-color: var(--bs-secondary);
+            --bs-btn-border-color: var(--bs-secondary);
+            --bs-btn-hover-bg: var(--bs-secondary);
+            --bs-btn-hover-border-color: var(--bs-secondary);
+            --bs-btn-focus-shadow-rgb: var(--bs-secondary-rgb);
+        }
+        .btn-warning {
+            --bs-btn-bg: var(--kairos-accent);
+            --bs-btn-border-color: var(--kairos-accent);
+            --bs-btn-color: var(--kairos-text);
+            --bs-btn-hover-bg: #CE8D4D;
+            --bs-btn-hover-border-color: #CE8D4D;
+            --bs-btn-hover-color: #fff;
+        }
+
+        /* ── Formularios ────────────────────────────────────────────── */
+        .form-control, .form-select {
+            border-color: var(--gris-borde);
+            border-radius: .5rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .15);
+        }
+        .form-check-input:checked {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
+        .form-check-input:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+        }
+
+        /* ── Paginación ─────────────────────────────────────────────── */
+        .pagination {
+            --bs-pagination-active-bg: var(--bs-primary);
+            --bs-pagination-active-border-color: var(--bs-primary);
+            --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), .25);
+        }
+
+        /* ── Alerts ─────────────────────────────────────────────────── */
+        .alert-success { background-color: #E3F5EF; border-color: #B9E4D6; color: #1F6E58; }
+        .alert-warning { background-color: #FDF0E1; border-color: #F5CB9B; color: #8A5A22; }
+        .alert-danger  { background-color: #FBE4E7; border-color: #F2AEB6; color: #842029; }
 
         /* ── Footer ─────────────────────────────────────────────────── */
         #kairos-footer {

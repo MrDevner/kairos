@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estado;
+use App\Models\Licencia;
 use App\Models\Pais;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,7 +37,13 @@ class PerfilController extends Controller
         $argentina   = Pais::where('iso2', 'AR')->value('id');
         $sanjuan     = $argentina ? Estado::where('id_pais', $argentina)->where('nombre', 'San Juan')->value('id') : null;
 
-        return view('perfil.show', compact('usuario', 'puedeEditarTodo', 'paises', 'argentina', 'sanjuan'));
+        $licencias = Licencia::deUsuario($usuario->id)
+            ->with('tipoLicencia')
+            ->orderByDesc('fecha_inicio')
+            ->limit(20)
+            ->get();
+
+        return view('perfil.show', compact('usuario', 'puedeEditarTodo', 'paises', 'argentina', 'sanjuan', 'licencias'));
     }
 
     public function update(Request $request): RedirectResponse

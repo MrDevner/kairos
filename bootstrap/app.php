@@ -1,10 +1,13 @@
 <?php
 
 use App\Support\ServerErrorLogger;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -24,6 +27,15 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (Throwable $e, Request $request) {
+            // Dejar que Laravel maneje estos casos con su comportamiento por defecto
+            // (redirect con errores, 401, respuesta ya armada), en vez de mostrar
+            // la pantalla de error del servidor.
+            if ($e instanceof ValidationException
+                || $e instanceof AuthenticationException
+                || $e instanceof HttpResponseException) {
+                return null;
+            }
+
             $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
 
             if ($statusCode < 500 || $request->expectsJson()) {

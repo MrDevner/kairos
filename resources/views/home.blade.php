@@ -104,7 +104,7 @@
 
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
-            <div class="card text-center h-100" style="border-top:3px solid #198754">
+            <div class="card text-center h-100" style="border-top:3px solid var(--bs-secondary)">
                 <div class="card-body py-3">
                     <i class="bi bi-person-check fs-2 text-success"></i>
                     <div class="fs-3 fw-bold mt-1 text-success">{{ $stats['presentes'] ?? 0 }}</div>
@@ -113,7 +113,7 @@
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card text-center h-100" style="border-top:3px solid #dc3545">
+            <div class="card text-center h-100" style="border-top:3px solid var(--bs-danger)">
                 <div class="card-body py-3">
                     <i class="bi bi-person-x fs-2 text-danger"></i>
                     <div class="fs-3 fw-bold mt-1 text-danger">{{ $stats['ausentes'] ?? 0 }}</div>
@@ -122,7 +122,7 @@
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card text-center h-100" style="border-top:3px solid #ffc107">
+            <div class="card text-center h-100" style="border-top:3px solid var(--kairos-accent)">
                 <div class="card-body py-3">
                     <i class="bi bi-clock-history fs-2 text-warning"></i>
                     <div class="fs-3 fw-bold mt-1 text-warning">{{ $stats['tardanzas'] ?? 0 }}</div>
@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card text-center h-100" style="border-top:3px solid #dc3545">
+            <div class="card text-center h-100" style="border-top:3px solid var(--bs-danger)">
                 <div class="card-body py-3">
                     <i class="bi bi-exclamation-circle fs-2 text-danger"></i>
                     <div class="fs-3 fw-bold mt-1 text-danger">{{ $stats['sin_justificar'] ?? 0 }}</div>
@@ -327,8 +327,8 @@ if (ctxAct) {
             datasets: [{
                 label: 'Marcas procesadas',
                 data: {!! json_encode($chartData ?? []) !!},
-                borderColor: '#1B4F72',
-                backgroundColor: 'rgba(117,170,219,.2)',
+                borderColor: '#2E5EAA',
+                backgroundColor: 'rgba(46,94,170,.15)',
                 tension: .3, fill: true,
             }]
         },
@@ -346,9 +346,9 @@ if (ctxAsis) {
         data: {
             labels: {!! json_encode($semanaLabels ?? ['Lun','Mar','Mié','Jue','Vie']) !!},
             datasets: [
-                { label: 'Presentes',  data: {!! json_encode($semanaPresentes ?? [0,0,0,0,0]) !!}, backgroundColor: '#198754' },
-                { label: 'Ausentes',   data: {!! json_encode($semanaAusentes  ?? [0,0,0,0,0]) !!}, backgroundColor: '#dc3545' },
-                { label: 'Tardanzas',  data: {!! json_encode($semanaTardanzas ?? [0,0,0,0,0]) !!}, backgroundColor: '#ffc107' },
+                { label: 'Presentes',  data: {!! json_encode($semanaPresentes ?? [0,0,0,0,0]) !!}, backgroundColor: '#4CAF93' },
+                { label: 'Ausentes',   data: {!! json_encode($semanaAusentes  ?? [0,0,0,0,0]) !!}, backgroundColor: '#DC3545' },
+                { label: 'Tardanzas',  data: {!! json_encode($semanaTardanzas ?? [0,0,0,0,0]) !!}, backgroundColor: '#F2A65A' },
             ]
         },
         options: {
