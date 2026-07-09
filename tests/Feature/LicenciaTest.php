@@ -9,7 +9,7 @@ use App\Models\EventoCalendario;
 use App\Models\Institucion;
 use App\Models\Licencia;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\LicenciaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -22,8 +22,8 @@ class LicenciaTest extends TestCase
 
     private LicenciaService $service;
     private Institucion     $inst;
-    private Usuario         $admin;
-    private Usuario         $empleado;
+    private User         $admin;
+    private User         $empleado;
     private Designacion     $designacion;
     private TipoLicencia    $tipoCorridos;
     private TipoLicencia    $tipoHabiles;
@@ -57,7 +57,7 @@ class LicenciaTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->admin = Usuario::create([
+        $this->admin = User::create([
             'documento' => '99000001',
             'apellidos' => 'Admin',
             'nombres'   => 'Test',
@@ -66,7 +66,7 @@ class LicenciaTest extends TestCase
             'activo'    => true,
         ]);
 
-        $this->empleado = Usuario::create([
+        $this->empleado = User::create([
             'documento' => '30000001',
             'apellidos' => 'Empleado',
             'nombres'   => 'Test',

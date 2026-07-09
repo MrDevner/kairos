@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('roles_institucion_usuario', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_usuario')
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->cascadeOnDelete();
             $table->foreignId('id_rol_institucion')
                 ->constrained('roles_institucion')
@@ -31,7 +31,7 @@ return new class extends Migration
             // Quién otorgó esta asignación (auditoría). Null = sistema/migración.
             $table->foreignId('id_asignado_por')
                 ->nullable()
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->nullOnDelete();
             // Hash/token de auditoría opcional.
             $table->string('control')->nullable();

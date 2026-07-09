@@ -40,7 +40,7 @@ class Licencia extends BaseModel
 
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 
     public function designacion(): BelongsTo
@@ -55,12 +55,12 @@ class Licencia extends BaseModel
 
     public function registradoPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_registrado_por');
+        return $this->belongsTo(User::class, 'id_registrado_por');
     }
 
     public function aprobadoPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_aprobado_por');
+        return $this->belongsTo(User::class, 'id_aprobado_por');
     }
 
     // ── Scopes ─────────────────────────────────────────────────────────────

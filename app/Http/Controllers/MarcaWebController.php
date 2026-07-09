@@ -5,30 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\ComputadorAutorizado;
 use App\Models\Dispositivo;
 use App\Models\MarcaOriginal;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class MarcaWebController extends Controller
 {
+    /** Nombre de la cookie que identifica al terminal en esta PC. */
+    private const COOKIE_TERMINAL = 'kairos_terminal';
+
     /**
      * Pantalla principal del terminal de marcas.
-     * Identifica el computador por fingerprint y verifica autorización.
+     * Identifica el computador por la marca (cookie) dejada en esta PC.
      */
     public function terminal(Request $request): View
     {
-        $fingerprint = $request->input('fp', '');
+        $fingerprint = $request->cookie(self::COOKIE_TERMINAL);
 
         $computador = $fingerprint
             ? ComputadorAutorizado::where('fingerprint', $fingerprint)->first()
             : null;
 
         if (!$computador) {
-            return view('marca-web.no-autorizado', ['fingerprint' => $fingerprint]);
+            return view('marca-web.no-autorizado');
         }
 
         if (!$computador->autorizado) {
@@ -54,21 +59,18 @@ class MarcaWebController extends Controller
     public function marcar(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'documento'   => ['required', 'string'],
-            'fingerprint' => ['required', 'string'],
+            'documento' => ['required', 'string'],
         ]);
 
-        // Verificar computador autorizado
-        $computador = ComputadorAutorizado::where('fingerprint', $data['fingerprint'])
-            ->where('autorizado', true)
-            ->first();
+        // Verificar computador autorizado a partir de la marca dejada en esta PC
+        $computador = $this->computadorDesdeCookie($request);
 
         if (!$computador) {
             return response()->json(['error' => 'Terminal no autorizado.'], 403);
         }
 
         // Verificar usuario
-        $usuario = Usuario::where('documento', $data['documento'])
+        $usuario = User::where('documento', $data['documento'])
             ->where('activo', true)
             ->first();
 
@@ -92,7 +94,7 @@ class MarcaWebController extends Controller
             'fecha_hora'     => now(),
             'tipo_captura'   => 'web',
             'datos_raw'      => [
-                'fingerprint' => $data['fingerprint'],
+                'fingerprint' => $computador->fingerprint,
                 'ip'          => $request->ip(),
                 'user_agent'  => $request->userAgent(),
             ],
@@ -114,20 +116,16 @@ class MarcaWebController extends Controller
     public function identificar(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'documento'   => ['required', 'string'],
-            'fingerprint' => ['required', 'string'],
+            'documento' => ['required', 'string'],
         ]);
 
-        $computador = ComputadorAutorizado::where('fingerprint', $data['fingerprint'])
-            ->where('autorizado', true)
-            ->with('dispositivo')
-            ->first();
+        $computador = $this->computadorDesdeCookie($request, con: 'dispositivo');
 
         if (!$computador) {
             return response()->json(['error' => 'Terminal no autorizado.'], 403);
         }
 
-        $usuario = Usuario::where('documento', $data['documento'])
+        $usuario = User::where('documento', $data['documento'])
             ->where('activo', true)
             ->first();
 
@@ -157,21 +155,17 @@ class MarcaWebController extends Controller
     public function confirmar(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'documento'   => ['required', 'string'],
-            'fingerprint' => ['required', 'string'],
-            'password'    => ['nullable', 'string'],
+            'documento' => ['required', 'string'],
+            'password'  => ['nullable', 'string'],
         ]);
 
-        $computador = ComputadorAutorizado::where('fingerprint', $data['fingerprint'])
-            ->where('autorizado', true)
-            ->with('dispositivo')
-            ->first();
+        $computador = $this->computadorDesdeCookie($request, con: 'dispositivo');
 
         if (!$computador) {
             return response()->json(['error' => 'Terminal no autorizado.'], 403);
         }
 
-        $usuario = Usuario::where('documento', $data['documento'])
+        $usuario = User::where('documento', $data['documento'])
             ->where('activo', true)
             ->first();
 
@@ -203,7 +197,7 @@ class MarcaWebController extends Controller
             'fecha_hora'     => now(),
             'tipo_captura'   => 'web',
             'datos_raw'      => [
-                'fingerprint' => $data['fingerprint'],
+                'fingerprint' => $computador->fingerprint,
                 'ip'          => $request->ip(),
                 'user_agent'  => $request->userAgent(),
             ],
@@ -220,28 +214,59 @@ class MarcaWebController extends Controller
 
     /**
      * Solicita autorización para un nuevo computador.
+     * El identificador del terminal se genera en el servidor y se deja
+     * como cookie persistente en esta PC (nunca viaja por GET).
      */
     public function solicitarAutorizacion(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'fingerprint'    => ['required', 'string', 'max:255'],
             'nombre_equipo'  => ['required', 'string', 'max:255'],
             'id_dispositivo' => ['required', 'integer', 'exists:dispositivos,id'],
         ]);
 
-        $computador = ComputadorAutorizado::firstOrCreate(
-            ['fingerprint' => $data['fingerprint']],
-            [
+        // Si esta PC ya tiene una marca (p. ej. reenvía el formulario), la reutiliza.
+        $fingerprint = $request->cookie(self::COOKIE_TERMINAL);
+        $computador  = $fingerprint
+            ? ComputadorAutorizado::where('fingerprint', $fingerprint)->first()
+            : null;
+
+        if (!$computador) {
+            do {
+                $fingerprint = Str::random(64);
+            } while (ComputadorAutorizado::where('fingerprint', $fingerprint)->exists());
+
+            $computador = ComputadorAutorizado::create([
+                'fingerprint'    => $fingerprint,
                 'id_dispositivo' => $data['id_dispositivo'],
                 'nombre_equipo'  => $data['nombre_equipo'],
                 'autorizado'     => false,
-            ]
-        );
+            ]);
+        }
 
         return response()->json([
             'ok'      => true,
             'mensaje' => 'Solicitud registrada. Un administrador deberá aprobarla.',
             'id'      => $computador->id,
-        ]);
+        ])->withCookie(
+            Cookie::forever(self::COOKIE_TERMINAL, $fingerprint, secure: $request->secure(), httpOnly: true)
+        );
+    }
+
+    /**
+     * Resuelve el computador autorizado a partir de la marca (cookie) dejada
+     * en esta PC. Devuelve null si no hay marca o si el terminal no está autorizado.
+     */
+    private function computadorDesdeCookie(Request $request, ?string $con = null): ?ComputadorAutorizado
+    {
+        $fingerprint = $request->cookie(self::COOKIE_TERMINAL);
+
+        if (!$fingerprint) {
+            return null;
+        }
+
+        return ComputadorAutorizado::where('fingerprint', $fingerprint)
+            ->where('autorizado', true)
+            ->when($con, fn ($q) => $q->with($con))
+            ->first();
     }
 }

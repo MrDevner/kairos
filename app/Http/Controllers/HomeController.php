@@ -10,7 +10,7 @@ use App\Models\ItemInforme;
 use App\Models\Licencia;
 use App\Models\MarcaComputada;
 use App\Models\MarcaOriginal;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\BancoHorasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -24,7 +24,7 @@ class HomeController extends Controller
 
     public function index(Request $request, BancoHorasService $bancoService)
     {
-        /** @var Usuario $user */
+        /** @var User $user */
         $user   = $request->user();
         $instId = (int) session('institucion_activa_id', 0);
         $hoy    = Carbon::today();
@@ -62,7 +62,7 @@ class HomeController extends Controller
 
     // ── Dashboard institucional ────────────────────────────────────────────
 
-    private function datosInstitucion(Institucion $inst, Usuario $user, Carbon $hoy): array
+    private function datosInstitucion(Institucion $inst, User $user, Carbon $hoy): array
     {
         $instId = $inst->id;
 
@@ -141,7 +141,7 @@ class HomeController extends Controller
         return [
             'stats' => [
                 'instituciones' => Institucion::activas()->count(),
-                'usuarios'      => Usuario::where('activo', true)->count(),
+                'usuarios'      => User::where('activo', true)->count(),
                 'dispositivos'  => Dispositivo::activos()->count(),
                 'errores_hoy'   => MarcaComputada::enFecha($hoy)->conErrores()->count(),
             ],
@@ -206,7 +206,7 @@ class HomeController extends Controller
         ];
     }
 
-    private function datosUsuario(Usuario $user, Carbon $hoy, BancoHorasService $bancoService): array
+    private function datosUsuario(User $user, Carbon $hoy, BancoHorasService $bancoService): array
     {
         $designacionVigente = $user->designaciones()->vigente()->first();
 

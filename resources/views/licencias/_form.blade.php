@@ -6,7 +6,7 @@
     <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
     @php
         $oldUsuarioId   = old('id_usuario');
-        $oldUsuario     = $oldUsuarioId ? \App\Models\Usuario::find($oldUsuarioId) : null;
+        $oldUsuario     = $oldUsuarioId ? \App\Models\User::find($oldUsuarioId) : null;
     @endphp
     <select id="sel-usuario" name="id_usuario"
             class="@error('id_usuario') is-invalid @enderror" required>

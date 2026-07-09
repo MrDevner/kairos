@@ -6,7 +6,7 @@ use App\Models\Dispositivo;
 use App\Models\Institucion;
 use App\Models\MarcaComputada;
 use App\Models\MarcaOriginal;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\MarcaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,7 +39,7 @@ class MarcaController extends Controller
         }
 
         $marcas   = $query->paginate(50)->withQueryString();
-        $usuarios = Usuario::orderBy('apellidos')->orderBy('nombres')
+        $usuarios = User::orderBy('apellidos')->orderBy('nombres')
             ->get(['id', 'nombres', 'apellidos', 'documento']);
 
         return view('marcas.index', compact('marcas', 'desde', 'hasta', 'usuarios'));
@@ -48,7 +48,7 @@ class MarcaController extends Controller
     public function create(): View
     {
         $dispositivos = Dispositivo::activos()->orderBy('nombre')->get();
-        $usuarios     = Usuario::orderBy('apellidos')->orderBy('nombres')
+        $usuarios     = User::orderBy('apellidos')->orderBy('nombres')
             ->get(['id', 'nombres', 'apellidos', 'documento']);
         return view('marcas.create', compact('dispositivos', 'usuarios'));
     }
@@ -75,7 +75,7 @@ class MarcaController extends Controller
     public function edit(MarcaOriginal $marca): View
     {
         $dispositivos = Dispositivo::activos()->orderBy('nombre')->get();
-        $usuarios     = Usuario::orderBy('apellidos')->orderBy('nombres')
+        $usuarios     = User::orderBy('apellidos')->orderBy('nombres')
             ->get(['id', 'nombres', 'apellidos', 'documento']);
         return view('marcas.edit', compact('marca', 'dispositivos', 'usuarios'));
     }
@@ -168,7 +168,7 @@ class MarcaController extends Controller
         }
 
         $marcas   = $query->paginate(30)->withQueryString();
-        $usuarios = Usuario::orderBy('apellidos')->orderBy('nombres')
+        $usuarios = User::orderBy('apellidos')->orderBy('nombres')
             ->get(['id', 'nombres', 'apellidos']);
 
         return view('marcas.computadas', compact('marcas', 'fecha', 'usuarios'));
@@ -179,7 +179,7 @@ class MarcaController extends Controller
     private function validar(Request $request): array
     {
         return $request->validate([
-            'id_usuario'     => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'     => ['required', 'integer', 'exists:users,id'],
             'id_dispositivo' => ['required', 'integer', 'exists:dispositivos,id'],
             'fecha_hora'     => ['required', 'date'],
         ]);

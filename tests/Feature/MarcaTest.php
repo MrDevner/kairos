@@ -13,7 +13,7 @@ use App\Models\Licencia;
 use App\Models\MarcaComputada;
 use App\Models\MarcaOriginal;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\MarcaService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,7 +26,7 @@ class MarcaTest extends TestCase
     private MarcaService $service;
     private Institucion  $inst;
     private Dispositivo  $dispositivo;
-    private Usuario      $usuario;
+    private User      $usuario;
     private Designacion  $designacion;
 
     protected function setUp(): void
@@ -58,7 +58,7 @@ class MarcaTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->usuario = Usuario::create([
+        $this->usuario = User::create([
             'documento' => '30100200',
             'apellidos' => 'Test',
             'nombres'   => 'Marca',

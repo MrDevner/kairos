@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ErrorServidor;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Permisos\Permisos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class ServerErrorController extends Controller
     public function show(ErrorServidor $errorServidor): View
     {
         $errorServidor->load(['usuario', 'asignadoA']);
-        $usuarios = Usuario::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres']);
+        $usuarios = User::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres']);
 
         return view('admin.errores-servidor.show', compact('errorServidor', 'usuarios'));
     }
@@ -70,7 +70,7 @@ class ServerErrorController extends Controller
     {
         $data = $request->validate([
             'estado'        => ['nullable', 'in:abierto,en_revision,mitigado,solucionado'],
-            'id_asignado_a' => ['nullable', 'integer', 'exists:usuarios,id'],
+            'id_asignado_a' => ['nullable', 'integer', 'exists:users,id'],
             'nota'          => ['nullable', 'string', 'max:2000'],
         ]);
 

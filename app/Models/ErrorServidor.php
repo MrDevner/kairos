@@ -58,12 +58,12 @@ class ErrorServidor extends Model
 
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 
     public function asignadoA(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_asignado_a');
+        return $this->belongsTo(User::class, 'id_asignado_a');
     }
 
     public function scopeActivos(Builder $query): Builder
@@ -77,7 +77,7 @@ class ErrorServidor extends Model
     }
 
     /** Agrega una nota a la bitácora (append, sin edición/borrado individual). */
-    public function agregarNota(Usuario $usuario, string $contenido): void
+    public function agregarNota(User $usuario, string $contenido): void
     {
         $notas = $this->notas ?? [];
 

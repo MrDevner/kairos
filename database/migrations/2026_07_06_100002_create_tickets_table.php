@@ -19,16 +19,16 @@ return new class extends Migration
             $table->enum('estado', ['abierto', 'en_proceso', 'resuelto', 'cerrado'])->default('abierto');
             $table->enum('prioridad', ['baja', 'media', 'alta', 'urgente'])->default('media');
 
-            $table->foreignId('id_creador')->constrained('usuarios')->cascadeOnDelete();
+            $table->foreignId('id_creador')->constrained('users')->cascadeOnDelete();
             // Quién lo abrió físicamente (puede diferir del creador si soporte lo abre "en nombre de").
-            $table->foreignId('id_abierto_por')->constrained('usuarios')->cascadeOnDelete();
-            $table->foreignId('id_asignado_a')->nullable()->constrained('usuarios')->nullOnDelete();
+            $table->foreignId('id_abierto_por')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('id_asignado_a')->nullable()->constrained('users')->nullOnDelete();
 
             $table->date('fecha_limite')->nullable();
             $table->dateTime('fecha_cierre')->nullable();
 
             $table->text('categoria_cambio_motivo')->nullable();
-            $table->foreignId('id_categoria_cambiada_por')->nullable()->constrained('usuarios')->nullOnDelete();
+            $table->foreignId('id_categoria_cambiada_por')->nullable()->constrained('users')->nullOnDelete();
 
             $table->timestamps();
 

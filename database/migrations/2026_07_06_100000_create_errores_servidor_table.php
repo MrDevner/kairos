@@ -14,7 +14,7 @@ return new class extends Migration
 
             $table->string('endpoint', 500)->nullable();
             $table->string('metodo_http', 10)->nullable();
-            $table->foreignId('id_usuario')->nullable()->constrained('usuarios')->nullOnDelete();
+            $table->foreignId('id_usuario')->nullable()->constrained('users')->nullOnDelete();
             $table->string('direccion_ip', 45)->nullable();
             $table->text('agente_usuario')->nullable();
             $table->json('parametros_solicitud')->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->unsignedInteger('cantidad_ocurrencias')->default(1);
 
             $table->enum('estado', ['abierto', 'en_revision', 'mitigado', 'solucionado'])->default('abierto');
-            $table->foreignId('id_asignado_a')->nullable()->constrained('usuarios')->nullOnDelete();
+            $table->foreignId('id_asignado_a')->nullable()->constrained('users')->nullOnDelete();
             $table->json('notas')->nullable();
 
             $table->timestamp('ultima_ocurrencia_en')->nullable();

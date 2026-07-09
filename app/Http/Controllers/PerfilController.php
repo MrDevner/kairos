@@ -53,7 +53,7 @@ class PerfilController extends Controller
 
         // Reglas base (contacto): disponibles para todos
         $rules = [
-            'email'     => ['nullable', 'email', 'max:150', "unique:usuarios,email,{$usuario->id}"],
+            'email'     => ['nullable', 'email', 'max:150', "unique:users,email,{$usuario->id}"],
             'telefono'  => ['nullable', 'string', 'max:30'],
             'domicilio' => ['nullable', 'string', 'max:255'],
         ];
@@ -65,8 +65,9 @@ class PerfilController extends Controller
         if ($puedeEditarTodo) {
             $rules['apellidos']            = ['required', 'string', 'max:100'];
             $rules['nombres']              = ['required', 'string', 'max:100'];
-            $rules['documento']            = ['required', 'string', 'max:20', "unique:usuarios,documento,{$usuario->id}"];
+            $rules['documento']            = ['required', 'string', 'max:20', "unique:users,documento,{$usuario->id}"];
             $rules['sexo']                 = ['nullable', 'in:M,F,X'];
+            $rules['nacimiento']           = ['nullable', 'date'];
             $rules['id_pais_nacimiento']   = ['nullable', 'integer', 'exists:paises,id'];
             $rules['id_estado_nacimiento'] = ['nullable', 'integer', 'exists:estados,id'];
         }

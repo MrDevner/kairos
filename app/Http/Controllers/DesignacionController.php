@@ -6,7 +6,7 @@ use App\Models\Cargo;
 use App\Models\Dependencia;
 use App\Models\Designacion;
 use App\Models\Institucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -44,7 +44,7 @@ class DesignacionController extends Controller
 
     public function create(): View
     {
-        $usuarios      = Usuario::where('activo', true)->orderBy('apellidos')->get();
+        $usuarios      = User::where('activo', true)->orderBy('apellidos')->get();
         $instituciones = Institucion::activas()->orderBy('nombre')->get();
         $cargos        = Cargo::activos()->orderBy('nombre')->get();
         $dependencias  = Dependencia::dependenciasActivas()->orderBy('nombre')->get();
@@ -70,7 +70,7 @@ class DesignacionController extends Controller
 
     public function edit(Designacion $designacion): View
     {
-        $usuarios      = Usuario::where('activo', true)->orderBy('apellidos')->get();
+        $usuarios      = User::where('activo', true)->orderBy('apellidos')->get();
         $instituciones = Institucion::activas()->orderBy('nombre')->get();
         $cargos        = Cargo::activos()->orderBy('nombre')->get();
         $dependencias  = Dependencia::dependenciasActivas()->orderBy('nombre')->get();
@@ -97,7 +97,7 @@ class DesignacionController extends Controller
     private function validar(Request $request): array
     {
         return $request->validate([
-            'id_usuario'                => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'                => ['required', 'integer', 'exists:users,id'],
             'id_cargo'                  => ['required', 'integer', 'exists:cargos,id'],
             'id_institucion'            => ['required', 'integer', 'exists:instituciones,id'],
             'id_dependencia'            => ['required', 'integer', 'exists:dependencias,id'],

@@ -31,7 +31,7 @@
                     <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
                     @php
                         $preUid  = old('id_usuario', $designacion->id_usuario);
-                        $preUser = $preUid ? \App\Models\Usuario::find($preUid) : null;
+                        $preUser = $preUid ? \App\Models\User::find($preUid) : null;
                     @endphp
                     <select id="sel-usuario-desig" name="id_usuario"
                             class="@error('id_usuario') is-invalid @enderror" required>

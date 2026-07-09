@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Institucion;
 use App\Models\RolInstitucion;
 use App\Models\RolInstitucionUsuario;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -13,7 +13,7 @@ class AsignacionRolController extends Controller
 {
     // ── Roles institucionales ──────────────────────────────────────────────
 
-    public function store(Request $request, Usuario $usuario): RedirectResponse
+    public function store(Request $request, User $usuario): RedirectResponse
     {
         $actor  = $request->user();
         $instId = $this->instId();
@@ -108,7 +108,7 @@ class AsignacionRolController extends Controller
 
     // ── Roles globales (solo Administrador General, vía comodín "*") ───────
 
-    public function asignarGlobal(Request $request, Usuario $usuario): RedirectResponse
+    public function asignarGlobal(Request $request, User $usuario): RedirectResponse
     {
         abort_unless($this->esAdminGeneral($request->user()), 403);
 
@@ -127,7 +127,7 @@ class AsignacionRolController extends Controller
         return back()->with('success', "Rol global «{$rol->nombre}» asignado.");
     }
 
-    public function revocarGlobal(Request $request, Usuario $usuario): RedirectResponse
+    public function revocarGlobal(Request $request, User $usuario): RedirectResponse
     {
         abort_unless($this->esAdminGeneral($request->user()), 403);
 
@@ -150,7 +150,7 @@ class AsignacionRolController extends Controller
         return (int) session('institucion_activa_id', 0);
     }
 
-    private function esAdminGeneral(Usuario $usuario): bool
+    private function esAdminGeneral(User $usuario): bool
     {
         return $usuario->permisos()->administrador()->tieneTodosLosPermisos();
     }
@@ -167,7 +167,7 @@ class AsignacionRolController extends Controller
      * Devuelve el nivel jerárquico más alto (número menor) del actor.
      * El Administrador General obtiene nivel 0 (puede todo).
      */
-    private function nivelActor(Usuario $actor, int $instId): int
+    private function nivelActor(User $actor, int $instId): int
     {
         if ($this->esAdminGeneral($actor)) {
             return 0;

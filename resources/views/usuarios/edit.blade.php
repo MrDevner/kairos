@@ -98,6 +98,13 @@
                 ])
 
                 <div class="col-12"><hr class="my-1"><p class="small text-muted mb-1">Nacimiento</p></div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold small">Fecha de nacimiento</label>
+                    <input type="date" name="nacimiento"
+                           class="form-control form-control-sm @error('nacimiento') is-invalid @enderror"
+                           value="{{ old('nacimiento', $usuario->nacimiento?->format('Y-m-d')) }}">
+                    @error('nacimiento')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
                 @include('partials._ubicacion_select', [
                     'paises'          => $paises,
                     'prefijo'         => 'nac',
@@ -110,9 +117,9 @@
                     'idPaisActual'    => $usuario->id_pais_nacimiento,
                     'idEstadoActual'  => $usuario->id_estado_nacimiento,
                     'idCiudadActual'  => null,
-                    'colPais'         => 'col-md-4',
-                    'colEstado'       => 'col-md-4',
-                    'colCiudad'       => 'col-md-4',
+                    'colPais'         => 'col-md-3',
+                    'colEstado'       => 'col-md-3',
+                    'colCiudad'       => 'col-md-3',
                 ])
 
                 <div class="col-md-4 d-flex align-items-end">

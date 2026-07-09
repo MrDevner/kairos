@@ -9,7 +9,7 @@ use App\Models\TicketLectura;
 use App\Models\TicketMensaje;
 use App\Models\TicketMensajeAdjunto;
 use App\Models\TicketSolicitudResolucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +53,7 @@ class TicketController extends Controller
         $categorias = TicketCategoria::categorias();
         $esSoporte = Ticket::esSoporte($request->user());
         $usuarios = $esSoporte
-            ? Usuario::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres'])
+            ? User::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres'])
             : collect();
 
         return view('tickets.create', compact('categorias', 'esSoporte', 'usuarios'));
@@ -69,7 +69,7 @@ class TicketController extends Controller
             'descripcion' => ['required', 'string', 'max:5000'],
             'categoria'   => ['required', 'string', Rule::in(TicketCategoria::categorias()->toArray())],
             'prioridad'   => ['required', Rule::in(Ticket::PRIORIDADES)],
-            'id_creador'  => ['nullable', 'integer', 'exists:usuarios,id'],
+            'id_creador'  => ['nullable', 'integer', 'exists:users,id'],
             'adjuntos'    => ['nullable', 'array'],
             'adjuntos.*'  => ['file', 'max:10240'],
         ]);
@@ -117,7 +117,7 @@ class TicketController extends Controller
         $esSoporte = Ticket::esSoporte($usuario);
         $categorias = TicketCategoria::categorias();
         $usuarios = $esSoporte
-            ? Usuario::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres'])
+            ? User::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get(['id', 'apellidos', 'nombres'])
             : collect();
 
         $miSolicitud = $ticket->solicitudesResolucion()->where('id_usuario', $usuario->id)->first();
@@ -137,8 +137,8 @@ class TicketController extends Controller
             'estado'        => ['nullable', Rule::in(Ticket::ESTADOS)],
             'prioridad'     => ['nullable', Rule::in(Ticket::PRIORIDADES)],
             'fecha_limite'  => ['nullable', 'date'],
-            'id_asignado_a' => ['nullable', 'integer', 'exists:usuarios,id'],
-            'id_creador'    => ['nullable', 'integer', 'exists:usuarios,id'],
+            'id_asignado_a' => ['nullable', 'integer', 'exists:users,id'],
+            'id_creador'    => ['nullable', 'integer', 'exists:users,id'],
             'motivo'        => ['nullable', 'string', 'min:5', 'max:1000'],
         ]);
 

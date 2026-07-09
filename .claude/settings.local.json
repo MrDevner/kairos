@@ -58,7 +58,29 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code} %{redirect_url}\\\\n\" http://kairos.test/ --max-time 5)",
       "Read(//c/Windows/System32/drivers/etc/**)",
       "Read(//c/xampp/apache/conf/extra/**)",
-      "Bash(php -l \"D:\\\\xampp\\\\htdocs\\\\kairos\\\\bootstrap\\\\app.php\")"
+      "Bash(php -l \"D:\\\\xampp\\\\htdocs\\\\kairos\\\\bootstrap\\\\app.php\")",
+      "Bash(php -l app/Models/Usuario.php)",
+      "Bash(php -l app/Http/Controllers/PerfilController.php)",
+      "Bash(php -l app/Http/Controllers/UsuarioController.php)",
+      "Bash(xargs sed -i -E 's/\\\\bUsuario\\\\b/User/g')",
+      "Bash(git diff *)",
+      "Read(//tmp/**)",
+      "Bash(sed -i \"s/3\\\\. User nuevo/3. Usuario nuevo/\" app/Http/Controllers/Auth/GoogleController.php)",
+      "Bash(sed -i \"s#// User común solo ve las suyas#// Usuario común solo ve las suyas#\" app/Http/Controllers/DDJJController.php)",
+      "Bash(sed -i \"s/=> 'User',$/=> 'Usuario',/\" app/Http/Controllers/LogController.php)",
+      "Bash(sed -i \"s/'success', 'User creado\\\\.'/'success', 'Usuario creado.'/\" app/Http/Controllers/UsuarioController.php)",
+      "Bash(sed -i \"s/'success', 'User actualizado\\\\.'/'success', 'Usuario actualizado.'/\" app/Http/Controllers/UsuarioController.php)",
+      "Bash(xargs sed -i \"s/unique:usuarios,/unique:users,/g; s/exists:usuarios,id/exists:users,id/g\")",
+      "Bash(git mv *)",
+      "Bash(xargs sed -i \"s/constrained\\('usuarios'\\)/constrained\\('users'\\)/g\")",
+      "Bash(xargs sed -i \"s/\\\\\\\\\\\\\\\\App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\Usuario::find/\\\\\\\\\\\\\\\\App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\User::find/g\")",
+      "Bash(git stash *)",
+      "Bash(curl -s -b /tmp/cookies.txt http://127.0.0.1:8123/perfil)",
+      "Bash(curl -s -b /tmp/cookies.txt -o /dev/null -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8123/perfil)",
+      "Bash(curl -s http://127.0.0.1:8123/login)",
+      "Bash(curl -s -b /tmp/cookies2.txt -o /dev/null -w \"GET /home -> %{http_code}\\\\n\" http://127.0.0.1:8123/home)",
+      "Bash(curl -s -b /tmp/cookies2.txt -o /tmp/perfil.html -w \"GET /perfil -> %{http_code}\\\\n\" http://127.0.0.1:8123/perfil)",
+      "Bash(php -l app/Http/Controllers/MarcaWebController.php)"
     ]
   }
 }

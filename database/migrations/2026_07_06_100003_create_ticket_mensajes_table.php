@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('ticket_mensajes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_ticket')->constrained('tickets')->cascadeOnDelete();
-            $table->foreignId('id_usuario')->constrained('usuarios')->cascadeOnDelete();
+            $table->foreignId('id_usuario')->constrained('users')->cascadeOnDelete();
             $table->text('mensaje');
             $table->timestamps();
         });

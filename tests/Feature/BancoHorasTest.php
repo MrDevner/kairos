@@ -8,7 +8,7 @@ use App\Models\Dependencia;
 use App\Models\Designacion;
 use App\Models\Institucion;
 use App\Models\MovimientoBancoHoras;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\BancoHorasService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -20,9 +20,9 @@ class BancoHorasTest extends TestCase
 
     private BancoHorasService $service;
     private Institucion       $inst;
-    private Usuario           $usuario;
+    private User           $usuario;
     private Designacion       $designacion;
-    private Usuario           $admin;
+    private User           $admin;
 
     protected function setUp(): void
     {
@@ -53,7 +53,7 @@ class BancoHorasTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->admin = Usuario::create([
+        $this->admin = User::create([
             'documento' => '99000001',
             'apellidos' => 'Admin',
             'nombres'   => 'Test',
@@ -62,7 +62,7 @@ class BancoHorasTest extends TestCase
             'activo'    => true,
         ]);
 
-        $this->usuario = Usuario::create([
+        $this->usuario = User::create([
             'documento' => '30100200',
             'apellidos' => 'Test',
             'nombres'   => 'BancoHoras',

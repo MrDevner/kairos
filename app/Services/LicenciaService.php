@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Institucion;
 use App\Models\Licencia;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -20,7 +20,7 @@ class LicenciaService
      *
      * @throws ValidationException
      */
-    public function registrar(array $datos, Usuario $registradoPor): Licencia
+    public function registrar(array $datos, User $registradoPor): Licencia
     {
         if ((int) $datos['id_usuario'] === $registradoPor->id) {
             throw ValidationException::withMessages([
@@ -39,7 +39,7 @@ class LicenciaService
      *
      * @throws \LogicException
      */
-    public function aprobar(Licencia $licencia, Usuario $aprobadoPor): void
+    public function aprobar(Licencia $licencia, User $aprobadoPor): void
     {
         if (!$licencia->estaPendiente()) {
             throw new \LogicException('Solo se pueden aprobar licencias pendientes.');
@@ -71,7 +71,7 @@ class LicenciaService
      *
      * @throws \LogicException
      */
-    public function rechazar(Licencia $licencia, Usuario $aprobadoPor, string $observaciones): void
+    public function rechazar(Licencia $licencia, User $aprobadoPor, string $observaciones): void
     {
         if (!$licencia->estaPendiente()) {
             throw new \LogicException('Solo se pueden rechazar licencias pendientes.');
@@ -110,7 +110,7 @@ class LicenciaService
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function licenciasVigentes(Usuario $usuario, string|Carbon $fecha)
+    public function licenciasVigentes(User $usuario, string|Carbon $fecha)
     {
         return Licencia::deUsuario($usuario->id)
             ->vigentesEnFecha($fecha)

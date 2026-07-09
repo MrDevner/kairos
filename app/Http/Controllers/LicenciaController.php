@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Designacion;
 use App\Models\Licencia;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\LicenciaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -56,7 +56,7 @@ class LicenciaController extends Controller
     public function create(): View
     {
         $instId  = (int) session('institucion_activa_id', 0);
-        $usuarios = Usuario::where('activo', true)->orderBy('apellidos')->get();
+        $usuarios = User::where('activo', true)->orderBy('apellidos')->get();
         $tipos    = TipoLicencia::activos()
             ->when($instId, fn ($q) => $q->visiblesParaInstitucion($instId))
             ->orderBy('nombre')
@@ -71,7 +71,7 @@ class LicenciaController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'id_usuario'       => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'       => ['required', 'integer', 'exists:users,id'],
             'id_tipo_licencia' => ['required', 'integer', 'exists:tipos_licencia,id'],
             'id_designacion'   => ['nullable', 'integer', 'exists:designaciones,id'],
             'fecha_inicio'     => ['required', 'date'],

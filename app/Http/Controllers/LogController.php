@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Designacion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -38,7 +38,7 @@ class LogController extends Controller
         'App\Models\RolInstitucionUsuario'=> 'Asignación de Rol',
         'App\Models\TiempoExtra'         => 'Tiempo Extra',
         'App\Models\TipoLicencia'        => 'Tipo de Licencia',
-        'App\Models\Usuario'             => 'Usuario',
+        'App\Models\User'             => 'Usuario',
     ];
 
     public function index(Request $request): View
@@ -56,10 +56,10 @@ class LogController extends Controller
         } elseif ($esAdminInst) {
             $usuarioIds = Designacion::where('id_institucion', $instId)
                 ->distinct()->pluck('id_usuario');
-            $query->where('causer_type', Usuario::class)
+            $query->where('causer_type', User::class)
                   ->whereIn('causer_id', $usuarioIds);
         } else {
-            $query->where('causer_type', Usuario::class)
+            $query->where('causer_type', User::class)
                   ->where('causer_id', $auth->id);
         }
 
@@ -77,7 +77,7 @@ class LogController extends Controller
             $query->where('subject_type', $request->modelo);
         }
         if (($esAdminGeneral || $esAdminInst) && $request->filled('causer_id')) {
-            $query->where('causer_type', Usuario::class)
+            $query->where('causer_type', User::class)
                   ->where('causer_id', (int) $request->causer_id);
         }
 
@@ -94,10 +94,10 @@ class LogController extends Controller
         // Usuarios disponibles para el filtro (solo admin)
         $usuariosFiltro = collect();
         if ($esAdminGeneral) {
-            $usuariosFiltro = Usuario::orderBy('apellidos')->orderBy('nombres')->get();
+            $usuariosFiltro = User::orderBy('apellidos')->orderBy('nombres')->get();
         } elseif ($esAdminInst) {
             $ids = Designacion::where('id_institucion', $instId)->distinct()->pluck('id_usuario');
-            $usuariosFiltro = Usuario::whereIn('id', $ids)->orderBy('apellidos')->orderBy('nombres')->get();
+            $usuariosFiltro = User::whereIn('id', $ids)->orderBy('apellidos')->orderBy('nombres')->get();
         }
 
         $modelos = self::MODELOS;
@@ -121,12 +121,12 @@ class LogController extends Controller
                 $usuarioIds = Designacion::where('id_institucion', $instId)
                     ->distinct()->pluck('id_usuario');
                 abort_unless(
-                    $activity->causer_type === Usuario::class && $usuarioIds->contains($activity->causer_id),
+                    $activity->causer_type === User::class && $usuarioIds->contains($activity->causer_id),
                     403
                 );
             } else {
                 abort_unless(
-                    $activity->causer_type === Usuario::class && $activity->causer_id === $auth->id,
+                    $activity->causer_type === User::class && $activity->causer_id === $auth->id,
                     403
                 );
             }
@@ -143,7 +143,7 @@ class LogController extends Controller
         return self::MODELOS[$class] ?? class_basename((string) $class);
     }
 
-    private function esAdminInstitucion(Usuario $user, int $instId): bool
+    private function esAdminInstitucion(User $user, int $instId): bool
     {
         return DB::table('roles_institucion_usuario as riu')
             ->join('roles_institucion as ri', 'ri.id', '=', 'riu.id_rol_institucion')

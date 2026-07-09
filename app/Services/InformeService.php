@@ -7,7 +7,7 @@ use App\Models\InformeDiario;
 use App\Models\Institucion;
 use App\Models\ItemInforme;
 use App\Models\MarcaComputada;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -205,7 +205,7 @@ class InformeService
         ]);
     }
 
-    private function tieneJustificacion(Usuario $usuario, Designacion $designacion, Carbon $fecha): bool
+    private function tieneJustificacion(User $usuario, Designacion $designacion, Carbon $fecha): bool
     {
         return $usuario->avisos()
             ->where('id_designacion', $designacion->id)

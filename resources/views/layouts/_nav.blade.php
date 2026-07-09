@@ -1,18 +1,12 @@
 @php $user = auth()->user(); @endphp
 
-{{-- Dashboard --}}
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-</li>
-
 {{-- Principal --}}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+    <a class="nav-link dropdown-toggle {{ request()->routeIs('home') ? 'active' : '' }}" href="#" data-bs-toggle="dropdown">
         <i class="bi bi-person-circle"></i> Principal
     </a>
     <ul class="dropdown-menu">
+        <li><a class="dropdown-item {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('perfil') ? 'active' : '' }}" href="{{ route('perfil') }}"><i class="bi bi-person-fill"></i> Perfil</a></li>
         <li><a class="dropdown-item" href="{{ route('perfil') }}#metodos-login"><i class="bi bi-key-fill"></i> Métodos de login</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('informes.*') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Informes personales</a></li>

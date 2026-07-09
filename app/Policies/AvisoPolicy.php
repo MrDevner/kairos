@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Aviso;
-use App\Models\Usuario;
+use App\Models\User;
 
 class AvisoPolicy
 {
@@ -13,7 +13,7 @@ class AvisoPolicy
      * - Tiene rol 'Departamento Personal' en la institución del aviso
      * - Es jefe vigente de la dependencia del usuario que avisó
      */
-    public function ver(Usuario $usuario, Aviso $aviso): bool
+    public function ver(User $usuario, Aviso $aviso): bool
     {
         if ($usuario->id === $aviso->id_usuario) {
             return true;
@@ -42,7 +42,7 @@ class AvisoPolicy
      * - Es personal del Departamento Personal en la institución
      * - O la institución permite avisos_usuario y es el propio usuario
      */
-    public function crear(Usuario $usuario, int $idInstitucion): bool
+    public function crear(User $usuario, int $idInstitucion): bool
     {
         if ($usuario->tieneRolEnInstitucion('Departamento Personal', $idInstitucion)) {
             return true;
@@ -59,12 +59,12 @@ class AvisoPolicy
     /**
      * Solo el Departamento Personal puede editar o eliminar avisos.
      */
-    public function editar(Usuario $usuario, Aviso $aviso): bool
+    public function editar(User $usuario, Aviso $aviso): bool
     {
         return $usuario->tieneRolEnInstitucion('Departamento Personal', $aviso->id_institucion);
     }
 
-    public function eliminar(Usuario $usuario, Aviso $aviso): bool
+    public function eliminar(User $usuario, Aviso $aviso): bool
     {
         return $this->editar($usuario, $aviso);
     }

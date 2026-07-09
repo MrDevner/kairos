@@ -24,11 +24,11 @@ class TicketLectura extends BaseModel
 
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 
     /** Upsert de la marca de lectura: es lo que alimenta el contador de no-leídos. */
-    public static function marcarLeido(Ticket $ticket, Usuario $usuario): void
+    public static function marcarLeido(Ticket $ticket, User $usuario): void
     {
         self::updateOrCreate(
             ['id_ticket' => $ticket->id, 'id_usuario' => $usuario->id],

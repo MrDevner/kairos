@@ -7,7 +7,7 @@ use App\Models\Dispositivo;
 use App\Models\Institucion;
 use App\Models\MarcaComputada;
 use App\Models\MarcaOriginal;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -71,7 +71,7 @@ class MarcaService
     }
 
     private function computarMarca(
-        Usuario $usuario,
+        User $usuario,
         Designacion $designacion,
         Collection $marcasOriginales,
         Carbon $fecha
@@ -237,7 +237,7 @@ class MarcaService
 
                 [$documento, $fechaHoraRaw] = $partes;
 
-                $usuario = Usuario::where('documento', trim($documento))->first();
+                $usuario = User::where('documento', trim($documento))->first();
 
                 if (!$usuario) {
                     $errores[] = "Línea " . ($nro + 1) . ": documento '{$documento}' no encontrado.";

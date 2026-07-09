@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\DeclaracionJurada;
 use App\Models\Designacion;
 use App\Models\HorarioDdjj;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -19,7 +19,7 @@ class DDJJService
      * @throws ValidationException
      */
     public function validarSuperposicion(
-        Usuario $usuario,
+        User $usuario,
         array $horarios,
         ?DeclaracionJurada $excluirDdjj = null
     ): void {
@@ -112,7 +112,7 @@ class DDJJService
      *
      * @throws \LogicException
      */
-    public function aprobar(DeclaracionJurada $ddjj, Usuario $aprobadoPor): void
+    public function aprobar(DeclaracionJurada $ddjj, User $aprobadoPor): void
     {
         if (!$ddjj->estaPresentada()) {
             throw new \LogicException('Solo se puede aprobar una DDJJ presentada.');

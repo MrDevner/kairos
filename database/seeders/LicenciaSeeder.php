@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Designacion;
 use App\Models\Licencia;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,7 +13,7 @@ class LicenciaSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = Usuario::where('documento', '99999999')->first();
+        $admin = User::where('documento', '99999999')->first();
         if (!$admin) return;
 
         // Crear tipos de licencia si no existen

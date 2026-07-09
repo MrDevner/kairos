@@ -23,7 +23,7 @@ return new class extends Migration
 
             $table->foreignId('id_generado_por')
                 ->nullable()
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->nullOnDelete();
 
             $table->timestamps();

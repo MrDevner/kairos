@@ -35,7 +35,7 @@ class CondicionEvento extends BaseModel
     /**
      * Evalúa si esta condición aplica al usuario/designación dados.
      */
-    public function aplicaA(Usuario $usuario, Designacion $designacion): bool
+    public function aplicaA(User $usuario, Designacion $designacion): bool
     {
         return match ($this->tipo_condicion) {
             'sexo'            => $usuario->sexo === $this->valor_condicion,

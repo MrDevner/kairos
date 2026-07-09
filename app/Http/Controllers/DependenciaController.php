@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dependencia;
 use App\Models\Institucion;
 use App\Models\Jefatura;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -56,7 +56,7 @@ class DependenciaController extends Controller
     {
         $dependencia->load(['institucion', 'padre', 'hijos', 'jefaturas' => fn ($q) => $q->with('usuario')->latest('fecha_desde')]);
         $jefeActual = $dependencia->jefeActual();
-        $usuarios   = Usuario::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get();
+        $usuarios   = User::where('activo', true)->orderBy('apellidos')->orderBy('nombres')->get();
         return view('dependencias.show', compact('dependencia', 'jefeActual', 'usuarios'));
     }
 
@@ -88,7 +88,7 @@ class DependenciaController extends Controller
     public function asignarJefe(Request $request, Dependencia $dependencia): RedirectResponse
     {
         $data = $request->validate([
-            'id_usuario'  => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'  => ['required', 'integer', 'exists:users,id'],
             'cargo'       => ['nullable', 'string', 'max:100'],
             'fecha_desde' => ['required', 'date'],
             'fecha_hasta' => ['nullable', 'date', 'after_or_equal:fecha_desde'],

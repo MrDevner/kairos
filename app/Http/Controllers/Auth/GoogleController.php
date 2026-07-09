@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -63,7 +63,7 @@ class GoogleController extends Controller
         // 0. Modo vinculación desde perfil
         $vincularParaId = session()->pull('vincular_para_usuario');
         if ($vincularParaId && auth()->check() && auth()->id() === $vincularParaId) {
-            if (Usuario::where('google_id', $gUser->getId())->where('id', '!=', $vincularParaId)->exists()) {
+            if (User::where('google_id', $gUser->getId())->where('id', '!=', $vincularParaId)->exists()) {
                 return redirect()->route('perfil')->with('error', 'Esa cuenta de Google ya está vinculada a otro usuario.');
             }
             auth()->user()->update(['google_id' => $gUser->getId()]);
@@ -71,12 +71,12 @@ class GoogleController extends Controller
         }
 
         // 1. Buscar por google_id existente
-        $usuario = Usuario::where('google_id', $gUser->getId())->first();
+        $usuario = User::where('google_id', $gUser->getId())->first();
 
         if (! $usuario) {
             // 2. Email coincide → vincular cuenta
             if ($gUser->getEmail()) {
-                $usuario = Usuario::where('email', $gUser->getEmail())->first();
+                $usuario = User::where('email', $gUser->getEmail())->first();
 
                 if ($usuario) {
                     $usuario->update([
@@ -108,12 +108,12 @@ class GoogleController extends Controller
      * El campo `documento` se inicializa con un placeholder hasta que
      * el administrador complete el perfil.
      */
-    private function crearDesdeGoogle(\Laravel\Socialite\Contracts\User $gUser): Usuario
+    private function crearDesdeGoogle(\Laravel\Socialite\Contracts\User $gUser): User
     {
         $nombre = trim($gUser->getName() ?? '');
         $partes  = explode(' ', $nombre, 2);
 
-        $usuario = Usuario::create([
+        $usuario = User::create([
             'nombres'   => $partes[0],
             'apellidos' => $partes[1] ?? $partes[0],
             'documento' => 'GOOGLE-' . $gUser->getId(),

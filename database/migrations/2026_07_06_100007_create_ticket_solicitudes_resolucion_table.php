@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('ticket_solicitudes_resolucion', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_ticket')->constrained('tickets')->cascadeOnDelete();
-            $table->foreignId('id_usuario')->constrained('usuarios')->cascadeOnDelete();
+            $table->foreignId('id_usuario')->constrained('users')->cascadeOnDelete();
             $table->boolean('es_solicitante')->default(false);
             $table->dateTime('aprobado_en')->nullable();
             $table->enum('estado_propuesto', ['resuelto', 'cerrado'])->nullable();

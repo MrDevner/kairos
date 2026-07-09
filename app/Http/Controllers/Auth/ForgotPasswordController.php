@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -27,7 +27,7 @@ class ForgotPasswordController extends Controller
             'documento' => ['required', 'string'],
         ]);
 
-        $usuario = Usuario::where('documento', $request->documento)
+        $usuario = User::where('documento', $request->documento)
             ->where('activo', true)
             ->first();
 

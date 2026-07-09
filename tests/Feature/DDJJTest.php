@@ -8,7 +8,7 @@ use App\Models\Dependencia;
 use App\Models\Designacion;
 use App\Models\HorarioDdjj;
 use App\Models\Institucion;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\DDJJService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +20,7 @@ class DDJJTest extends TestCase
     use RefreshDatabase;
 
     private DDJJService $service;
-    private Usuario     $usuario;
+    private User     $usuario;
     private Designacion $designacion;
 
     protected function setUp(): void
@@ -52,10 +52,10 @@ class DDJJTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->usuario = Usuario::create([
+        $this->usuario = User::create([
             'documento' => '11111111',
             'apellidos' => 'Test',
-            'nombres'   => 'Usuario',
+            'nombres'   => 'User',
             'email'     => 'test@kairos.test',
             'password'  => bcrypt('password'),
             'activo'    => true,

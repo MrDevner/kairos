@@ -273,17 +273,6 @@
             line-height: 1.5;
             letter-spacing: .2px;
         }
-        .fp-code {
-            font-family: 'Courier New', monospace;
-            font-size: .72rem;
-            color: rgba(255,255,255,.35);
-            background: rgba(255,255,255,.06);
-            border-radius: .35rem;
-            padding: .2rem .5rem;
-            display: inline-block;
-            margin-top: .3rem;
-            word-break: break-all;
-        }
 
         /* Spinner */
         .spin {
@@ -345,27 +334,14 @@
             <div class="divider"></div>
 
             <div class="fp-info">
-                Identificador de este equipo
-                <br>
-                <span class="fp-code" id="fpDisplay">calculando…</span>
+                Al solicitar la autorización, este equipo queda identificado
+                mediante una marca que el servidor deja en esta PC.
             </div>
         </div>
 
     </div>
 
 <script>
-// Fingerprint simple basado en userAgent + resolución + idioma
-const fp = btoa([navigator.userAgent, screen.width, screen.height, navigator.language].join('|')).slice(0, 40);
-
-document.getElementById('fpDisplay').textContent = fp;
-
-// Agregar fp a la URL para persistir entre recargas
-const url = new URL(window.location.href);
-if (!url.searchParams.get('fp')) {
-    url.searchParams.set('fp', fp);
-    window.history.replaceState({}, '', url);
-}
-
 async function solicitar() {
     const nombre      = document.getElementById('nombre').value.trim();
     const dispositivo = parseInt(document.getElementById('dispositivo').value);
@@ -390,7 +366,7 @@ async function solicitar() {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify({ fingerprint: fp, nombre_equipo: nombre, id_dispositivo: dispositivo }),
+            body: JSON.stringify({ nombre_equipo: nombre, id_dispositivo: dispositivo }),
         });
 
         const data = await resp.json();
@@ -399,6 +375,7 @@ async function solicitar() {
             msgEl.className = 'msg ok';
             msgEl.textContent = data.mensaje ?? 'Solicitud enviada. Espere la aprobación del administrador.';
             btn.innerHTML = '<i class="bi bi-check-lg"></i> Solicitud enviada';
+            setTimeout(() => window.location.reload(), 1200);
         } else {
             msgEl.className = 'msg error';
             msgEl.textContent = data.message ?? data.error ?? 'Error al enviar la solicitud.';

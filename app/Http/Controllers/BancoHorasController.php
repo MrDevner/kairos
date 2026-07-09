@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BancoHoras;
 use App\Models\Designacion;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\BancoHorasService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ class BancoHorasController extends Controller
         return view('banco-horas.index', compact('bancos'));
     }
 
-    public function show(Usuario $usuario): View
+    public function show(User $usuario): View
     {
         $designaciones = $usuario->designaciones()->vigente()->with('cargo')->get();
 
@@ -52,13 +52,13 @@ class BancoHorasController extends Controller
     public function ajuste(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'id_usuario'    => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'    => ['required', 'integer', 'exists:users,id'],
             'id_designacion' => ['nullable', 'integer', 'exists:designaciones,id'],
             'minutos'       => ['required', 'integer', 'not_in:0'],
             'motivo'        => ['required', 'string', 'max:500'],
         ]);
 
-        $usuario     = Usuario::findOrFail($data['id_usuario']);
+        $usuario     = User::findOrFail($data['id_usuario']);
         $designacion = isset($data['id_designacion'])
             ? Designacion::find($data['id_designacion'])
             : null;

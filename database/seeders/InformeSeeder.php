@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\InformeDiario;
 use App\Models\Institucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -12,7 +12,7 @@ class InformeSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = Usuario::where('documento', '99999999')->first();
+        $admin = User::where('documento', '99999999')->first();
         $unsj  = Institucion::where('sigla', 'UNSJ')->first();
 
         if (!$admin || !$unsj) return;

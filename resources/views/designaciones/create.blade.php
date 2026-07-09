@@ -30,7 +30,7 @@
                     <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
                     @php
                         $oldUid  = old('id_usuario');
-                        $oldUser = $oldUid ? \App\Models\Usuario::find($oldUid) : null;
+                        $oldUser = $oldUid ? \App\Models\User::find($oldUid) : null;
                     @endphp
                     <select id="sel-usuario-desig" name="id_usuario"
                             class="@error('id_usuario') is-invalid @enderror" required>

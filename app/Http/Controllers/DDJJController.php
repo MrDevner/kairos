@@ -18,7 +18,7 @@ class DDJJController extends Controller
 
     public function index(Request $request): View
     {
-        /** @var \App\Models\Usuario $user */
+        /** @var \App\Models\User $user */
         $user = $request->user();
 
         $query = DeclaracionJurada::with(['usuario', 'designacion.cargo', 'designacion.institucion'])
@@ -44,7 +44,7 @@ class DDJJController extends Controller
 
     public function create(Request $request): View
     {
-        /** @var \App\Models\Usuario $user */
+        /** @var \App\Models\User $user */
         $user = $request->user();
         $designaciones = $user->designaciones()->vigente()->with('cargo', 'institucion')->get();
         return view('ddjj.create', compact('designaciones'));
@@ -52,7 +52,7 @@ class DDJJController extends Controller
 
     public function store(DDJJRequest $request): RedirectResponse
     {
-        /** @var \App\Models\Usuario $user */
+        /** @var \App\Models\User $user */
         $user       = $request->user();
         $designacion = Designacion::findOrFail($request->id_designacion);
 

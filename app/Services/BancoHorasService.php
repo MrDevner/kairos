@@ -6,7 +6,7 @@ use App\Models\BancoHoras;
 use App\Models\Designacion;
 use App\Models\MarcaComputada;
 use App\Models\MovimientoBancoHoras;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class BancoHorasService
@@ -17,7 +17,7 @@ class BancoHorasService
      * Si banco_horas_por = 'designacion', se usa la designación indicada.
      */
     public function obtenerOCrearBanco(
-        Usuario $usuario,
+        User $usuario,
         ?Designacion $designacion = null
     ): BancoHoras {
         // Determinar si el banco es por usuario o por designación
@@ -100,7 +100,7 @@ class BancoHorasService
         BancoHoras $banco,
         int $minutos,
         string $motivo,
-        Usuario $registradoPor
+        User $registradoPor
     ): void {
         DB::transaction(function () use ($banco, $minutos, $motivo, $registradoPor) {
             $banco->increment('saldo_minutos', $minutos);
@@ -120,7 +120,7 @@ class BancoHorasService
      * Devuelve el saldo actual en minutos del banco del usuario,
      * respetando la lógica de banco por usuario o por designación.
      */
-    public function consultarSaldo(Usuario $usuario, ?Designacion $designacion = null): int
+    public function consultarSaldo(User $usuario, ?Designacion $designacion = null): int
     {
         $banco = $this->obtenerOCrearBanco($usuario, $designacion);
         return $banco->saldo_minutos;

@@ -15,7 +15,7 @@ use App\Models\ItemInforme;
 use App\Models\Licencia;
 use App\Models\MarcaComputada;
 use App\Models\TipoLicencia;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\InformeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -27,7 +27,7 @@ class InformeTest extends TestCase
 
     private InformeService $service;
     private Institucion    $inst;
-    private Usuario        $usuario;
+    private User        $usuario;
     private Designacion    $designacion;
 
     protected function setUp(): void
@@ -59,7 +59,7 @@ class InformeTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->usuario = Usuario::create([
+        $this->usuario = User::create([
             'documento' => '30100200',
             'apellidos' => 'Test',
             'nombres'   => 'Informe',

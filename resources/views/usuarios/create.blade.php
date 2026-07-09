@@ -60,6 +60,13 @@
                     </select>
                     @error('sexo')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Fecha de nacimiento</label>
+                    <input type="date" name="nacimiento"
+                           class="form-control form-control-sm @error('nacimiento') is-invalid @enderror"
+                           value="{{ old('nacimiento') }}">
+                    @error('nacimiento')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <div class="form-check mb-1">
                         <input class="form-check-input" type="checkbox" name="activo" id="activo" value="1"

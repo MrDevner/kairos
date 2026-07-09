@@ -36,7 +36,7 @@ class RolInstitucionUsuario extends BaseModel
 
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 
     public function rolInstitucion(): BelongsTo
@@ -52,7 +52,7 @@ class RolInstitucionUsuario extends BaseModel
     /** Usuario que otorgó esta asignación de rol (auditoría). */
     public function asignadoPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_asignado_por');
+        return $this->belongsTo(User::class, 'id_asignado_por');
     }
 
     // --- Scopes ---

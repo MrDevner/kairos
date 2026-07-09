@@ -123,7 +123,7 @@ class AvisoController extends Controller
         abort_unless($this->puedeCrearAvisos($auth, $instId), 403);
 
         $data = $request->validate([
-            'id_usuario'            => ['required', 'integer', 'exists:usuarios,id'],
+            'id_usuario'            => ['required', 'integer', 'exists:users,id'],
             'id_designacion'        => ['required', 'integer', 'exists:designaciones,id'],
             'id_institucion'        => ['required', 'integer', 'exists:instituciones,id'],
             'tipo'                  => ['required', 'in:ausencia,tardanza'],

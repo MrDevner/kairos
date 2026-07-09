@@ -10,7 +10,7 @@ use App\Models\Designacion;
 use App\Models\EventoCalendario;
 use App\Models\HorarioDdjj;
 use App\Models\Institucion;
-use App\Models\Usuario;
+use App\Models\User;
 use App\Services\CalendarioService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -22,7 +22,7 @@ class CalendarioTest extends TestCase
 
     private CalendarioService $service;
     private Institucion       $inst;
-    private Usuario           $usuario;
+    private User           $usuario;
     private Designacion       $designacion;
 
     protected function setUp(): void
@@ -54,10 +54,10 @@ class CalendarioTest extends TestCase
             'activo'          => true,
         ]);
 
-        $this->usuario = Usuario::create([
+        $this->usuario = User::create([
             'documento' => '30100200',
             'apellidos' => 'Test',
-            'nombres'   => 'Usuario',
+            'nombres'   => 'User',
             'email'     => 'cal@test.test',
             'password'  => bcrypt('password'),
             'activo'    => true,

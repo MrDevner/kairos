@@ -2,7 +2,7 @@
 
 namespace App\Permisos;
 
-use App\Models\Usuario;
+use App\Models\User;
 
 /**
  * Punto único de entrada al sistema de permisos, usado en controllers,
@@ -18,13 +18,13 @@ final class Permisos
     private function __construct() {}
 
     /** El usuario autenticado, sin importar si está personificando a otro. */
-    public static function usuarioReal(): ?Usuario
+    public static function usuarioReal(): ?User
     {
         return auth()->user();
     }
 
     /** El usuario real, o el personificado si hay una personificación activa. */
-    public static function usuarioActual(): ?Usuario
+    public static function usuarioActual(): ?User
     {
         $real = self::usuarioReal();
 
@@ -38,7 +38,7 @@ final class Permisos
             return $real;
         }
 
-        return Usuario::find($idPersonificado) ?? $real;
+        return User::find($idPersonificado) ?? $real;
     }
 
     public static function estaPersonificando(): bool
@@ -46,7 +46,7 @@ final class Permisos
         return session(self::CLAVE_SESION_PERSONIFICADO) !== null;
     }
 
-    public static function iniciarPersonificacion(Usuario $usuario): void
+    public static function iniciarPersonificacion(User $usuario): void
     {
         session([self::CLAVE_SESION_PERSONIFICADO => $usuario->id]);
     }

@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->foreignId('id_registrado_por')
                 ->nullable()
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->nullOnDelete();
 
             $table->timestamps();

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
+use App\Models\User;
 use App\Permisos\Permisos;
 use Illuminate\Http\RedirectResponse;
 
@@ -16,7 +16,7 @@ use Illuminate\Http\RedirectResponse;
  */
 class ImpersonacionController extends Controller
 {
-    public function iniciar(Usuario $usuario): RedirectResponse
+    public function iniciar(User $usuario): RedirectResponse
     {
         abort_unless(
             Permisos::delUsuarioReal()->administrador()->tieneTodosLosPermisos(),

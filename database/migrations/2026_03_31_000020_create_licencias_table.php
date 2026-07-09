@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('id_usuario')
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->foreignId('id_designacion')
@@ -35,12 +35,12 @@ return new class extends Migration
             $table->string('documentacion')->nullable();
 
             $table->foreignId('id_registrado_por')
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->foreignId('id_aprobado_por')
                 ->nullable()
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->nullOnDelete();
 
             $table->dateTime('fecha_aprobacion')->nullable();

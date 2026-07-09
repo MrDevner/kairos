@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Institucion;
 use App\Models\Pais;
 use App\Models\RolInstitucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class UsuarioController extends Controller
             return response()->json(['results' => []]);
         }
 
-        $results = Usuario::where('activo', true)
+        $results = User::where('activo', true)
             ->where(fn ($query) =>
                 $query->where('apellidos', 'like', "%{$q}%")
                       ->orWhere('nombres',   'like', "%{$q}%")
@@ -50,7 +50,7 @@ class UsuarioController extends Controller
         $instId   = (int) session('institucion_activa_id', 0);
         $esAdmin  = auth()->user()->permisos()->administrador()->tieneTodosLosPermisos();
         $verTodos = $esAdmin && $request->boolean('todos');
-        $query    = Usuario::orderBy('apellidos');
+        $query    = User::orderBy('apellidos');
 
         if ($instId && ! $verTodos) {
             $query->whereHas('designaciones', fn ($q) =>
@@ -88,7 +88,7 @@ class UsuarioController extends Controller
         $data = $this->manejarFoto($request, $data);
         $data = $this->manejarPassword($request, $data);
 
-        $usuario = Usuario::create($data);
+        $usuario = User::create($data);
 
         if ($request->filled('roles')) {
             $this->sincronizarRolesGlobales($usuario, $request->roles);
@@ -97,7 +97,7 @@ class UsuarioController extends Controller
         return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuario creado.');
     }
 
-    public function show(Usuario $usuario): View
+    public function show(User $usuario): View
     {
         $usuario->load([
             'designaciones'       => fn ($q) => $q->vigente()->with('cargo', 'institucion', 'dependencia'),
@@ -141,7 +141,7 @@ class UsuarioController extends Controller
         ));
     }
 
-    public function edit(Usuario $usuario): View
+    public function edit(User $usuario): View
     {
         $usuario->load('ciudadDomicilio.estado');
         $roles  = $this->rolesGlobales();
@@ -149,7 +149,7 @@ class UsuarioController extends Controller
         return view('usuarios.edit', compact('usuario', 'roles', 'paises'));
     }
 
-    public function update(Request $request, Usuario $usuario): RedirectResponse
+    public function update(Request $request, User $usuario): RedirectResponse
     {
         $data = $this->validar($request, $usuario->id);
         $data['activo'] = $request->boolean('activo');
@@ -165,7 +165,7 @@ class UsuarioController extends Controller
         return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuario actualizado.');
     }
 
-    public function destroy(Usuario $usuario): RedirectResponse
+    public function destroy(User $usuario): RedirectResponse
     {
         abort_if($usuario->id === auth()->id(), 422, 'No puede eliminar su propia cuenta.');
         $usuario->update(['activo' => false]);
@@ -177,19 +177,20 @@ class UsuarioController extends Controller
         return $request->validate([
             'apellidos'            => ['required', 'string', 'max:100'],
             'nombres'              => ['required', 'string', 'max:100'],
-            'documento'            => ['required', 'string', 'max:20', "unique:usuarios,documento,{$exceptId}"],
-            'email'                => ['nullable', 'email', 'max:150', "unique:usuarios,email,{$exceptId}"],
+            'documento'            => ['required', 'string', 'max:20', "unique:users,documento,{$exceptId}"],
+            'email'                => ['nullable', 'email', 'max:150', "unique:users,email,{$exceptId}"],
             'telefono'             => ['nullable', 'string', 'max:30'],
             'domicilio'            => ['nullable', 'string', 'max:255'],
             'id_ciudad_domicilio'  => ['nullable', 'integer', 'exists:ciudades,id'],
             'id_pais_nacimiento'   => ['nullable', 'integer', 'exists:paises,id'],
             'id_estado_nacimiento' => ['nullable', 'integer', 'exists:estados,id'],
             'sexo'                 => ['nullable', 'in:M,F,X'],
+            'nacimiento'           => ['nullable', 'date'],
             'password'             => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
     }
 
-    private function manejarFoto(Request $request, array $data, ?Usuario $usuario = null): array
+    private function manejarFoto(Request $request, array $data, ?User $usuario = null): array
     {
         if ($request->hasFile('foto')) {
             $request->validate(['foto' => ['image', 'max:2048']]);
@@ -223,7 +224,7 @@ class UsuarioController extends Controller
      * Sincroniza las asignaciones globales (id_institucion null) del usuario contra
      * la lista de nombres de rol seleccionada, dentro del catálogo de roles globales.
      */
-    private function sincronizarRolesGlobales(Usuario $usuario, array $nombresRoles): void
+    private function sincronizarRolesGlobales(User $usuario, array $nombresRoles): void
     {
         $idsSeleccionados = $this->rolesGlobales()
             ->whereIn('nombre', $nombresRoles)

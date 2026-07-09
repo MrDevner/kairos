@@ -35,22 +35,22 @@ class Ticket extends BaseModel
 
     public function creador(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_creador');
+        return $this->belongsTo(User::class, 'id_creador');
     }
 
     public function abiertoPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_abierto_por');
+        return $this->belongsTo(User::class, 'id_abierto_por');
     }
 
     public function asignadoA(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_asignado_a');
+        return $this->belongsTo(User::class, 'id_asignado_a');
     }
 
     public function categoriaCambiadaPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_categoria_cambiada_por');
+        return $this->belongsTo(User::class, 'id_categoria_cambiada_por');
     }
 
     public function mensajes(): HasMany
@@ -75,24 +75,24 @@ class Ticket extends BaseModel
 
     // --- Permisos del sistema de tickets ---
     // esSoporte = admin wildcard o permiso de lectura en el módulo 'tickets'
-    // (Usuario::permisos()->tickets()->read() ya devuelve true para el comodín "*").
+    // (User::permisos()->tickets()->read() ya devuelve true para el comodín "*").
 
-    public static function esSoporte(Usuario $usuario): bool
+    public static function esSoporte(User $usuario): bool
     {
         return $usuario->permisos()->tickets()->read();
     }
 
-    public static function puedeVerTodos(Usuario $usuario): bool
+    public static function puedeVerTodos(User $usuario): bool
     {
         return self::esSoporte($usuario);
     }
 
-    public static function puedeCrear(Usuario $usuario): bool
+    public static function puedeCrear(User $usuario): bool
     {
         return $usuario->activo;
     }
 
-    public function esParticipante(Usuario $usuario): bool
+    public function esParticipante(User $usuario): bool
     {
         return $this->id_creador === $usuario->id
             || $this->id_abierto_por === $usuario->id
@@ -100,7 +100,7 @@ class Ticket extends BaseModel
             || $this->mensajes()->where('id_usuario', $usuario->id)->exists();
     }
 
-    /** @return Collection<int, Usuario> */
+    /** @return Collection<int, User> */
     public function participantes(): Collection
     {
         $ids = collect([$this->id_creador, $this->id_abierto_por, $this->id_asignado_a])
@@ -109,13 +109,13 @@ class Ticket extends BaseModel
             ->unique()
             ->values();
 
-        return Usuario::whereIn('id', $ids)->get();
+        return User::whereIn('id', $ids)->get();
     }
 
     // --- Scopes ---
 
     /** Si el usuario no ve todos los tickets, se filtra a los propios/asignados/participados. */
-    public function scopeVisiblesPara(Builder $query, Usuario $usuario): Builder
+    public function scopeVisiblesPara(Builder $query, User $usuario): Builder
     {
         if (self::puedeVerTodos($usuario)) {
             return $query;
@@ -146,7 +146,7 @@ class Ticket extends BaseModel
      * después de su última lectura registrada, más las solicitudes de
      * resolución pendientes de su aprobación.
      */
-    public static function contarNoLeidosParaUsuario(Usuario $usuario): int
+    public static function contarNoLeidosParaUsuario(User $usuario): int
     {
         $esSoporte = self::esSoporte($usuario);
 

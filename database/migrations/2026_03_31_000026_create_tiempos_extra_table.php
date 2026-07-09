@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('id_usuario')
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->foreignId('id_designacion')
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->text('motivo');
 
             $table->foreignId('id_registrado_por')
-                ->constrained('usuarios')
+                ->constrained('users')
                 ->cascadeOnDelete();
 
             $table->timestamps();

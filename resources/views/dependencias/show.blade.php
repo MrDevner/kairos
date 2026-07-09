@@ -224,7 +224,7 @@
                         <label class="form-label fw-semibold small">Usuario <span class="text-danger">*</span></label>
                         @php
                             $oldUidJefe  = old('id_usuario');
-                            $oldUserJefe = $oldUidJefe ? \App\Models\Usuario::find($oldUidJefe) : null;
+                            $oldUserJefe = $oldUidJefe ? \App\Models\User::find($oldUidJefe) : null;
                         @endphp
                         <select id="sel-usuario-jefe" name="id_usuario" required>
                             @if($oldUserJefe)

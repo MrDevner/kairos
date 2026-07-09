@@ -35,7 +35,7 @@ class InformeDiario extends BaseModel
 
     public function generadoPor(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'id_generado_por');
+        return $this->belongsTo(User::class, 'id_generado_por');
     }
 
     public function items(): HasMany

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\RolInstitucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,7 +11,7 @@ class UsuarioSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = Usuario::firstOrCreate(
+        $admin = User::firstOrCreate(
             ['documento' => '28479741'],
             [
                 'apellidos' => 'Domínguez',

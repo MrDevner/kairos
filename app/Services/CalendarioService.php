@@ -6,7 +6,7 @@ use App\Models\CondicionEvento;
 use App\Models\Designacion;
 use App\Models\EventoCalendario;
 use App\Models\Institucion;
-use App\Models\Usuario;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -57,7 +57,7 @@ class CalendarioService
      * @return array{horarios: array, requiere_revision: bool}
      */
     public function calcularJornadaEfectiva(
-        Usuario $usuario,
+        User $usuario,
         Designacion $designacion,
         string|Carbon $fecha
     ): array {
@@ -156,7 +156,7 @@ class CalendarioService
     public function paroAplicaAEmpleado(
         Institucion $institucion,
         string|Carbon $fecha,
-        Usuario $usuario,
+        User $usuario,
         Designacion $designacion
     ): ?EventoCalendario {
         $fecha = Carbon::parse($fecha)->toDateString();

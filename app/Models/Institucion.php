@@ -264,7 +264,7 @@ class Institucion extends BaseModel
      * Personal siempre pueden. Cualquier rol adicional configurado en
      * `configuracion.roles_autorizan_licencias` también puede.
      */
-    public function puedeAutorizarLicencias(Usuario $user): bool
+    public function puedeAutorizarLicencias(User $user): bool
     {
         if ($user->permisos()->administrador()->tieneTodosLosPermisos()) {
             return true;
