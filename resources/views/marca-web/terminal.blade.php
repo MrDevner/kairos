@@ -568,7 +568,6 @@
     </div>
 
 <script>
-const FP   = '{{ $computador->fingerprint }}';
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
 // Offset servidor — calculado una vez al cargar la página
@@ -625,7 +624,7 @@ async function identificar() {
 
     try {
         const r = await apiPost('{{ route("marca-web.identificar") }}', {
-            documento: doc, fingerprint: FP,
+            documento: doc,
         });
 
         if (!r.ok || !r.json.ok) {
@@ -684,7 +683,7 @@ async function confirmar() {
     btn.innerHTML = '<span class="spin"></span> Registrando...';
     clearError('eVerif');
 
-    const payload = { documento: docActual, fingerprint: FP };
+    const payload = { documento: docActual };
     if (requierePass) payload.password = pass;
 
     try {
