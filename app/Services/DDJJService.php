@@ -4,16 +4,16 @@ namespace App\Services;
 
 use App\Models\DeclaracionJurada;
 use App\Models\Designacion;
-use App\Models\HorarioDdjj;
 use App\Models\User;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 
 class DDJJService
 {
     /**
-     * Valida que ninguno de los horarios propuestos se superponga con los
-     * bloques de DDJJ activas del usuario (en todas sus designaciones).
+     * Valida que ninguno de los horarios propuestos se superponga entre sí ni con los
+     * bloques de DDJJ activas del usuario, considerando únicamente designaciones que
+     * sigan vigentes (una designación dada de baja deja de "ocupar" el horario).
      *
      * @param  array<array{dia_semana: string, hora_entrada: string, hora_salida: string}>  $horarios
      * @throws ValidationException
@@ -23,7 +23,24 @@ class DDJJService
         array $horarios,
         ?DeclaracionJurada $excluirDdjj = null
     ): void {
+        // Solapamientos dentro del propio lote (relevante cuando un solo envío
+        // trae horarios de varias designaciones a la vez).
+        foreach ($horarios as $i => $a) {
+            foreach ($horarios as $j => $b) {
+                if ($i >= $j || $a['dia_semana'] !== $b['dia_semana']) {
+                    continue;
+                }
+
+                if ($a['hora_entrada'] < $b['hora_salida'] && $b['hora_entrada'] < $a['hora_salida']) {
+                    throw ValidationException::withMessages([
+                        'horarios' => "Los horarios declarados para el {$a['dia_semana']} se superponen entre sí.",
+                    ]);
+                }
+            }
+        }
+
         $query = DeclaracionJurada::deUsuario($usuario->id)->activas()
+            ->whereHas('designacion', fn (Builder $q) => $q->vigente())
             ->with('horarios');
 
         if ($excluirDdjj) {
@@ -53,13 +70,12 @@ class DDJJService
     }
 
     /**
-     * Valida que la suma de horas semanales declaradas no supere
-     * las horas obligatorias de la designación.
+     * Devuelve un mensaje de advertencia si las horas declaradas superan el máximo
+     * de la designación, o null si está dentro del límite. No bloquea el guardado.
      *
      * @param  array<array{hora_entrada: string, hora_salida: string}>  $horarios
-     * @throws ValidationException
      */
-    public function validarHorasMaximas(Designacion $designacion, array $horarios): void
+    public function advertenciaHorasMaximas(Designacion $designacion, array $horarios): ?string
     {
         $minutosDeclarados = collect($horarios)->sum(function (array $h) {
             [$hE, $mE] = explode(':', $h['hora_entrada']);
@@ -69,15 +85,15 @@ class DDJJService
 
         $minutosObligatorios = $designacion->horasSemanalesObligatorias() * 60;
 
-        if ($minutosDeclarados > $minutosObligatorios) {
-            $horasDec = round($minutosDeclarados / 60, 2);
-            $horasObl = round($minutosObligatorios / 60, 2);
-
-            throw ValidationException::withMessages([
-                'horarios' => "Las horas declaradas ({$horasDec}h) superan "
-                    . "el máximo permitido por la designación ({$horasObl}h semanales).",
-            ]);
+        if ($minutosDeclarados <= $minutosObligatorios) {
+            return null;
         }
+
+        $horasDec = round($minutosDeclarados / 60, 2);
+        $horasObl = round($minutosObligatorios / 60, 2);
+
+        return "Designación \"{$designacion->cargo->nombre}\": las horas declaradas "
+            . "({$horasDec}h) superan el máximo permitido ({$horasObl}h semanales).";
     }
 
     /**

@@ -82,7 +82,9 @@
       "Bash(curl -s -b /tmp/cookies2.txt -o /tmp/perfil.html -w \"GET /perfil -> %{http_code}\\\\n\" http://127.0.0.1:8123/perfil)",
       "Bash(php -l app/Http/Controllers/MarcaWebController.php)",
       "Bash(curl -s -b /tmp/term_cookies.txt -o /tmp/step3.html -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8124/terminal)",
-      "Bash(curl -s -b /tmp/term_cookies.txt -o /tmp/step4.html -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8124/terminal)"
+      "Bash(curl -s -b /tmp/term_cookies.txt -o /tmp/step4.html -w \"status=%{http_code}\\\\n\" http://127.0.0.1:8124/terminal)",
+      "Bash(php test_route_debug.php)",
+      "Bash(php test_route_debug2.php)"
     ]
   }
 }

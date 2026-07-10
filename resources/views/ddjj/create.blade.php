@@ -49,7 +49,7 @@
 
 {{-- Indicador de pasos --}}
 <div class="step-indicator">
-    <div class="step active" id="ind-1">1. Datos generales</div>
+    <div class="step active" id="ind-1">1. Trabajador y datos generales</div>
     <div class="step" id="ind-2">2. Horario semanal</div>
     <div class="step" id="ind-3">3. Resumen y envío</div>
 </div>
@@ -61,34 +61,34 @@
     <div class="wizard-step active" id="step-1">
         <div class="card">
             <div class="card-header" style="background:var(--azul);color:#fff">
-                <i class="bi bi-1-circle me-1"></i> Paso 1: Datos generales
+                <i class="bi bi-1-circle me-1"></i> Paso 1: Trabajador y datos generales
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Designación <span class="text-danger">*</span></label>
-                        <select name="id_designacion" id="id_designacion" class="form-select form-select-sm @error('id_designacion') is-invalid @enderror" required>
-                            <option value="">— Seleccione una designación —</option>
-                            @foreach($designaciones as $des)
-                                <option value="{{ $des->id }}" @selected(old('id_designacion') == $des->id)>
-                                    {{ $des->usuario->nombre_completo ?? '?' }} — {{ $des->cargo->nombre ?? '?' }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_designacion')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <label class="form-label fw-semibold small">Trabajador <span class="text-danger">*</span></label>
+                        @if($puedeGestionar)
+                            <select name="id_usuario" id="sel-trabajador" class="form-select form-select-sm @error('id_usuario') is-invalid @enderror" style="width:100%" required>
+                                <option value="">— Buscar trabajador —</option>
+                            </select>
+                        @else
+                            <input type="hidden" name="id_usuario" value="{{ $user->id }}">
+                            <input type="text" class="form-control form-control-sm" readonly value="{{ $user->nombre_completo }}">
+                        @endif
+                        @error('id_usuario')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-3">
                         <label class="form-label fw-semibold small">Fecha inicio <span class="text-danger">*</span></label>
                         <input type="date" name="fecha_inicio" id="s1_fecha_inicio"
                                class="form-control form-control-sm @error('fecha_inicio') is-invalid @enderror"
-                               value="{{ old('fecha_inicio') }}" required>
+                               value="{{ old('fecha_inicio', now()->toDateString()) }}" required>
                         @error('fecha_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Fecha fin <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold small">Fecha fin</label>
                         <input type="date" name="fecha_fin" id="s1_fecha_fin"
                                class="form-control form-control-sm @error('fecha_fin') is-invalid @enderror"
-                               value="{{ old('fecha_fin') }}" required>
+                               value="{{ old('fecha_fin') }}">
                         @error('fecha_fin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-12">
@@ -110,32 +110,14 @@
 
     {{-- ═══════════ PASO 2 ═══════════ --}}
     <div class="wizard-step" id="step-2">
-        <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
-                <i class="bi bi-2-circle me-1"></i> Paso 2: Horario semanal
-            </div>
-            <div class="card-body">
-                @php
-                    $dias = ['lunes','martes','miercoles','jueves','viernes'];
-                    $diasLabels = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
-                    $modalidades = ['presencial','remoto','mixto'];
-                @endphp
-
-                @foreach($dias as $i => $dia)
-                <div class="mb-4">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <strong class="small">{{ $diasLabels[$i] }}</strong>
-                        <button type="button" class="btn btn-xs btn-outline-primary btn-sm py-0 px-2"
-                                onclick="agregarHorario('{{ $dia }}')">
-                            <i class="bi bi-plus-lg me-1"></i> Agregar horario
-                        </button>
-                    </div>
-                    <div id="horarios-{{ $dia }}">
-                        {{-- Filas de horario generadas dinámicamente --}}
-                    </div>
-                </div>
-                @endforeach
-            </div>
+        <div id="bloques-designaciones">
+            <p class="text-muted small">
+                @if($puedeGestionar)
+                    Seleccione un trabajador en el paso 1 para ver sus designaciones vigentes.
+                @else
+                    Cargando sus designaciones vigentes…
+                @endif
+            </p>
         </div>
         <div class="d-flex justify-content-between mt-3">
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="goStep(1)">
@@ -158,8 +140,8 @@
                 <div class="row g-2 mb-3">
                     <div class="col-md-6">
                         <div class="border rounded p-2 small">
-                            <strong>Designación:</strong>
-                            <span id="res-designacion" class="ms-1">—</span>
+                            <strong>Trabajador:</strong>
+                            <span id="res-trabajador" class="ms-1">—</span>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -182,7 +164,7 @@
 
                 <div class="alert alert-info small py-2">
                     <i class="bi bi-info-circle me-1"></i>
-                    Al guardar, la declaración quedará en estado <strong>Borrador</strong>. Luego podrá presentarla.
+                    Al guardar, cada designación con horario cargado quedará como una declaración jurada en estado <strong>Borrador</strong>. Luego podrán presentarse.
                 </div>
             </div>
         </div>
@@ -201,9 +183,143 @@
 
 @push('scripts')
 <script>
-    const dias = ['lunes','martes','miercoles','jueves','viernes'];
-    const diasLabels = { lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes' };
-    let contadores = { lunes:0, martes:0, miercoles:0, jueves:0, viernes:0 };
+    const DIAS = ['lunes','martes','miercoles','jueves','viernes'];
+    const DIAS_LABEL = { lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes' };
+    const EDIFICIOS = @json($edificios);
+    let filaIdx = 0;
+
+    @if($puedeGestionar)
+    $('#sel-trabajador').select2({
+        placeholder: 'Buscar trabajador por apellido, nombre o documento…',
+        minimumInputLength: 3,
+        language: {
+            inputTooShort: function () { return 'Ingrese al menos 3 caracteres'; },
+            searching:     function () { return 'Buscando…'; },
+            noResults:     function () { return 'Sin resultados'; },
+        },
+        ajax: {
+            url: '{{ route('ddjj.trabajadores-buscar') }}',
+            dataType: 'json',
+            delay: 300,
+            data: params => ({ q: params.term }),
+            processResults: data => data,
+        },
+    });
+    $('#sel-trabajador').on('change', function () { cargarDesignaciones(this.value); });
+    @else
+    document.addEventListener('DOMContentLoaded', function () { cargarDesignaciones({{ $user->id }}); });
+    @endif
+
+    function cargarDesignaciones(idUsuario) {
+        const cont = document.getElementById('bloques-designaciones');
+        cont.innerHTML = '<p class="text-muted small">Cargando designaciones…</p>';
+
+        if (!idUsuario) {
+            cont.innerHTML = '<p class="text-muted small">Seleccione un trabajador en el paso 1 para ver sus designaciones vigentes.</p>';
+            return;
+        }
+
+        fetch('{{ route('ddjj.designaciones-activas') }}?id_usuario=' + idUsuario)
+            .then(r => r.json())
+            .then(data => {
+                cont.innerHTML = '';
+                if (!data.length) {
+                    cont.innerHTML = '<div class="alert alert-warning small mb-0">El trabajador no tiene designaciones vigentes en esta institución.</div>';
+                    return;
+                }
+                data.forEach(d => cont.appendChild(renderBloqueDesignacion(d)));
+            });
+    }
+
+    function renderBloqueDesignacion(d) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card mb-3';
+        wrapper.dataset.designacionText = d.text;
+
+        let diasHtml = '';
+        DIAS.forEach(dia => {
+            diasHtml += `
+            <div class="mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <strong class="small">${DIAS_LABEL[dia]}</strong>
+                    <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2"
+                            onclick="agregarHorario(${d.id}, '${dia}')">
+                        <i class="bi bi-plus-lg me-1"></i> Agregar horario
+                    </button>
+                </div>
+                <div id="horarios-${d.id}-${dia}"></div>
+            </div>`;
+        });
+
+        wrapper.innerHTML = `
+            <div class="card-header" style="background:var(--celeste);color:#fff">
+                <i class="bi bi-briefcase me-1"></i> ${d.text}
+                ${d.horas_obligatorias ? `<span class="badge bg-light text-dark ms-2">${d.horas_obligatorias}h/sem</span>` : ''}
+            </div>
+            <div class="card-body">${diasHtml}</div>
+        `;
+        return wrapper;
+    }
+
+    function opcionesEdificios() {
+        let html = '<option value="">— Sin especificar —</option>';
+        EDIFICIOS.forEach(e => { html += `<option value="${e.id}">${e.nombre}</option>`; });
+        return html;
+    }
+
+    function actualizarOficinas(selectEdificio) {
+        const selectOficina = selectEdificio.closest('.horario-row').querySelector('[name*="[id_oficina]"]');
+        const edificio = EDIFICIOS.find(e => String(e.id) === selectEdificio.value);
+        let html = '<option value="">— Sin especificar —</option>';
+        if (edificio) {
+            edificio.oficinas.forEach(o => { html += `<option value="${o.id}">${o.nombre}</option>`; });
+        }
+        selectOficina.innerHTML = html;
+    }
+
+    function agregarHorario(idDesignacion, dia) {
+        const idx = filaIdx++;
+        const container = document.getElementById(`horarios-${idDesignacion}-${dia}`);
+        const div = document.createElement('div');
+        div.className = 'horario-row d-flex flex-wrap gap-2 align-items-center';
+        div.innerHTML = `
+            <input type="hidden" name="horarios[${idx}][id_designacion]" value="${idDesignacion}">
+            <input type="hidden" name="horarios[${idx}][dia_semana]" value="${dia}">
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Entrada</label>
+                <input type="time" name="horarios[${idx}][hora_entrada]" class="form-control form-control-sm" style="width:120px">
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Salida</label>
+                <input type="time" name="horarios[${idx}][hora_salida]" class="form-control form-control-sm" style="width:120px">
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Modalidad</label>
+                <select name="horarios[${idx}][modalidad]" class="form-select form-select-sm" style="width:140px">
+                    <option value="presencial" selected>Presencial</option>
+                    <option value="remoto">Remoto</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Edificio</label>
+                <select name="horarios[${idx}][id_edificio]" class="form-select form-select-sm" style="width:160px" onchange="actualizarOficinas(this)">
+                    ${opcionesEdificios()}
+                </select>
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Oficina/Aula</label>
+                <select name="horarios[${idx}][id_oficina]" class="form-select form-select-sm" style="width:160px">
+                    <option value="">— Sin especificar —</option>
+                </select>
+            </div>
+            <div class="mt-3">
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="this.closest('.horario-row').remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
 
     function goStep(num) {
         document.querySelectorAll('.wizard-step').forEach(function(s) { s.classList.remove('active'); });
@@ -219,57 +335,38 @@
         window.scrollTo(0, 0);
     }
 
-    function agregarHorario(dia) {
-        const idx = contadores[dia]++;
-        const container = document.getElementById('horarios-' + dia);
-        const div = document.createElement('div');
-        div.className = 'horario-row d-flex flex-wrap gap-2 align-items-center';
-        div.innerHTML = `
-            <div>
-                <label class="form-label form-label-sm mb-0 small">Entrada</label>
-                <input type="time" name="horarios[${dia}][${idx}][hora_entrada]" class="form-control form-control-sm" style="width:120px">
-            </div>
-            <div>
-                <label class="form-label form-label-sm mb-0 small">Salida</label>
-                <input type="time" name="horarios[${dia}][${idx}][hora_salida]" class="form-control form-control-sm" style="width:120px">
-            </div>
-            <div>
-                <label class="form-label form-label-sm mb-0 small">Modalidad</label>
-                <select name="horarios[${dia}][${idx}][modalidad]" class="form-select form-select-sm" style="width:140px">
-                    <option value="">—</option>
-                    <option value="presencial">Presencial</option>
-                    <option value="remoto">Remoto</option>
-                    <option value="mixto">Mixto</option>
-                </select>
-            </div>
-            <div class="mt-3">
-                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="this.closest('.horario-row').remove()">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        `;
-        container.appendChild(div);
-    }
-
     function buildSummary() {
-        const des = document.getElementById('id_designacion');
-        document.getElementById('res-designacion').textContent = des.options[des.selectedIndex]?.text ?? '—';
+        @if($puedeGestionar)
+            const selTrabajador = document.getElementById('sel-trabajador');
+            document.getElementById('res-trabajador').textContent =
+                (selTrabajador.selectedOptions[0] && selTrabajador.selectedOptions[0].textContent) || '—';
+        @else
+            document.getElementById('res-trabajador').textContent = '{{ $user->nombre_completo }}';
+        @endif
         document.getElementById('res-fecha-ini').textContent = document.getElementById('s1_fecha_inicio').value || '—';
         document.getElementById('res-fecha-fin').textContent = document.getElementById('s1_fecha_fin').value || '—';
 
-        let html = '<div class="table-responsive"><table class="table table-sm table-bordered small mb-0"><thead class="table-light"><tr><th>Día</th><th>Entrada</th><th>Salida</th><th>Modalidad</th></tr></thead><tbody>';
+        let html = '<div class="table-responsive"><table class="table table-sm table-bordered small mb-0">'
+            + '<thead class="table-light"><tr><th>Designación</th><th>Día</th><th>Entrada</th><th>Salida</th><th>Modalidad</th><th>Ubicación</th></tr></thead><tbody>';
         let hasRows = false;
-        dias.forEach(function(dia) {
-            const rows = document.querySelectorAll('#horarios-' + dia + ' .horario-row');
-            rows.forEach(function(row) {
+
+        document.querySelectorAll('#bloques-designaciones > .card').forEach(function(bloque) {
+            const designacionText = bloque.dataset.designacionText || '—';
+            bloque.querySelectorAll('.horario-row').forEach(function(row) {
                 hasRows = true;
+                const dia     = row.querySelector('[name*="dia_semana"]')?.value || '—';
                 const entrada = row.querySelector('[name*="hora_entrada"]')?.value || '—';
                 const salida  = row.querySelector('[name*="hora_salida"]')?.value || '—';
                 const modal   = row.querySelector('[name*="modalidad"]')?.value || '—';
-                html += `<tr><td>${diasLabels[dia]}</td><td>${entrada}</td><td>${salida}</td><td>${modal}</td></tr>`;
+                const selEdif = row.querySelector('[name*="[id_edificio]"]');
+                const selOfi  = row.querySelector('[name*="[id_oficina]"]');
+                const edifTxt = selEdif && selEdif.value ? selEdif.selectedOptions[0].textContent : '';
+                const ofiTxt  = selOfi && selOfi.value ? selOfi.selectedOptions[0].textContent : '';
+                const ubicacion = [edifTxt, ofiTxt].filter(Boolean).join(' — ') || '—';
+                html += `<tr><td>${designacionText}</td><td>${DIAS_LABEL[dia] || dia}</td><td>${entrada}</td><td>${salida}</td><td>${modal}</td><td>${ubicacion}</td></tr>`;
             });
         });
-        if (!hasRows) html += '<tr><td colspan="4" class="text-center text-muted">Sin horarios cargados</td></tr>';
+        if (!hasRows) html += '<tr><td colspan="6" class="text-center text-muted">Sin horarios cargados</td></tr>';
         html += '</tbody></table></div>';
         document.getElementById('res-horarios').innerHTML = html;
     }

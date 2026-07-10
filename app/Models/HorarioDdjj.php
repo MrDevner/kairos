@@ -16,6 +16,8 @@ class HorarioDdjj extends BaseModel
         'modalidad',
         'id_institucion_externa',
         'id_dependencia',
+        'id_edificio',
+        'id_oficina',
     ];
 
     // ── Relaciones ─────────────────────────────────────────────────────────
@@ -33,6 +35,16 @@ class HorarioDdjj extends BaseModel
     public function dependencia(): BelongsTo
     {
         return $this->belongsTo(Dependencia::class, 'id_dependencia');
+    }
+
+    public function edificio(): BelongsTo
+    {
+        return $this->belongsTo(Edificio::class, 'id_edificio');
+    }
+
+    public function oficina(): BelongsTo
+    {
+        return $this->belongsTo(Oficina::class, 'id_oficina');
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

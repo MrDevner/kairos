@@ -83,17 +83,19 @@
                         <th>Modalidad</th>
                         <th>Inst. externa</th>
                         <th>Dependencia</th>
+                        <th>Edificio</th>
+                        <th>Oficina/Aula</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($dias as $i => $dia)
                         @php
-                            $horariosDia = $ddjj->horarios->where('dia', $dia);
+                            $horariosDia = $ddjj->horarios->where('dia_semana', $dia)->values();
                         @endphp
                         @if($horariosDia->isEmpty())
                             <tr>
                                 <td class="fw-semibold small">{{ $diasLabels[$i] }}</td>
-                                <td colspan="5" class="text-muted small">Sin horario registrado</td>
+                                <td colspan="7" class="text-muted small">Sin horario registrado</td>
                             </tr>
                         @else
                             @foreach($horariosDia as $j => $h)
@@ -110,8 +112,10 @@
                                             —
                                         @endif
                                     </td>
-                                    <td class="small">{{ $h->institucion_externa ?? '—' }}</td>
+                                    <td class="small">{{ $h->institucionExterna->nombre ?? '—' }}</td>
                                     <td class="small">{{ $h->dependencia->nombre ?? '—' }}</td>
+                                    <td class="small">{{ $h->edificio->nombre ?? '—' }}</td>
+                                    <td class="small">{{ $h->oficina->nombre ?? '—' }}</td>
                                 </tr>
                             @endforeach
                         @endif

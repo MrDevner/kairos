@@ -17,7 +17,7 @@
     </a>
 </div>
 
-<div class="card" style="max-width:720px">
+<div class="card">
     <div class="card-header" style="background:var(--azul);color:#fff">
         <i class="bi bi-person me-1"></i> Datos del usuario
     </div>

@@ -66,10 +66,10 @@
                         @error('fecha_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-semibold small">Fecha fin <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold small">Fecha fin</label>
                         <input type="date" name="fecha_fin" id="s1_fecha_fin"
                                class="form-control form-control-sm @error('fecha_fin') is-invalid @enderror"
-                               value="{{ old('fecha_fin', $ddjj->fecha_fin->format('Y-m-d')) }}" required>
+                               value="{{ old('fecha_fin', $ddjj->fecha_fin?->format('Y-m-d')) }}">
                         @error('fecha_fin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-12">
@@ -99,7 +99,7 @@
                 @php
                     $dias = ['lunes','martes','miercoles','jueves','viernes'];
                     $diasLabels = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
-                    $horariosPorDia = $ddjj->horarios->groupBy('dia');
+                    $horariosPorDia = $ddjj->horarios->groupBy('dia_semana');
                 @endphp
 
                 @foreach($dias as $i => $dia)
@@ -182,32 +182,70 @@
 <script>
     const dias = ['lunes','martes','miercoles','jueves','viernes'];
     const diasLabels = { lunes:'Lunes', martes:'Martes', miercoles:'Miércoles', jueves:'Jueves', viernes:'Viernes' };
-    let contadores = { lunes:0, martes:0, miercoles:0, jueves:0, viernes:0 };
 
     // Horarios existentes precargados desde el servidor
-    const horariosExistentes = @json($ddjj->horarios->groupBy('dia'));
+    const horariosExistentes = @json($ddjj->horarios->groupBy('dia_semana'));
+    const EDIFICIOS = @json($edificios);
+    let filaIdx = 0;
 
-    function crearFilaHorario(dia, idx, entrada, salida, modalidad) {
+    function opcionesEdificios(idSeleccionado) {
+        let html = '<option value="">— Sin especificar —</option>';
+        EDIFICIOS.forEach(e => {
+            html += `<option value="${e.id}" ${String(e.id) === String(idSeleccionado || '') ? 'selected' : ''}>${e.nombre}</option>`;
+        });
+        return html;
+    }
+
+    function opcionesOficinas(idEdificio, idSeleccionado) {
+        let html = '<option value="">— Sin especificar —</option>';
+        const edificio = EDIFICIOS.find(e => String(e.id) === String(idEdificio || ''));
+        if (edificio) {
+            edificio.oficinas.forEach(o => {
+                html += `<option value="${o.id}" ${String(o.id) === String(idSeleccionado || '') ? 'selected' : ''}>${o.nombre}</option>`;
+            });
+        }
+        return html;
+    }
+
+    function actualizarOficinas(selectEdificio) {
+        const selectOficina = selectEdificio.closest('.horario-row').querySelector('[name*="[id_oficina]"]');
+        selectOficina.innerHTML = opcionesOficinas(selectEdificio.value, null);
+    }
+
+    function crearFilaHorario(dia, entrada, salida, modalidad, idEdificio, idOficina) {
+        const idx = filaIdx++;
         const div = document.createElement('div');
         div.className = 'horario-row d-flex flex-wrap gap-2 align-items-center';
         div.innerHTML = `
+            <input type="hidden" name="horarios[${idx}][dia_semana]" value="${dia}">
             <div>
                 <label class="form-label form-label-sm mb-0 small">Entrada</label>
-                <input type="time" name="horarios[${dia}][${idx}][hora_entrada]" class="form-control form-control-sm"
+                <input type="time" name="horarios[${idx}][hora_entrada]" class="form-control form-control-sm"
                        style="width:120px" value="${entrada || ''}">
             </div>
             <div>
                 <label class="form-label form-label-sm mb-0 small">Salida</label>
-                <input type="time" name="horarios[${dia}][${idx}][hora_salida]" class="form-control form-control-sm"
+                <input type="time" name="horarios[${idx}][hora_salida]" class="form-control form-control-sm"
                        style="width:120px" value="${salida || ''}">
             </div>
             <div>
                 <label class="form-label form-label-sm mb-0 small">Modalidad</label>
-                <select name="horarios[${dia}][${idx}][modalidad]" class="form-select form-select-sm" style="width:140px">
+                <select name="horarios[${idx}][modalidad]" class="form-select form-select-sm" style="width:140px">
                     <option value="">—</option>
                     <option value="presencial" ${modalidad === 'presencial' ? 'selected' : ''}>Presencial</option>
                     <option value="remoto"     ${modalidad === 'remoto'     ? 'selected' : ''}>Remoto</option>
-                    <option value="mixto"      ${modalidad === 'mixto'      ? 'selected' : ''}>Mixto</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Edificio</label>
+                <select name="horarios[${idx}][id_edificio]" class="form-select form-select-sm" style="width:160px" onchange="actualizarOficinas(this)">
+                    ${opcionesEdificios(idEdificio)}
+                </select>
+            </div>
+            <div>
+                <label class="form-label form-label-sm mb-0 small">Oficina/Aula</label>
+                <select name="horarios[${idx}][id_oficina]" class="form-select form-select-sm" style="width:160px">
+                    ${opcionesOficinas(idEdificio, idOficina)}
                 </select>
             </div>
             <div class="mt-3">
@@ -221,8 +259,7 @@
     }
 
     function agregarHorario(dia) {
-        const idx = contadores[dia]++;
-        document.getElementById('horarios-' + dia).appendChild(crearFilaHorario(dia, idx));
+        document.getElementById('horarios-' + dia).appendChild(crearFilaHorario(dia));
     }
 
     function goStep(num) {
@@ -241,7 +278,7 @@
         document.getElementById('res-fecha-ini').textContent = document.getElementById('s1_fecha_inicio').value || '—';
         document.getElementById('res-fecha-fin').textContent = document.getElementById('s1_fecha_fin').value || '—';
 
-        let html = '<div class="table-responsive"><table class="table table-sm table-bordered small mb-0"><thead class="table-light"><tr><th>Día</th><th>Entrada</th><th>Salida</th><th>Modalidad</th></tr></thead><tbody>';
+        let html = '<div class="table-responsive"><table class="table table-sm table-bordered small mb-0"><thead class="table-light"><tr><th>Día</th><th>Entrada</th><th>Salida</th><th>Modalidad</th><th>Ubicación</th></tr></thead><tbody>';
         let hasRows = false;
         dias.forEach(function(dia) {
             document.querySelectorAll('#horarios-' + dia + ' .horario-row').forEach(function(row) {
@@ -249,10 +286,15 @@
                 const entrada = row.querySelector('[name*="hora_entrada"]')?.value || '—';
                 const salida  = row.querySelector('[name*="hora_salida"]')?.value || '—';
                 const modal   = row.querySelector('[name*="modalidad"]')?.value || '—';
-                html += `<tr><td>${diasLabels[dia]}</td><td>${entrada}</td><td>${salida}</td><td>${modal}</td></tr>`;
+                const selEdif = row.querySelector('[name*="[id_edificio]"]');
+                const selOfi  = row.querySelector('[name*="[id_oficina]"]');
+                const edifTxt = selEdif && selEdif.value ? selEdif.selectedOptions[0].textContent : '';
+                const ofiTxt  = selOfi && selOfi.value ? selOfi.selectedOptions[0].textContent : '';
+                const ubicacion = [edifTxt, ofiTxt].filter(Boolean).join(' — ') || '—';
+                html += `<tr><td>${diasLabels[dia]}</td><td>${entrada}</td><td>${salida}</td><td>${modal}</td><td>${ubicacion}</td></tr>`;
             });
         });
-        if (!hasRows) html += '<tr><td colspan="4" class="text-center text-muted">Sin horarios cargados</td></tr>';
+        if (!hasRows) html += '<tr><td colspan="5" class="text-center text-muted">Sin horarios cargados</td></tr>';
         html += '</tbody></table></div>';
         document.getElementById('res-horarios').innerHTML = html;
     }
@@ -262,12 +304,13 @@
         dias.forEach(function(dia) {
             const filas = horariosExistentes[dia] || [];
             filas.forEach(function(h) {
-                const idx = contadores[dia]++;
                 const fila = crearFilaHorario(
-                    dia, idx,
+                    dia,
                     (h.hora_entrada || '').substring(0, 5),
                     (h.hora_salida  || '').substring(0, 5),
-                    h.modalidad || ''
+                    h.modalidad || '',
+                    h.id_edificio,
+                    h.id_oficina
                 );
                 document.getElementById('horarios-' + dia).appendChild(fila);
             });

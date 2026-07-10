@@ -16,6 +16,7 @@ use App\Http\Controllers\DDJJController;
 use App\Http\Controllers\DependenciaController;
 use App\Http\Controllers\DesignacionController;
 use App\Http\Controllers\DispositivoController;
+use App\Http\Controllers\EdificioController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonacionController;
 use App\Http\Controllers\InformeController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\InstitucionActivaController;
 use App\Http\Controllers\InstitucionController;
 use App\Http\Controllers\LicenciaController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\OficinaController;
 use App\Http\Controllers\RolInstitucionController;
 use App\Http\Controllers\TipoLicenciaController;
 use App\Http\Controllers\LogController;
@@ -93,6 +95,14 @@ Route::middleware('auth')->group(function () {
     Route::post('dependencias/{dependencia}/jefe',          [DependenciaController::class, 'asignarJefe'])->name('dependencias.jefe');
     Route::delete('dependencias/{dependencia}/jefe',        [DependenciaController::class, 'darDeBajaJefe'])->name('dependencias.jefe.baja');
 
+    // Edificios / Complejos
+    Route::resource('edificios', EdificioController::class)
+        ->parameters(['edificios' => 'edificio']);
+
+    // Oficinas / Aulas
+    Route::resource('oficinas', OficinaController::class)
+        ->parameters(['oficinas' => 'oficina']);
+
     // Usuarios
     Route::get('usuarios/buscar', [UsuarioController::class, 'buscar'])->name('usuarios.buscar');
     Route::resource('usuarios', UsuarioController::class);
@@ -105,9 +115,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('usuarios/{usuario}/roles-global', [AsignacionRolController::class, 'revocarGlobal'])->name('usuarios.roles.global.destroy');
 
     // Designaciones
-    Route::resource('designaciones', DesignacionController::class);
+    Route::resource('designaciones', DesignacionController::class)
+        ->parameters(['designaciones' => 'designacion']);
 
     // DDJJ
+    Route::get('ddjj/trabajadores-buscar',   [DDJJController::class, 'buscarTrabajadores'])->name('ddjj.trabajadores-buscar');
+    Route::get('ddjj/designaciones-activas', [DDJJController::class, 'designacionesActivasDeUsuario'])->name('ddjj.designaciones-activas');
     Route::resource('ddjj', DDJJController::class);
     Route::post('ddjj/{ddjj}/presentar', [DDJJController::class, 'presentar'])->name('ddjj.presentar');
     Route::post('ddjj/{ddjj}/aprobar',   [DDJJController::class, 'aprobar'])->name('ddjj.aprobar');

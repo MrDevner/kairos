@@ -44,12 +44,14 @@
 
 {{-- Institución --}}
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('dependencias.*','dispositivos.*','cargos.*','roles.*','tipos-licencia.*','calendario.*') ? 'active' : '' }}"
+    <a class="nav-link dropdown-toggle {{ request()->routeIs('dependencias.*','edificios.*','oficinas.*','dispositivos.*','cargos.*','roles.*','tipos-licencia.*','calendario.*') ? 'active' : '' }}"
        href="#" data-bs-toggle="dropdown">
         <i class="bi bi-building-fill"></i> Institución
     </a>
     <ul class="dropdown-menu">
         <li><a class="dropdown-item {{ request()->routeIs('dependencias.*') ? 'active' : '' }}" href="{{ route('dependencias.index') }}"><i class="bi bi-diagram-3-fill"></i> Dependencias</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('edificios.*') ? 'active' : '' }}" href="{{ route('edificios.index') }}"><i class="bi bi-building"></i> Edificios / Complejos</a></li>
+        <li><a class="dropdown-item {{ request()->routeIs('oficinas.*') ? 'active' : '' }}" href="{{ route('oficinas.index') }}"><i class="bi bi-door-open-fill"></i> Oficinas / Aulas</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('dispositivos.*') ? 'active' : '' }}" href="{{ route('dispositivos.index') }}"><i class="bi bi-hdd-network-fill"></i> Dispositivos</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="{{ route('cargos.index') }}"><i class="bi bi-briefcase-fill"></i> Cargos</a></li>
         <li><a class="dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><i class="bi bi-shield-fill-check"></i> Roles & permisos</a></li>
