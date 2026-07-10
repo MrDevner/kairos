@@ -91,14 +91,14 @@
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small">Fecha inicio <span class="text-danger">*</span></label>
                     <input type="date" name="fecha_inicio" class="form-control form-control-sm @error('fecha_inicio') is-invalid @enderror"
-                           value="{{ old('fecha_inicio', $designacion->fecha_inicio) }}" required>
+                           value="{{ old('fecha_inicio', $designacion->fecha_inicio?->format('Y-m-d')) }}" required>
                     @error('fecha_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label fw-semibold small">Fecha fin</label>
                     <input type="date" name="fecha_fin" class="form-control form-control-sm @error('fecha_fin') is-invalid @enderror"
-                           value="{{ old('fecha_fin', $designacion->fecha_fin) }}">
+                           value="{{ old('fecha_fin', $designacion->fecha_fin?->format('Y-m-d')) }}">
                     @error('fecha_fin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 

@@ -61,6 +61,17 @@
             </button>
         @endif
 
+        {{-- Eliminar (aprobada, solo con permiso) --}}
+        @if($ddjj->estado === 'aprobada' && auth()->user()->permisos()->ddjj()->delete())
+            <form method="POST" action="{{ route('ddjj.destroy', $ddjj) }}"
+                  onsubmit="return confirm('¿Eliminar esta declaración jurada aprobada? Esta acción no se puede deshacer.')">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                </button>
+            </form>
+        @endif
+
         <a href="{{ route('ddjj.index') }}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Volver
         </a>

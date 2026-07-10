@@ -90,6 +90,12 @@ class DesignacionController extends Controller
 
     public function destroy(Designacion $designacion): RedirectResponse
     {
+        abort_if(
+            $designacion->declaracionesJuradas()->exists(),
+            422,
+            'No se puede dar de baja: la designación tiene declaraciones juradas asociadas. Elimínelas primero.'
+        );
+
         $designacion->update(['activa' => false, 'fecha_fin' => now()->toDateString()]);
         return redirect()->route('designaciones.index')->with('success', 'Designación finalizada.');
     }

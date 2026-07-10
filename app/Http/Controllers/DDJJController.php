@@ -262,9 +262,15 @@ class DDJJController extends Controller
         return $redirect;
     }
 
-    public function destroy(DeclaracionJurada $ddjj): RedirectResponse
+    public function destroy(Request $request, DeclaracionJurada $ddjj): RedirectResponse
     {
-        abort_unless($ddjj->esBorrador(), 403, 'Solo se puede eliminar un borrador.');
+        $puedeEliminarAprobada = $ddjj->estaAprobada() && $request->user()->permisos()->ddjj()->delete();
+        abort_unless(
+            $ddjj->esBorrador() || $puedeEliminarAprobada,
+            403,
+            'No tiene permisos para eliminar esta declaración jurada.'
+        );
+
         $ddjj->horarios()->delete();
         $ddjj->delete();
         return redirect()->route('ddjj.index')->with('success', 'DDJJ eliminada.');

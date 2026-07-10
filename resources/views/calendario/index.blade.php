@@ -31,9 +31,19 @@
     <h5 class="fw-bold mb-0" style="color:var(--azul)">
         <i class="bi bi-calendar3 me-1"></i> Calendario
     </h5>
-    <a href="{{ route('calendario.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo evento
-    </a>
+    <div class="d-flex gap-2">
+        <form method="POST" action="{{ route('calendario.importar-feriados') }}"
+              onsubmit="return confirm('¿Importar los feriados nacionales de {{ $anio }} desde ArgentinaDatos?')">
+            @csrf
+            <input type="hidden" name="anio" value="{{ $anio }}">
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-cloud-download me-1"></i> Importar feriados {{ $anio }}
+            </button>
+        </form>
+        <a href="{{ route('calendario.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo evento
+        </a>
+    </div>
 </div>
 
 {{-- Filtros --}}

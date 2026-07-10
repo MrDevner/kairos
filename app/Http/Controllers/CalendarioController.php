@@ -7,8 +7,11 @@ use App\Models\CategoriaCargo;
 use App\Models\Dependencia;
 use App\Models\EventoCalendario;
 use App\Models\Institucion;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class CalendarioController extends Controller
@@ -105,6 +108,56 @@ class CalendarioController extends Controller
         $calendario->condiciones()->delete();
         $calendario->delete();
         return redirect()->route('calendario.index')->with('success', 'Evento eliminado.');
+    }
+
+    /**
+     * Importa los feriados nacionales de un año desde la API pública ArgentinaDatos.
+     */
+    public function importarFeriados(Request $request): RedirectResponse
+    {
+        $anio = (int) $request->input('anio', now()->year);
+
+        try {
+            $response = Http::timeout(10)->get("https://api.argentinadatos.com/v1/feriados/{$anio}");
+            $response->throw();
+        } catch (ConnectionException $e) {
+            return back()->with('error', 'No se pudo conectar con la API de feriados. Intente nuevamente más tarde.');
+        } catch (RequestException $e) {
+            return back()->with('error', 'La API de feriados respondió con un error para el año ' . $anio . '.');
+        }
+
+        $creados    = 0;
+        $existentes = 0;
+
+        foreach ($response->json() as $f) {
+            $yaExiste = EventoCalendario::where('fecha_inicio', $f['fecha'])
+                ->where('tipo', 'feriado')
+                ->whereNull('id_institucion')
+                ->exists();
+
+            if ($yaExiste) {
+                $existentes++;
+                continue;
+            }
+
+            EventoCalendario::create([
+                'id_institucion' => null,
+                'titulo'         => $f['nombre'],
+                'descripcion'    => 'Feriado ' . ($f['tipo'] ?? 'nacional') . ' — importado de ArgentinaDatos',
+                'fecha_inicio'   => $f['fecha'],
+                'tipo'           => 'feriado',
+                'afecta_computo' => true,
+            ]);
+            $creados++;
+        }
+
+        $mensaje = "{$creados} feriados importados";
+        if ($existentes) {
+            $mensaje .= " ({$existentes} ya existían)";
+        }
+        $mensaje .= " para el año {$anio}.";
+
+        return redirect()->route('calendario.index', ['anio' => $anio])->with('success', $mensaje);
     }
 
     private function validar(Request $request): array

@@ -97,10 +97,10 @@
                                     <i class="bi bi-pencil"></i>
                                 </a>
                                 <form method="POST" action="{{ route('designaciones.destroy', $des) }}" class="d-inline"
-                                      onsubmit="return confirm('¿Eliminar esta designación?')">
+                                      onsubmit="return confirm('¿Dar de baja esta designación?')">
                                     @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
+                                    <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Dar de baja">
+                                        <i class="bi bi-person-dash"></i>
                                     </button>
                                 </form>
                             </td>

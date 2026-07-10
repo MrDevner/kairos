@@ -128,6 +128,7 @@ Route::middleware('auth')->group(function () {
 
     // Calendario
     Route::resource('calendario', CalendarioController::class);
+    Route::post('calendario/importar-feriados', [CalendarioController::class, 'importarFeriados'])->name('calendario.importar-feriados');
 
     // Avisos
     Route::get('avisos/designaciones-usuario', [AvisoController::class, 'designacionesPorUsuario'])->name('avisos.designaciones-usuario');
