@@ -13,7 +13,7 @@ class InstitucionesSeeder extends Seeder
         $cph = Institucion::firstOrCreate(
             ['sigla' => 'CPH'],
             [
-                'nombre'               => 'El Colegio Pérez Hernández',
+                'nombre'               => 'Colegio Pérez Hernández',
                 'descripcion'          => 'Institución educativa El Colegio Pérez Hernández.',
                 'id_institucion_padre'  => null,
                 'activa'               => true,
