@@ -109,24 +109,24 @@
             <table class="cal-table">
                 <thead>
                     <tr>
-                        <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
+                        <th>Dom</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php
                         $primerDia = \Carbon\Carbon::create($anio, $mes, 1);
                         // Día de la semana: 1=Lun ... 7=Dom
-                        $inicio = $primerDia->copy()->startOfWeek(\Carbon\Carbon::MONDAY);
-                        $fin    = $primerDia->copy()->endOfMonth()->endOfWeek(\Carbon\Carbon::MONDAY);
+                        $inicio = $primerDia->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+                        $fin    = $primerDia->copy()->endOfMonth()->endOfWeek(\Carbon\Carbon::SUNDAY);
                         $cursor = $inicio->copy();
                         $hoy    = \Carbon\Carbon::today();
 
                         // Mapear eventos por fecha (multi-día: aparece en cada día del rango)
                         $eventosPorFecha = [];
                         foreach($eventos as $ev) {
-                            $d   = $ev->fecha_inicio->copy();
-                            $fin = $ev->fecha_fin ? $ev->fecha_fin->copy() : $ev->fecha_inicio->copy();
-                            while ($d <= $fin) {
+                            $d        = $ev->fecha_inicio->copy();
+                            $finEvent = $ev->fecha_fin ? $ev->fecha_fin->copy() : $ev->fecha_inicio->copy();
+                            while ($d <= $finEvent) {
                                 $eventosPorFecha[$d->format('Y-m-d')][] = $ev;
                                 $d->addDay();
                             }
