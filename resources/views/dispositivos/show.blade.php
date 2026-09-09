@@ -9,11 +9,11 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-hdd-network-fill me-1"></i> {{ $dispositivo->nombre }}
     </h5>
     <div>
-        <a href="{{ route('dispositivos.edit', $dispositivo) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('dispositivos.edit', $dispositivo) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('dispositivos.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -31,7 +31,7 @@
 <div class="row g-3" style="max-width:820px">
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Información general
             </div>
             <div class="card-body">
@@ -74,7 +74,7 @@
 
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-sliders me-1"></i> Configuración
             </div>
             <div class="card-body">
@@ -113,8 +113,7 @@
 @if($dispositivo->esWeb() || $computadores->isNotEmpty())
 <div class="mt-4" style="max-width:820px">
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center"
-             style="background:var(--azul);color:#fff">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <span><i class="bi bi-pc-display me-1"></i> Terminales web registrados</span>
             <span class="badge bg-light text-dark">{{ $computadores->count() }}</span>
         </div>

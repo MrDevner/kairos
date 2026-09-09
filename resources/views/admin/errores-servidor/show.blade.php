@@ -10,7 +10,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-bug-fill me-1"></i> {{ $errorServidor->clase_error }}
     </h5>
     <a href="{{ route('admin.errores-servidor.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -18,18 +18,12 @@
     </a>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 <div class="row g-3">
     <div class="col-lg-8">
         {{-- Detalle --}}
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Detalle
             </div>
             <div class="card-body">
@@ -64,7 +58,7 @@
         {{-- Parámetros de la solicitud --}}
         @if(!empty($errorServidor->parametros_solicitud))
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-braces me-1"></i> Parámetros de la solicitud
             </div>
             <div class="card-body p-0">
@@ -75,7 +69,7 @@
 
         {{-- Stack trace --}}
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-list-columns-reverse me-1"></i> Stack trace
             </div>
             <div class="card-body p-0">
@@ -85,7 +79,7 @@
 
         {{-- Notas --}}
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-chat-left-text me-1"></i> Notas
             </div>
             <div class="card-body">
@@ -106,7 +100,7 @@
     <div class="col-lg-4">
         {{-- Triage --}}
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-clipboard-check me-1"></i> Triage
             </div>
             <div class="card-body">
@@ -137,7 +131,7 @@
                         <textarea name="nota" class="form-control form-control-sm" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm w-100 btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Guardar
                     </button>
                 </form>

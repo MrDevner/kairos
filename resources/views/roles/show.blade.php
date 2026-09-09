@@ -11,7 +11,7 @@
 @php $puedeModificar = $nivelActor === 0 || $rol->nivel > $nivelActor; @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-shield-check me-1"></i> {{ $rol->nombre }}
         <span class="badge bg-{{ $rol->activo ? 'success' : 'secondary' }} ms-2">
             {{ $rol->activo ? 'Activo' : 'Inactivo' }}
@@ -20,7 +20,7 @@
     </h5>
     <div>
         @if($puedeModificar)
-            <a href="{{ route('roles.edit', $rol) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+            <a href="{{ route('roles.edit', $rol) }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-pencil me-1"></i> Editar
             </a>
         @else
@@ -40,7 +40,7 @@
 
 {{-- Matriz de permisos (sólo lectura) --}}
 <div class="card mb-3">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-key me-1"></i> Permisos por módulo
     </div>
     <div class="card-body p-0">
@@ -79,7 +79,7 @@
 
 {{-- Usuarios asignados --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-people me-2"></i> Usuarios con este rol
         <span class="badge bg-light text-dark ms-auto">{{ $rol->asignaciones->count() }}</span>
     </div>

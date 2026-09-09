@@ -9,7 +9,7 @@
 @push('styles')
 <style>
     .cal-table { table-layout: fixed; width: 100%; }
-    .cal-table th { background: var(--azul); color: #fff; text-align: center; padding: .4rem; font-size: .82rem; }
+    .cal-table th { background:var(--k2-primary); color: #fff; text-align: center; padding: .4rem; font-size: .82rem; }
     .cal-table td {
         vertical-align: top;
         padding: .35rem;
@@ -28,7 +28,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-calendar3 me-1"></i> Calendario
     </h5>
     <div class="d-flex gap-2">
@@ -40,7 +40,7 @@
                 <i class="bi bi-cloud-download me-1"></i> Importar feriados {{ $anio }}
             </button>
         </form>
-        <a href="{{ route('calendario.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('calendario.create') }}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Nuevo evento
         </a>
     </div>
@@ -74,7 +74,7 @@
                 </select>
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Ver
                 </button>
                 <a href="{{ route('calendario.index') }}" class="btn btn-sm btn-outline-secondary ms-1">Hoy</a>
@@ -95,7 +95,7 @@
 
 {{-- Cabecera del mes --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <a href="{{ route('calendario.index', ['mes' => $mes == 1 ? 12 : $mes - 1, 'anio' => $mes == 1 ? $anio - 1 : $anio, 'institucion' => request('institucion')]) }}"
            class="text-white me-2 text-decoration-none"><i class="bi bi-chevron-left"></i></a>
         <span class="flex-grow-1 text-center fw-semibold">

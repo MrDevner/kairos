@@ -10,7 +10,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-pencil me-1"></i> Editar Oficina
     </h5>
     <a href="{{ route('oficinas.show', $oficina) }}" class="btn btn-sm btn-outline-secondary">
@@ -19,7 +19,7 @@
 </div>
 
 <div class="card" style="max-width:680px">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-door-open-fill me-1"></i> Datos de la oficina
     </div>
     <div class="card-body">
@@ -63,7 +63,7 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-check-lg me-1"></i> Actualizar
                 </button>
                 <a href="{{ route('oficinas.show', $oficina) }}" class="btn btn-sm btn-outline-secondary">

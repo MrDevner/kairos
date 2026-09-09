@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-pencil-square me-1"></i> Editar marca
     </h5>
     <div class="d-flex gap-2">
@@ -24,7 +24,7 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-fingerprint me-1"></i> Datos de la marca
             </div>
             <div class="card-body">

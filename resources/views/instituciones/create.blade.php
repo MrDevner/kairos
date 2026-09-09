@@ -14,7 +14,7 @@
                     @csrf
                     @include('instituciones._form', ['padres' => $padres])
                     <div class="d-flex gap-2 mt-3">
-                        <button type="submit" class="btn" style="background:var(--azul);color:#fff">
+                        <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg"></i> Guardar
                         </button>
                         <a href="{{ route('instituciones.index') }}" class="btn btn-outline-secondary">Cancelar</a>

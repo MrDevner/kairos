@@ -10,7 +10,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h5 class="fw-bold mb-1" style="color:var(--azul)">
+        <h5 class="k2-page-title mb-1">
             <i class="bi bi-door-open-fill me-1"></i> {{ $oficina->nombre }}
             @if($oficina->activo)
                 <span class="badge bg-success ms-1">Activa</span>
@@ -26,7 +26,7 @@
         </div>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('oficinas.edit', $oficina) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('oficinas.edit', $oficina) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('oficinas.index') }}" class="btn btn-sm btn-outline-secondary">

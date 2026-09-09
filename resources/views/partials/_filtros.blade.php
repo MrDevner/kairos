@@ -5,7 +5,7 @@
         <form method="GET" action="{{ $action }}" class="row g-2 align-items-end">
             {{ $slot ?? '' }}
             <div class="col-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
                 <a href="{{ $action }}" class="btn btn-sm btn-outline-secondary">

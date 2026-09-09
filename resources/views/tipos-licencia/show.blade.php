@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-card-list me-1"></i> {{ $tipo->nombre }}
     </h5>
     <div class="d-flex gap-2">
@@ -29,7 +29,7 @@
 <div class="row g-3">
     <div class="col-lg-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos generales
             </div>
             <div class="card-body">
@@ -89,7 +89,7 @@
 
     <div class="col-lg-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-file-earmark-medical me-1"></i> Licencias registradas
                 <span class="badge bg-light text-dark ms-auto">{{ $tipo->licencias()->count() }}</span>
             </div>

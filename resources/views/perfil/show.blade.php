@@ -24,11 +24,11 @@
 @endphp
 
 <div class="d-flex align-items-center mb-3 gap-2">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-person-circle me-1"></i> Mi Perfil
     </h5>
     @if($puedeEditarTodo)
-        <span class="badge" style="background:var(--celeste);color:var(--azul);font-size:.75rem">
+        <span class="badge" style="background:var(--k2-primary-50);color:var(--k2-primary-text);font-size:.75rem">
             <i class="bi bi-shield-check me-1"></i> Edición completa
         </span>
     @endif
@@ -37,12 +37,6 @@
 @if(session('success') && !str_contains(session('success'), 'PIN'))
     <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
         {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3">
-        {{ session('error') }}
         <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
     </div>
 @endif
@@ -93,13 +87,13 @@
                         {{-- Foto de perfil --}}
                         <div class="col-lg-3">
                             <div class="card h-100">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-image me-1"></i> Foto de perfil
                                 </div>
                                 <div class="card-body text-center">
                                     <div id="preview-container" class="mb-3 mx-auto"
                                          style="width:100px;height:100px;border-radius:50%;overflow:hidden;
-                                                border:3px solid var(--celeste);background:var(--azul);
+                                                border:3px solid var(--celeste);background:var(--k2-primary);
                                                 display:flex;align-items:center;justify-content:center;">
                                         @if($usuario->foto)
                                             <img id="preview-img" src="{{ asset('storage/' . $usuario->foto) }}"
@@ -123,8 +117,7 @@
                         <div class="col-lg-9">
                             {{-- Datos personales --}}
                             <div class="card mb-3">
-                                <div class="card-header d-flex align-items-center justify-content-between"
-                                     style="background:var(--azul);color:#fff">
+                                <div class="card-header d-flex align-items-center justify-content-between">
                                     <span><i class="bi bi-person me-1"></i> Datos personales</span>
                                     @if(!$puedeEditarTodo)
                                         <span class="badge bg-secondary" style="font-size:.72rem">
@@ -238,7 +231,7 @@
 
                             {{-- Datos de contacto --}}
                             <div class="card">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-telephone me-1"></i> Datos de contacto
                                 </div>
                                 <div class="card-body">
@@ -402,7 +395,7 @@
                         <div class="col-lg-6">
                             {{-- Contraseña --}}
                             <div class="card mb-3">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-lock me-1"></i> Cambiar contraseña
                                 </div>
                                 <div class="card-body">
@@ -425,7 +418,7 @@
 
                             {{-- PIN de marca --}}
                             <div class="card">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-123 me-1"></i> PIN de marca
                                 </div>
                                 <div class="card-body">
@@ -464,7 +457,7 @@
                         <div class="col-lg-6">
                             {{-- Métodos de acceso --}}
                             <div class="card mb-3" id="metodos-login">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-key me-1"></i> Métodos de acceso
                                 </div>
                                 <div class="card-body">
@@ -527,7 +520,7 @@
 
                             {{-- Roles --}}
                             <div class="card">
-                                <div class="card-header" style="background:var(--azul);color:#fff">
+                                <div class="card-header">
                                     <i class="bi bi-shield-check me-1"></i> Roles
                                 </div>
                                 <div class="card-body">
@@ -537,7 +530,7 @@
                                         <p class="small fw-semibold text-muted mb-1">Roles globales</p>
                                         <div class="d-flex flex-wrap gap-1 mb-3">
                                             @foreach($rolesGlobal as $rg)
-                                                <span class="badge" style="background:var(--azul)">{{ $rg }}</span>
+                                                <span class="badge" style="background:var(--k2-primary)">{{ $rg }}</span>
                                             @endforeach
                                         </div>
                                     @endif
@@ -563,7 +556,7 @@
                                                     @foreach($usuario->rolesInstitucion as $ri)
                                                         <tr>
                                                             <td>
-                                                                <span class="badge" style="background:var(--celeste);color:var(--azul)">
+                                                                <span class="badge" style="background:var(--k2-primary-50);color:var(--k2-primary-text)">
                                                                     {{ $ri->rolInstitucion?->nombre ?? '—' }}
                                                                 </span>
                                                             </td>
@@ -591,7 +584,7 @@
     </div>{{-- /card --}}
 
     <div class="mt-3 d-flex gap-2">
-        <button type="submit" class="btn" style="background:var(--azul);color:#fff">
+        <button type="submit" class="btn btn-primary">
             <i class="bi bi-check-lg me-1"></i> Guardar cambios
         </button>
         <a href="{{ route('perfil') }}" class="btn btn-outline-secondary">

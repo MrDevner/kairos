@@ -11,12 +11,12 @@
 {{-- Header usuario --}}
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div class="d-flex align-items-center gap-3">
-        <div style="width:54px;height:54px;border-radius:50%;background:var(--azul);color:#fff;
+        <div style="width:54px;height:54px;border-radius:50%;background:var(--k2-primary);color:#fff;
                     display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem">
             {{ strtoupper(substr($usuario->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($usuario->apellidos ?? '', 0, 1)) }}
         </div>
         <div>
-            <h5 class="fw-bold mb-0" style="color:var(--azul)">{{ $usuario->nombre_completo ?? '—' }}</h5>
+            <h5 class="k2-page-title">{{ $usuario->nombre_completo ?? '—' }}</h5>
             <div class="small text-muted">Banco de Horas</div>
         </div>
     </div>
@@ -27,7 +27,7 @@
 
 @foreach($bancos as $banco)
 <div class="card mb-4">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-briefcase me-1"></i>
         {{ $banco->designacion->cargo->nombre ?? 'Sin cargo' }}
         @if($banco->designacion->institucion)
@@ -137,7 +137,7 @@
                            placeholder="Motivo del ajuste…" required maxlength="200">
                 </div>
                 <div class="col-sm-auto">
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff"
+                    <button type="submit" class="btn btn-sm btn-primary"
                             onclick="return confirm('¿Confirmar ajuste manual de horas?')">
                         <i class="bi bi-check-lg me-1"></i> Aplicar ajuste
                     </button>

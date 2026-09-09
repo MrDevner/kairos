@@ -15,7 +15,7 @@
     $documentoBloqueado = $mostrarDatos && ! $errors->has('documento');
 @endphp
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-person-plus me-1"></i> Nuevo Usuario
     </h5>
     <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -101,15 +101,6 @@
                                value="{{ old('nacimiento') }}">
                         @error('nacimiento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <div class="form-check mb-1">
-                            <input type="hidden" name="activo" value="0">
-                            <input class="form-check-input" type="checkbox" name="activo" id="activo" value="1"
-                                   @checked(old('activo', 1))>
-                            <label class="form-check-label small" for="activo">Usuario activo</label>
-                        </div>
-                    </div>
-
                     {{-- Contraseña --}}
                     <div class="col-md-6">
                         <label class="form-label fw-semibold small">Contraseña</label>
@@ -130,7 +121,7 @@
                         <label class="form-label fw-semibold small">Foto de perfil</label>
                         <div class="d-flex align-items-center gap-3">
                             <div id="preview-container" style="width:70px;height:70px;border-radius:50%;
-                                 background:var(--azul);color:#fff;display:flex;align-items:center;
+                                 background:var(--k2-primary);color:#fff;display:flex;align-items:center;
                                  justify-content:center;font-size:1.5rem;overflow:hidden;flex-shrink:0">
                                 <i class="bi bi-person" id="preview-icon"></i>
                                 <img id="preview-img" src="#" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
@@ -168,7 +159,7 @@
                 </div>
 
                 <div class="d-flex gap-2 mt-4">
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Guardar
                     </button>
                     <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>

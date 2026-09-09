@@ -36,12 +36,12 @@
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-calendar-event me-1"></i> {{ $calendario->titulo }}
         <span class="badge ms-2 {{ $tipoColor ? 'bg-'.$tipoColor : '' }}" style="{{ $tipoStyle }}">{{ $tipoLabel }}</span>
     </h5>
     <div>
-        <a href="{{ route('calendario.edit', $calendario) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('calendario.edit', $calendario) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <form method="POST" action="{{ route('calendario.destroy', $calendario) }}"
@@ -63,7 +63,7 @@
     {{-- Datos del evento --}}
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos del evento
             </div>
             <div class="card-body">
@@ -139,7 +139,7 @@
     @if($calendario->tipo === 'evento_condicional')
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-funnel me-1"></i> Condiciones
                 <span class="badge bg-light text-dark ms-2">{{ $calendario->condiciones->count() }}</span>
             </div>

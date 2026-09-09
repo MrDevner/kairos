@@ -9,14 +9,14 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-diagram-3-fill me-1"></i> {{ $dependencia->nombre }}
         @if($dependencia->sigla)
             <span class="badge bg-secondary ms-1">{{ $dependencia->sigla }}</span>
         @endif
     </h5>
     <div>
-        <a href="{{ route('dependencias.edit', $dependencia) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('dependencias.edit', $dependencia) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('dependencias.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -29,7 +29,7 @@
     {{-- Columna izquierda: datos --}}
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos
             </div>
             <div class="card-body">
@@ -73,7 +73,7 @@
 
         {{-- Sub-dependencias --}}
         <div class="card mt-3">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-diagram-2 me-1"></i> Sub-dependencias
                 <span class="badge bg-light text-dark ms-auto">{{ $dependencia->hijos->count() }}</span>
             </div>
@@ -106,7 +106,7 @@
     <div class="col-md-8">
         {{-- Jefatura actual --}}
         <div class="card mb-3">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-person-badge me-1"></i> Jefatura actual
                 <button type="button" class="btn btn-sm btn-light ms-auto"
                         data-bs-toggle="modal" data-bs-target="#modalAsignarJefe">
@@ -116,7 +116,7 @@
             <div class="card-body">
                 @if($jefeActual)
                     <div class="d-flex align-items-center gap-3">
-                        <div style="width:52px;height:52px;border-radius:50%;background:var(--azul);
+                        <div style="width:52px;height:52px;border-radius:50%;background:var(--k2-primary);
                                     color:#fff;display:flex;align-items:center;justify-content:center;
                                     font-weight:700;font-size:1.1rem;flex-shrink:0">
                             {{ strtoupper(substr($jefeActual->usuario->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($jefeActual->usuario->apellidos ?? '', 0, 1)) }}
@@ -157,7 +157,7 @@
 
         {{-- Historial de jefaturas --}}
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-clock-history me-1"></i> Historial de jefaturas
             </div>
             <div class="card-body p-0">
@@ -213,7 +213,7 @@
         <div class="modal-content">
             <form method="POST" action="{{ route('dependencias.jefe', $dependencia) }}">
                 @csrf
-                <div class="modal-header" style="background:var(--azul);color:#fff">
+                <div class="modal-header" style="background:var(--k2-primary);color:#fff">
                     <h6 class="modal-title" id="modalAsignarJefeLabel">
                         <i class="bi bi-person-badge me-1"></i> Asignar jefe — {{ $dependencia->nombre }}
                     </h6>
@@ -262,7 +262,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Asignar
                     </button>
                 </div>

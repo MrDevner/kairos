@@ -9,7 +9,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-bug-fill me-1"></i> Errores de servidor
     </h5>
 </div>
@@ -114,7 +114,7 @@
                        placeholder="Mensaje, endpoint, clase, correlation id…">
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i>
                 </button>
                 <a href="{{ route('admin.errores-servidor.index', ['tab' => $tab]) }}" class="btn btn-sm btn-outline-secondary ms-1">

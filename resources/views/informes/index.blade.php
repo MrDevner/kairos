@@ -8,14 +8,14 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-file-earmark-bar-graph-fill me-1"></i> Informes de asistencia
     </h5>
 </div>
 
 {{-- Generar informe --}}
 <div class="card mb-3">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-plus-circle me-1"></i> Generar nuevo informe
     </div>
     <div class="card-body">
@@ -38,7 +38,7 @@
                 @error('fecha')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-gear me-1"></i> Generar informe
                 </button>
             </div>
@@ -65,7 +65,7 @@
                 <input type="date" name="hasta" value="{{ request('hasta') }}" class="form-control form-control-sm" placeholder="Hasta">
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Filtrar
                 </button>
                 <a href="{{ route('informes.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -78,7 +78,7 @@
 
 {{-- Tabla --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-list-ul me-2"></i> Informes generados
         <span class="badge bg-light text-dark ms-auto">{{ $informes->total() }} registros</span>
     </div>

@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-hdd-network me-1"></i> Nuevo Dispositivo
     </h5>
     <a href="{{ route('dispositivos.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -18,7 +18,7 @@
 </div>
 
 <div class="card" style="max-width:680px">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-hdd-network me-1"></i> Datos del dispositivo
     </div>
     <div class="card-body">
@@ -26,7 +26,7 @@
             @csrf
             @include('dispositivos._form', ['instituciones' => $instituciones])
             <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-check-lg me-1"></i> Guardar
                 </button>
                 <a href="{{ route('dispositivos.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>

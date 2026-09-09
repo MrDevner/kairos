@@ -18,7 +18,7 @@
         font-size: .82rem; font-weight: 600; text-align: center;
         border-right: 1px solid #fff; position: relative;
     }
-    .step-indicator .step.active { background: var(--azul); color: #fff; }
+    .step-indicator .step.active { background:var(--k2-primary); color: #fff; }
     .step-indicator .step.done   { background: var(--celeste); color: #fff; }
     .step-indicator .step:first-child { border-radius: .375rem 0 0 .375rem; }
     .step-indicator .step:last-child  { border-radius: 0 .375rem .375rem 0; border-right: none; }
@@ -28,7 +28,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-pencil-square me-1"></i> Editar Declaración Jurada
     </h5>
     <a href="{{ route('ddjj.show', $ddjj) }}" class="btn btn-sm btn-outline-secondary">
@@ -48,7 +48,7 @@
     {{-- ═══════════ PASO 1 ═══════════ --}}
     <div class="wizard-step active" id="step-1">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-1-circle me-1"></i> Paso 1: Datos generales
             </div>
             <div class="card-body">
@@ -83,7 +83,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-sm" style="background:var(--azul);color:#fff" onclick="goStep(2)">
+            <button type="button" class="btn btn-sm btn-primary" onclick="goStep(2)">
                 Siguiente <i class="bi bi-arrow-right ms-1"></i>
             </button>
         </div>
@@ -92,7 +92,7 @@
     {{-- ═══════════ PASO 2 ═══════════ --}}
     <div class="wizard-step" id="step-2">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-2-circle me-1"></i> Paso 2: Horario semanal
             </div>
             <div class="card-body">
@@ -122,7 +122,7 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="goStep(1)">
                 <i class="bi bi-arrow-left me-1"></i> Anterior
             </button>
-            <button type="button" class="btn btn-sm" style="background:var(--azul);color:#fff" onclick="goStep(3)">
+            <button type="button" class="btn btn-sm btn-primary" onclick="goStep(3)">
                 Siguiente <i class="bi bi-arrow-right ms-1"></i>
             </button>
         </div>
@@ -131,7 +131,7 @@
     {{-- ═══════════ PASO 3 ═══════════ --}}
     <div class="wizard-step" id="step-3">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-3-circle me-1"></i> Paso 3: Resumen
             </div>
             <div class="card-body">
@@ -169,7 +169,7 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="goStep(2)">
                 <i class="bi bi-arrow-left me-1"></i> Anterior
             </button>
-            <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+            <button type="submit" class="btn btn-sm btn-primary">
                 <i class="bi bi-check-lg me-1"></i> Guardar cambios
             </button>
         </div>

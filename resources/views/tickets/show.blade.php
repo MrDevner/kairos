@@ -15,7 +15,7 @@
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-life-preserver me-1"></i> {{ $ticket->titulo }}
         <span class="badge bg-{{ $estadoColor }}">{{ ucfirst(str_replace('_',' ',$ticket->estado)) }}</span>
         <span class="badge bg-{{ $prioridadColor }}">{{ ucfirst($ticket->prioridad) }}</span>
@@ -23,12 +23,6 @@
     <a href="{{ route('tickets.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Volver</a>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 @if($errors->any())
     <div class="alert alert-danger py-2 small">
         <ul class="mb-0">
@@ -41,7 +35,7 @@
     <div class="col-lg-8">
         {{-- Descripción --}}
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-card-text me-1"></i> Descripción
             </div>
             <div class="card-body">
@@ -60,7 +54,7 @@
 
         {{-- Mensajería --}}
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-chat-dots me-1"></i> Mensajes
                 <span class="badge bg-light text-dark ms-1">{{ $ticket->mensajes->count() }}</span>
             </div>
@@ -91,7 +85,7 @@
                     @csrf
                     <textarea name="mensaje" class="form-control form-control-sm mb-2" rows="3" required maxlength="5000" placeholder="Escribir un mensaje…"></textarea>
                     <input type="file" name="adjuntos[]" multiple class="form-control form-control-sm mb-2">
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-send me-1"></i> Enviar
                     </button>
                 </form>
@@ -105,7 +99,7 @@
     <div class="col-lg-4">
         {{-- Información --}}
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff"><i class="bi bi-info-circle me-1"></i> Información</div>
+            <div class="card-header"><i class="bi bi-info-circle me-1"></i> Información</div>
             <div class="card-body">
                 <dl class="row mb-0 small">
                     <dt class="col-5 text-muted">Categoría</dt>
@@ -133,12 +127,12 @@
         {{-- Panel de soporte --}}
         @if($esSoporte)
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff"><i class="bi bi-gear me-1"></i> Gestión (soporte)</div>
+            <div class="card-header"><i class="bi bi-gear me-1"></i> Gestión (soporte)</div>
             <div class="card-body">
                 @if(is_null($ticket->id_asignado_a) && $ticket->estado === 'abierto')
                 <form method="POST" action="{{ route('tickets.tomar', $ticket) }}" class="mb-2">
                     @csrf
-                    <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm w-100 btn-primary">
                         <i class="bi bi-hand-index-thumb me-1"></i> Tomar ticket
                     </button>
                 </form>
@@ -180,7 +174,7 @@
                         <label class="form-label small fw-semibold">Motivo (si reasigna o cambia creador)</label>
                         <input type="text" name="motivo" class="form-control form-control-sm" minlength="5" maxlength="1000">
                     </div>
-                    <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm w-100 btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Guardar cambios
                     </button>
                 </form>
@@ -191,7 +185,7 @@
         {{-- Cambiar categoría --}}
         @if($esSoporte || $ticket->id_asignado_a === auth()->id())
         <div class="card mb-3">
-            <div class="card-header" style="background:var(--azul);color:#fff"><i class="bi bi-tag me-1"></i> Cambiar categoría</div>
+            <div class="card-header"><i class="bi bi-tag me-1"></i> Cambiar categoría</div>
             <div class="card-body">
                 <form method="POST" action="{{ route('tickets.categoria', $ticket) }}">
                     @csrf
@@ -214,14 +208,14 @@
         {{-- Resolución colaborativa --}}
         @if($ticket->estado !== 'cerrado')
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff"><i class="bi bi-check2-circle me-1"></i> Resolución</div>
+            <div class="card-header"><i class="bi bi-check2-circle me-1"></i> Resolución</div>
             <div class="card-body">
                 @if($hayResolucionPendiente)
                     <p class="small mb-2">Hay una solicitud de cierre pendiente de aprobación.</p>
                     @if($miSolicitud && is_null($miSolicitud->aprobado_en))
                         <form method="POST" action="{{ route('tickets.resolucion.aprobar', $ticket) }}" class="mb-2">
                             @csrf
-                            <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                            <button type="submit" class="btn btn-sm w-100 btn-primary">
                                 <i class="bi bi-check-lg me-1"></i> Aprobar cierre
                             </button>
                         </form>
@@ -243,7 +237,7 @@
                             </select>
                         </div>
                         @endif
-                        <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                        <button type="submit" class="btn btn-sm w-100 btn-primary">
                             <i class="bi bi-flag me-1"></i> Solicitar cierre
                         </button>
                     </form>

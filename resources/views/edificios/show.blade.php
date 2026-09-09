@@ -10,7 +10,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h5 class="fw-bold mb-1" style="color:var(--azul)">
+        <h5 class="k2-page-title mb-1">
             <i class="bi bi-building me-1"></i> {{ $edificio->nombre }}
             @if($edificio->activo)
                 <span class="badge bg-success ms-1">Activo</span>
@@ -21,7 +21,7 @@
         <div class="small text-muted">{{ $edificio->institucion->nombre ?? '—' }}</div>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('edificios.edit', $edificio) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('edificios.edit', $edificio) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('edificios.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -37,7 +37,7 @@
 @endif
 
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-door-open-fill me-2"></i> Oficinas / Aulas
         <a href="{{ route('oficinas.create', ['id_edificio' => $edificio->id]) }}" class="btn btn-sm btn-light ms-auto py-0">
             <i class="bi bi-plus-lg me-1"></i> Nueva oficina

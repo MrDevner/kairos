@@ -6,9 +6,9 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0"><i class="bi bi-building me-2" style="color:var(--azul)"></i>Instituciones</h5>
+    <h5 class="k2-page-title"><i class="bi bi-building me-2"></i>Instituciones</h5>
     @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
-        <a href="{{ route('instituciones.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('instituciones.create') }}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-lg"></i> Nueva institución
         </a>
     @endif
@@ -23,7 +23,7 @@
                        class="form-control form-control-sm" placeholder="Buscar por nombre o sigla…">
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Buscar
                 </button>
                 <a href="{{ route('instituciones.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -37,7 +37,7 @@
 @if(isset($instituciones))
     {{-- Modo búsqueda: lista plana con paginación --}}
     <div class="card">
-        <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+        <div class="card-header d-flex align-items-center">
             <i class="bi bi-search me-2"></i> Resultados para «{{ request('buscar') }}»
             <span class="badge bg-light text-dark ms-auto">{{ $instituciones->total() }} registros</span>
         </div>

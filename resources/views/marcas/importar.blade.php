@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-upload me-1"></i> Importar marcas
     </h5>
     <a href="{{ route('marcas.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -30,7 +30,7 @@
 <div class="row g-3">
     <div class="col-md-7">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-file-earmark-arrow-up me-1"></i> Cargar archivo de marcas
             </div>
             <div class="card-body">
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                        <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-upload me-1"></i> Importar
                         </button>
                         <a href="{{ route('marcas.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>
@@ -75,7 +75,7 @@
 
     <div class="col-md-5">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Formato esperado
             </div>
             <div class="card-body small">

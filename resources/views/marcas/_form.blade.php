@@ -39,7 +39,7 @@
 </div>
 
 <div class="d-flex gap-2">
-    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+    <button type="submit" class="btn btn-sm btn-primary">
         <i class="bi bi-check-lg me-1"></i> {{ isset($marca) ? 'Actualizar' : 'Registrar' }}
     </button>
     <a href="{{ route('marcas.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>

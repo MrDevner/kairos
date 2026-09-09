@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-building me-1"></i> {{ $institucion->nombre }}
         @if($institucion->sigla)
             <small class="badge bg-secondary fw-normal ms-1">{{ $institucion->sigla }}</small>
@@ -16,7 +16,7 @@
     </h5>
     <div>
         @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
-            <a href="{{ route('instituciones.edit', $institucion) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+            <a href="{{ route('instituciones.edit', $institucion) }}" class="btn btn-sm btn-primary">
                 <i class="bi bi-pencil me-1"></i> Editar
             </a>
         @endif
@@ -32,7 +32,7 @@
 
         {{-- Datos generales --}}
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos generales
             </div>
             <div class="card-body">
@@ -87,7 +87,7 @@
 
         {{-- Configuración --}}
         <div class="card mt-3">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-sliders me-1"></i> Configuración operativa
             </div>
             <div class="card-body">
@@ -126,7 +126,7 @@
 
         {{-- Sub-instituciones --}}
         <div class="card">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-diagram-3 me-1"></i> Sub-instituciones
                 <span class="badge bg-light text-dark ms-auto">{{ $institucion->hijas->count() }}</span>
             </div>
@@ -157,16 +157,10 @@
             $rolesOpcionales     = $rolesInst->whereNotIn('nombre', $rolesDefault);
         @endphp
         <div class="card mt-3">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-shield-check me-1"></i> Autorización de licencias
             </div>
             <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
 
                 <p class="small text-muted mb-2">
                     Roles que pueden aprobar o rechazar licencias en esta institución:
@@ -209,8 +203,7 @@
                         @empty
                             <p class="text-muted small">No hay otros roles disponibles.</p>
                         @endforelse
-                        <button type="submit" class="btn btn-sm mt-2"
-                                style="background:var(--azul);color:#fff">
+                        <button type="submit" class="btn btn-sm mt-2 btn-primary">
                             <i class="bi bi-save me-1"></i> Guardar
                         </button>
                     </form>
@@ -224,7 +217,7 @@
                 || (\App\Models\RolInstitucion::nivelMinimoDeUsuario(auth()->id(), $institucion->id) <= \App\Models\RolInstitucion::NIVEL_GESTION);
         @endphp
         <div class="card mt-3">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-megaphone-fill me-1"></i> Licencias disponibles para avisos
                 @if($tiposLicenciaAvisoIds->isEmpty())
                     <span class="badge bg-light text-dark ms-2 small fw-normal">Todas</span>
@@ -273,8 +266,7 @@
                             <p class="text-muted small">No hay tipos de licencia disponibles.</p>
                         @endforelse
                         <div class="d-flex gap-2 mt-2">
-                            <button type="submit" class="btn btn-sm"
-                                    style="background:var(--azul);color:#fff">
+                            <button type="submit" class="btn btn-sm btn-primary">
                                 <i class="bi bi-save me-1"></i> Guardar
                             </button>
                             @if($tiposLicenciaAvisoIds->isNotEmpty())
@@ -293,7 +285,7 @@
 
         {{-- Dependencias --}}
         <div class="card mt-3">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-diagram-2 me-1"></i> Dependencias
                 <span class="badge bg-light text-dark ms-auto">{{ $institucion->dependencias->count() }}</span>
             </div>

@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-diagram-3-fill me-1"></i> Resumen por dependencia
     </h5>
 </div>
@@ -52,7 +52,7 @@
             </div>
 
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Consultar
                 </button>
                 <a href="{{ route('informes.resumen-dependencia') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -121,7 +121,7 @@
 
     {{-- Tabla --}}
     <div class="card">
-        <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+        <div class="card-header d-flex align-items-center">
             <i class="bi bi-list-ul me-2"></i> Detalle por dependencia
             <span class="badge bg-light text-dark ms-auto">{{ $filas->count() }} dependencias</span>
         </div>

@@ -9,21 +9,15 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-life-preserver me-1"></i> Tickets de soporte
         @if($puedeVerTodos)<span class="badge bg-secondary fw-normal">todos</span>@endif
     </h5>
-    <a href="{{ route('tickets.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+    <a href="{{ route('tickets.create') }}" class="btn btn-sm btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nuevo ticket
     </a>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 {{-- Filtros --}}
 <div class="card mb-3">
@@ -61,7 +55,7 @@
                 <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="Título o descripción…">
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-search"></i></button>
                 <a href="{{ route('tickets.index') }}" class="btn btn-sm btn-outline-secondary ms-1"><i class="bi bi-x"></i></a>
             </div>
         </form>

@@ -24,7 +24,7 @@
 {{-- Header --}}
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h5 class="fw-bold mb-1" style="color:var(--azul)">
+        <h5 class="k2-page-title mb-1">
             <i class="bi bi-file-earmark-text me-1"></i> Declaración Jurada
             <span class="badge bg-{{ $estadoBadge }} ms-1">{{ ucfirst($ddjj->estado) }}</span>
         </h5>
@@ -80,7 +80,7 @@
 
 {{-- Grilla semanal --}}
 <div class="card mb-3">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-calendar-week me-1"></i> Horario semanal
     </div>
     <div class="card-body p-0">
@@ -140,7 +140,7 @@
 {{-- Observaciones --}}
 @if($ddjj->observaciones)
     <div class="card">
-        <div class="card-header" style="background:var(--azul);color:#fff">
+        <div class="card-header">
             <i class="bi bi-chat-text me-1"></i> Observaciones
         </div>
         <div class="card-body">
@@ -156,7 +156,7 @@
         <div class="modal-content">
             <form method="POST" action="{{ route('ddjj.rechazar', $ddjj) }}">
                 @csrf
-                <div class="modal-header" style="background:var(--azul);color:#fff">
+                <div class="modal-header" style="background:var(--k2-primary);color:#fff">
                     <h6 class="modal-title"><i class="bi bi-x-circle me-1"></i> Rechazar DDJJ</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>

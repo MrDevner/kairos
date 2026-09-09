@@ -23,7 +23,7 @@
         position:relative; z-index:1; border:3px solid #dee2e6;
     }
     .stepper-step.done     .stepper-circle { background:var(--celeste); color:#fff; border-color:var(--celeste); }
-    .stepper-step.active   .stepper-circle { background:var(--azul);    color:#fff; border-color:var(--azul); }
+    .stepper-step.active   .stepper-circle { background:var(--k2-primary);    color:#fff; border-color:var(--azul); }
     .stepper-step.rejected .stepper-circle { background:#dc3545;        color:#fff; border-color:#dc3545; }
     .stepper-label { font-size:.78rem; font-weight:600; color:#6c757d; }
     .stepper-step.active   .stepper-label { color:var(--azul); }
@@ -40,22 +40,10 @@
     $textColor  = $estado === 'pendiente' ? 'dark' : 'white';
 @endphp
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small mb-3" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show py-2 small mb-3" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h5 class="fw-bold mb-1" style="color:var(--azul)">
+        <h5 class="k2-page-title mb-1">
             <i class="bi bi-calendar-check me-1"></i> Licencia
             <span class="badge bg-{{ $badgeColor }} text-{{ $textColor }} ms-1">{{ ucfirst($estado) }}</span>
         </h5>
@@ -92,7 +80,7 @@
 
 {{-- Stepper --}}
 <div class="card mb-3">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-diagram-2 me-1"></i> Estado del trámite
     </div>
     <div class="card-body py-3">
@@ -124,7 +112,7 @@
 <div class="row g-3">
     <div class="col-lg-7">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos de la licencia
             </div>
             <div class="card-body">
@@ -183,7 +171,7 @@
 
     <div class="col-lg-5">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-clipboard-check me-1"></i> Resolución
             </div>
             <div class="card-body">
@@ -220,7 +208,7 @@
         <div class="modal-content">
             <form method="POST" action="{{ route('licencias.rechazar', $licencia) }}">
                 @csrf
-                <div class="modal-header" style="background:var(--azul);color:#fff">
+                <div class="modal-header" style="background:var(--k2-primary);color:#fff">
                     <h6 class="modal-title"><i class="bi bi-x-circle me-1"></i> Rechazar licencia</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>

@@ -1,113 +1,112 @@
-@php $user = auth()->user(); @endphp
+{{--
+    Menú principal del layout.
+    Variables esperadas:
+      $menu        → estructura definida en layouts/app.blade.php
+      $modo        → 'desktop' (barra horizontal con dropdowns) | 'mobile' (lista vertical del offcanvas)
+      $instActiva  → (solo mobile) institución activa, para el acceso al dashboard institucional
+--}}
+@php
+    $esActivo = function (array $item) {
+        if (array_key_exists('activo', $item)) {
+            return (bool) $item['activo'];
+        }
+        return !empty($item['active']) && request()->routeIs(...$item['active']);
+    };
+@endphp
 
-{{-- Principal --}}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('home') ? 'active' : '' }}" href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-person-circle"></i> Principal
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('perfil') ? 'active' : '' }}" href="{{ route('perfil') }}"><i class="bi bi-person-fill"></i> Perfil</a></li>
-        <li><a class="dropdown-item" href="{{ route('perfil') }}#metodos-login"><i class="bi bi-key-fill"></i> Métodos de login</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('informes.*') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Informes personales</a></li>
+@if($modo === 'desktop')
+    <ul class="k2-nav">
+        @foreach($menu as $grupo)
+            @if(isset($grupo['items']))
+                @php $grupoBadge = array_sum(array_map(fn ($i) => (int) ($i['badge'] ?? 0), $grupo['items'])); @endphp
+                <li class="dropdown">
+                    <a class="k2-nav-link dropdown-toggle {{ $esActivo($grupo) ? 'active' : '' }}"
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi {{ $grupo['icon'] }}"></i>
+                        <span>{{ $grupo['label'] }}</span>
+                        @if($grupoBadge > 0)
+                            <span class="k2-badge danger" style="padding:.1rem .45rem">{{ $grupoBadge }}</span>
+                        @endif
+                        <i class="bi bi-chevron-down k2-caret"></i>
+                    </a>
+                    <div class="dropdown-menu k2-dropdown {{ ($grupo['cols'] ?? 1) > 1 ? 'k2-dropdown-wide' : '' }}">
+                        <div class="k2-dropdown-head">{{ $grupo['label'] }}</div>
+                        <div class="{{ ($grupo['cols'] ?? 1) > 1 ? 'k2-dropdown-grid' : '' }}">
+                            @foreach($grupo['items'] as $item)
+                                <a class="k2-dropdown-item {{ $esActivo($item) ? 'active' : '' }} {{ !empty($item['danger']) ? 'danger' : '' }}"
+                                   href="{{ $item['url'] }}"
+                                   @if(!empty($item['external'])) target="_blank" rel="noopener noreferrer" @endif>
+                                    <span class="k2-dropdown-icon"><i class="bi {{ $item['icon'] }}"></i></span>
+                                    <span class="k2-dropdown-text">
+                                        <span class="k2-dropdown-label">{{ $item['label'] }}</span>
+                                        @if(!empty($item['desc']))
+                                            <span class="k2-dropdown-desc">{{ $item['desc'] }}</span>
+                                        @endif
+                                    </span>
+                                    @if(($item['badge'] ?? 0) > 0)
+                                        <span class="k2-badge danger ms-auto">{{ $item['badge'] }}</span>
+                                    @elseif(!empty($item['external']))
+                                        <i class="bi bi-box-arrow-up-right k2-dropdown-ext"></i>
+                                    @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </li>
+            @else
+                <li>
+                    <a class="k2-nav-link {{ $esActivo($grupo) ? 'active' : '' }}" href="{{ $grupo['url'] }}">
+                        <i class="bi {{ $grupo['icon'] }}"></i>
+                        <span>{{ $grupo['label'] }}</span>
+                    </a>
+                </li>
+            @endif
+        @endforeach
     </ul>
-</li>
 
-{{-- Personal --}}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('avisos.*','designaciones.*','ddjj.*','licencias.*','usuarios.*','marcas.*') ? 'active' : '' }}"
-       href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-people-fill"></i> Personal
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item {{ request()->routeIs('avisos.*') ? 'active' : '' }}" href="{{ route('avisos.index') }}"><i class="bi bi-megaphone-fill"></i> Avisos del personal</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('designaciones.*') ? 'active' : '' }}" href="{{ route('designaciones.index') }}"><i class="bi bi-briefcase-fill"></i> Designaciones</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('ddjj.*') ? 'active' : '' }}" href="{{ route('ddjj.index') }}"><i class="bi bi-file-text-fill"></i> DDJJ</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('licencias.*') ? 'active' : '' }}" href="{{ route('licencias.index') }}"><i class="bi bi-calendar-check-fill"></i> Licencias & Permisos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('marcas.*') ? 'active' : '' }}" href="{{ route('marcas.index') }}"><i class="bi bi-fingerprint"></i> Marcas del personal</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('usuarios.*') ? 'active' : '' }}" href="{{ route('usuarios.index') }}"><i class="bi bi-person-badge-fill"></i> Usuarios</a></li>
-    </ul>
-</li>
-
-{{-- Informes --}}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('informes.*') ? 'active' : '' }}"
-       href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-bar-chart-fill"></i> Informes
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item {{ request()->routeIs('informes.marcas') ? 'active' : '' }}" href="{{ route('informes.marcas') }}"><i class="bi bi-clock-history"></i> Mensual de marcas</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('informes.index') ? 'active' : '' }}" href="{{ route('informes.index') }}"><i class="bi bi-person-lines-fill"></i> General del usuario</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('informes.resumen-dependencia') ? 'active' : '' }}" href="{{ route('informes.resumen-dependencia') }}"><i class="bi bi-diagram-3-fill"></i> Resumen por dependencia</a></li>
-    </ul>
-</li>
-
-{{-- Institución --}}
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('dependencias.*','edificios.*','oficinas.*','dispositivos.*','cargos.*','roles.*','tipos-licencia.*','calendario.*') ? 'active' : '' }}"
-       href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-building-fill"></i> Institución
-    </a>
-    <ul class="dropdown-menu">
-        <li><a class="dropdown-item {{ request()->routeIs('dependencias.*') ? 'active' : '' }}" href="{{ route('dependencias.index') }}"><i class="bi bi-diagram-3-fill"></i> Dependencias</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('edificios.*') ? 'active' : '' }}" href="{{ route('edificios.index') }}"><i class="bi bi-building"></i> Edificios / Complejos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('oficinas.*') ? 'active' : '' }}" href="{{ route('oficinas.index') }}"><i class="bi bi-door-open-fill"></i> Oficinas / Aulas</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('dispositivos.*') ? 'active' : '' }}" href="{{ route('dispositivos.index') }}"><i class="bi bi-hdd-network-fill"></i> Dispositivos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="{{ route('cargos.index') }}"><i class="bi bi-briefcase-fill"></i> Cargos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><i class="bi bi-shield-fill-check"></i> Roles & permisos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('tipos-licencia.*') ? 'active' : '' }}" href="{{ route('tipos-licencia.index') }}"><i class="bi bi-card-list"></i> Tipos de licencias</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('calendario.*') ? 'active' : '' }}" href="{{ route('calendario.index') }}"><i class="bi bi-calendar-event"></i> Calendario</a></li>
-    </ul>
-</li>
-
-{{-- Tickets de soporte --}}
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('tickets.*') ? 'active' : '' }}" href="{{ route('tickets.index') }}">
-        <i class="bi bi-life-preserver"></i> Tickets
-        @if(($ticketsNoLeidos ?? 0) > 0)
-            <span class="badge bg-danger rounded-pill">{{ $ticketsNoLeidos }}</span>
+@else
+    @foreach($menu as $grupo)
+        @if(isset($grupo['items']))
+            <div class="k2-mnav-group">{{ $grupo['label'] }}</div>
+            @foreach($grupo['items'] as $item)
+                <a class="k2-mnav-link {{ $esActivo($item) ? 'active' : '' }}"
+                   href="{{ $item['url'] }}"
+                   @if(!empty($item['external'])) target="_blank" rel="noopener noreferrer" @endif>
+                    <i class="bi {{ $item['icon'] }}"></i>
+                    <span>{{ $item['label'] }}</span>
+                    @if(($item['badge'] ?? 0) > 0)
+                        <span class="k2-badge danger ms-auto">{{ $item['badge'] }}</span>
+                    @elseif(!empty($item['external']))
+                        <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:.7rem;opacity:.6"></i>
+                    @endif
+                </a>
+            @endforeach
+        @else
+            <div class="k2-mnav-group">General</div>
+            <a class="k2-mnav-link {{ $esActivo($grupo) ? 'active' : '' }}" href="{{ $grupo['url'] }}">
+                <i class="bi {{ $grupo['icon'] }}"></i>
+                <span>{{ $grupo['label'] }}</span>
+            </a>
+            @if(!empty($instActiva))
+                <a class="k2-mnav-link {{ request()->routeIs('home.institucion') ? 'active' : '' }}" href="{{ route('home.institucion') }}">
+                    <i class="bi bi-building"></i>
+                    <span>Dashboard institucional</span>
+                </a>
+            @endif
         @endif
-    </a>
-</li>
+    @endforeach
 
-{{-- Logs --}}
-<li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('logs.*') ? 'active' : '' }}" href="{{ route('logs.index') }}">
-        <i class="bi bi-journal-text"></i> Logs
+    <div class="k2-mnav-group">Cuenta</div>
+    <a class="k2-mnav-link {{ request()->routeIs('perfil') ? 'active' : '' }}" href="{{ route('perfil') }}">
+        <i class="bi bi-person-circle"></i><span>Mi perfil</span>
     </a>
-</li>
-
-{{-- Administrador (solo Administrador General) --}}
-@if($user->permisos()->administrador()->tieneTodosLosPermisos())
-<li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle {{ request()->routeIs('instituciones.*') ? 'active' : '' }}"
-       href="#" data-bs-toggle="dropdown">
-        <i class="bi bi-shield-lock-fill"></i> Administrador
+    <a class="k2-mnav-link" href="{{ route('perfil') }}#metodos-login">
+        <i class="bi bi-key"></i><span>Métodos de acceso</span>
     </a>
-    <ul class="dropdown-menu">
-        <li>
-            <a class="dropdown-item"
-               href="{{ config('kairos.phpmyadmin_url') }}"
-               target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-database-fill-gear"></i> Acceso a BD
-                <i class="bi bi-box-arrow-up-right ms-1" style="font-size:.72rem;opacity:.7"></i>
-            </a>
-        </li>
-        <li><hr class="dropdown-divider"></li>
-        <li>
-            <a class="dropdown-item {{ request()->routeIs('usuarios.*') && request()->boolean('todos') ? 'active' : '' }}"
-               href="{{ route('usuarios.index', ['todos' => 1]) }}">
-                <i class="bi bi-people-fill"></i> Todos los usuarios
-            </a>
-        </li>
-        <li><a class="dropdown-item {{ request()->routeIs('instituciones.*') ? 'active' : '' }}" href="{{ route('instituciones.index') }}"><i class="bi bi-building-fill-gear"></i> Instituciones</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('cargos.*') ? 'active' : '' }}" href="{{ route('cargos.index') }}"><i class="bi bi-briefcase-fill"></i> Cargos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}"><i class="bi bi-shield-fill-check"></i> Roles & permisos</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('tipos-licencia.*') ? 'active' : '' }}" href="{{ route('tipos-licencia.index') }}"><i class="bi bi-card-list"></i> Tipos de licencias</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('calendario.*') ? 'active' : '' }}" href="{{ route('calendario.index') }}"><i class="bi bi-calendar-event"></i> Calendario</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item {{ request()->routeIs('tickets.categorias.*') ? 'active' : '' }}" href="{{ route('tickets.categorias.index') }}"><i class="bi bi-tags-fill"></i> Categorías de tickets</a></li>
-        <li><a class="dropdown-item {{ request()->routeIs('admin.errores-servidor.*') ? 'active' : '' }}" href="{{ route('admin.errores-servidor.index') }}"><i class="bi bi-bug-fill"></i> Errores de servidor</a></li>
-    </ul>
-</li>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="k2-mnav-link border-0 bg-transparent" style="color:var(--k2-danger-text);width:calc(100% - 1rem)">
+            <i class="bi bi-box-arrow-right" style="color:inherit"></i><span>Cerrar sesión</span>
+        </button>
+    </form>
 @endif

@@ -13,7 +13,7 @@
         ->count();
 @endphp
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-people-fill me-1"></i>
         @if($verTodos ?? false)
             Todos los usuarios del sistema
@@ -30,7 +30,7 @@
                       style="font-size:.6rem">{{ $filtrosActivos }}</span>
             @endif
         </button>
-        <a href="{{ route('usuarios.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('usuarios.create') }}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Nuevo usuario
         </a>
     </div>
@@ -78,7 +78,7 @@
                        class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-x"></i> Limpiar
                     </a>
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-search"></i> Filtrar
                     </button>
                 </div>
@@ -89,7 +89,7 @@
 
 {{-- Tabla --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-list-ul me-2"></i> Listado
         <span class="badge bg-light text-dark ms-auto">{{ $usuarios->total() }} registros</span>
     </div>
@@ -114,7 +114,7 @@
                                     <img src="{{ asset('storage/' . $u->foto) }}" alt=""
                                          style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--celeste)">
                                 @else
-                                    <div style="width:34px;height:34px;border-radius:50%;background:var(--azul);
+                                    <div style="width:34px;height:34px;border-radius:50%;background:var(--k2-primary);
                                                 color:#fff;display:flex;align-items:center;justify-content:center;
                                                 font-weight:700;font-size:.75rem;margin:0 auto">
                                         {{ strtoupper(substr($u->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($u->apellidos ?? '', 0, 1)) }}

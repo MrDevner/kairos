@@ -9,11 +9,11 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-person-circle me-1"></i> Perfil de Usuario
     </h5>
     <div>
-        <a href="{{ route('usuarios.edit', $usuario) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('usuarios.edit', $usuario) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('usuarios.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -26,7 +26,7 @@
     {{-- Columna izquierda: datos del usuario --}}
     <div class="col-md-4">
         <div class="card text-center">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-person me-1"></i> Datos personales
             </div>
             <div class="card-body">
@@ -36,7 +36,7 @@
                         <img src="{{ asset('storage/' . $usuario->foto) }}" alt="{{ $usuario->nombre_completo }}"
                              style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--celeste)">
                     @else
-                        <div style="width:90px;height:90px;border-radius:50%;background:var(--azul);
+                        <div style="width:90px;height:90px;border-radius:50%;background:var(--k2-primary);
                                     color:#fff;display:flex;align-items:center;justify-content:center;
                                     font-weight:700;font-size:2rem;margin:0 auto;border:3px solid var(--celeste)">
                             {{ strtoupper(substr($usuario->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($usuario->apellidos ?? '', 0, 1)) }}
@@ -111,7 +111,7 @@
     {{-- Columna derecha: tabs --}}
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-card-list me-1"></i> Información laboral
             </div>
             <div class="card-body p-0">
@@ -177,7 +177,7 @@
                             @php $rolesGlobal = $usuario->nombresRolesGlobales(); @endphp
                             <div class="mb-2 d-flex flex-wrap gap-1 align-items-center">
                                 @forelse($rolesGlobal as $rg)
-                                    <span class="badge d-inline-flex align-items-center gap-1" style="background:var(--azul)">
+                                    <span class="badge d-inline-flex align-items-center gap-1" style="background:var(--k2-primary)">
                                         {{ $rg }}
                                         <form method="POST" action="{{ route('usuarios.roles.global.destroy', $usuario) }}"
                                               class="d-inline"
@@ -203,7 +203,7 @@
                                             @endif
                                         @endforeach
                                     </select>
-                                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                                    <button type="submit" class="btn btn-sm btn-primary">
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </form>
@@ -215,7 +215,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <p class="fw-semibold small text-muted mb-0">Roles institucionales</p>
                             @if($puedeGestionar)
-                                <button class="btn btn-sm" style="background:var(--azul);color:#fff"
+                                <button class="btn btn-sm btn-primary"
                                         data-bs-toggle="modal" data-bs-target="#modal-asignar-rol">
                                     <i class="bi bi-plus-lg me-1"></i> Asignar rol
                                 </button>
@@ -312,7 +312,7 @@
         <div class="modal-content">
             <form method="POST" action="{{ route('usuarios.roles.store', $usuario) }}">
                 @csrf
-                <div class="modal-header" style="background:var(--azul);color:#fff">
+                <div class="modal-header" style="background:var(--k2-primary);color:#fff">
                     <h6 class="modal-title"><i class="bi bi-shield-plus me-1"></i> Asignar rol institucional</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -321,7 +321,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Asignar
                     </button>
                 </div>
@@ -336,7 +336,7 @@
         <div class="modal-content">
             <form method="POST" id="form-editar-rol" action="">
                 @csrf @method('PUT')
-                <div class="modal-header" style="background:var(--azul);color:#fff">
+                <div class="modal-header" style="background:var(--k2-primary);color:#fff">
                     <h6 class="modal-title"><i class="bi bi-shield-check me-1"></i> Editar asignación de rol</h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
@@ -345,7 +345,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Actualizar
                     </button>
                 </div>

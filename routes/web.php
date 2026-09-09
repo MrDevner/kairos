@@ -25,7 +25,6 @@ use App\Http\Controllers\InstitucionController;
 use App\Http\Controllers\LicenciaController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\OficinaController;
-use App\Http\Controllers\PanelController;
 use App\Http\Controllers\RolInstitucionController;
 use App\Http\Controllers\TipoLicenciaController;
 use App\Http\Controllers\LogController;
@@ -34,7 +33,6 @@ use App\Http\Controllers\TicketCategoriaController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UbicacionController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Middleware\EnsureAdministradorGeneral;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
@@ -63,11 +61,7 @@ Route::match(['get', 'post'], '/logout', [AutenticacionController::class, 'logou
 Route::middleware('auth')->group(function () {
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-    // Panel de administración (layout app2, solo Administrador General)
-    Route::get('/panel', [PanelController::class, 'index'])
-        ->middleware(EnsureAdministradorGeneral::class)
-        ->name('panel.index');
+    Route::get('/home/institucion', [HomeController::class, 'institucion'])->name('home.institucion');
 
     // Perfil del usuario autenticado
     Route::get('/perfil', [PerfilController::class, 'show'])->name('perfil');

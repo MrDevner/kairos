@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-megaphone-fill me-1"></i> Aviso #{{ $aviso->id }}
     </h5>
     <div class="d-flex gap-2">
@@ -31,16 +31,10 @@
     </div>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 <div class="card" style="max-width:600px">
     {{-- Header con badge de tipo --}}
-    <div class="card-header d-flex align-items-center gap-2" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center gap-2">
         @if($aviso->tipo === 'ausencia')
             <span class="badge bg-warning text-dark fs-6">
                 <i class="bi bi-calendar-x me-1"></i> Ausencia

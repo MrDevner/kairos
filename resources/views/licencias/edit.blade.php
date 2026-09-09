@@ -12,7 +12,7 @@
 <div class="row justify-content-center">
     <div class="col-lg-7">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-pencil-square me-1"></i> Editar licencia
                 <span class="badge bg-warning text-dark ms-2">Pendiente</span>
             </div>
@@ -22,7 +22,7 @@
                     @include('licencias._form')
                     <hr>
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                        <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-check-lg me-1"></i> Guardar cambios
                         </button>
                         <a href="{{ route('licencias.show', $licencia) }}" class="btn btn-sm btn-outline-secondary">

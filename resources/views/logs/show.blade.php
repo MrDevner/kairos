@@ -47,7 +47,7 @@
 @endphp
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-journal-text me-1"></i> Detalle de actividad
         <span class="badge bg-{{ $eventoColor }} ms-2">{{ $eventoLabel }}</span>
     </h5>
@@ -61,7 +61,7 @@
     {{-- Encabezado --}}
     <div class="col-12">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Información general
             </div>
             <div class="card-body">
@@ -105,7 +105,7 @@
     @if(!empty($campos))
     <div class="col-12">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 @if($activity->event === 'updated')
                     <i class="bi bi-pencil-square me-1"></i> Campos modificados
                 @elseif($activity->event === 'created')

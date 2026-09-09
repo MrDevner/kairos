@@ -10,7 +10,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)"><i class="bi bi-plus-lg me-1"></i> Nuevo ticket</h5>
+    <h5 class="k2-page-title"><i class="bi bi-plus-lg me-1"></i> Nuevo ticket</h5>
     <a href="{{ route('tickets.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Volver</a>
 </div>
 
@@ -77,7 +77,7 @@
             </div>
 
             <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-check-lg me-1"></i> Crear ticket
                 </button>
                 <a href="{{ route('tickets.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>

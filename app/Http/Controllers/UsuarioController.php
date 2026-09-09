@@ -110,7 +110,7 @@ class UsuarioController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validar($request, null, esNuevo: true);
-        $data['activo'] = $request->boolean('activo');
+        $data['activo'] = true;
         $data = $this->manejarFoto($request, $data);
         $data = $this->manejarPassword($request, $data);
 

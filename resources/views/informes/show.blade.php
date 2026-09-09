@@ -23,7 +23,7 @@
                  style="max-height:56px;max-width:120px;object-fit:contain">
         @endif
         <div>
-            <h5 class="fw-bold mb-1" style="color:var(--azul)">
+            <h5 class="k2-page-title mb-1">
                 <i class="bi bi-file-earmark-bar-graph me-1"></i>
                 Informe de asistencia
                 <span class="badge bg-{{ $estadoBadge }} ms-1">{{ ucfirst($informe->estado) }}</span>
@@ -93,7 +93,7 @@
 
 {{-- Tabla de ítems --}}
 <div class="card">
-    <div class="card-header" style="background:var(--azul);color:#fff">
+    <div class="card-header">
         <i class="bi bi-table me-1"></i> Detalle por empleado
     </div>
     <div class="card-body p-0">

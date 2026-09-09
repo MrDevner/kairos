@@ -10,12 +10,12 @@
 {{-- Header --}}
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div class="d-flex align-items-center gap-3">
-        <div style="width:50px;height:50px;border-radius:50%;background:var(--azul);color:#fff;
+        <div style="width:50px;height:50px;border-radius:50%;background:var(--k2-primary);color:#fff;
                     display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.15rem">
             {{ strtoupper(substr($marca->usuario->nombres ?? 'U', 0, 1)) }}{{ strtoupper(substr($marca->usuario->apellidos ?? '', 0, 1)) }}
         </div>
         <div>
-            <h5 class="fw-bold mb-0" style="color:var(--azul)">{{ $marca->usuario->nombre_completo ?? '—' }}</h5>
+            <h5 class="k2-page-title">{{ $marca->usuario->nombre_completo ?? '—' }}</h5>
             <div class="small text-muted">
                 {{ $marca->fecha_hora->format('d/m/Y H:i:s') }}
                 &mdash; {{ $marca->dispositivo->nombre ?? 'Dispositivo desconocido' }}
@@ -36,7 +36,7 @@
     {{-- Datos de la marca original --}}
     <div class="col-md-5">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-fingerprint me-1"></i> Marca registrada
             </div>
             <div class="card-body">
@@ -97,7 +97,7 @@
     {{-- Marcas computadas del mismo día --}}
     <div class="col-md-7">
         <div class="card h-100">
-            <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+            <div class="card-header d-flex align-items-center">
                 <i class="bi bi-calculator me-1"></i> Marcas computadas del mismo día
                 <span class="badge bg-light text-dark ms-auto">{{ $computadas->count() }}</span>
             </div>

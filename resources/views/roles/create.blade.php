@@ -9,7 +9,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-shield-plus me-1"></i> Nuevo rol
     </h5>
     <a href="{{ route('roles.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -23,7 +23,7 @@
             @csrf
             @include('roles._form')
             <div class="mt-4 d-flex gap-2">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-check-lg me-1"></i> Guardar rol
                 </button>
                 <a href="{{ route('roles.index') }}" class="btn btn-sm btn-outline-secondary">Cancelar</a>

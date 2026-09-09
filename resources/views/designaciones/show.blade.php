@@ -9,11 +9,11 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-briefcase me-1"></i> Detalle de Designación
     </h5>
     <div>
-        <a href="{{ route('designaciones.edit', $designacion) }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('designaciones.edit', $designacion) }}" class="btn btn-sm btn-primary">
             <i class="bi bi-pencil me-1"></i> Editar
         </a>
         <a href="{{ route('designaciones.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -25,7 +25,7 @@
 <div class="row g-3">
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-info-circle me-1"></i> Datos de la designación
             </div>
             <div class="card-body">
@@ -79,7 +79,7 @@
 
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">
+            <div class="card-header">
                 <i class="bi bi-file-text me-1"></i> Últimas Declaraciones Juradas
             </div>
             <div class="card-body p-0">

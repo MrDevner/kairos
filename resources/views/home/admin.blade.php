@@ -1,19 +1,21 @@
-@extends('layouts.app2')
+@extends('layouts.app')
 
-@section('title', 'Panel de administración')
+@section('title', 'Inicio')
 @section('page-title', 'Panel de administración')
 @section('page-subtitle')
     Visión general del sistema · {{ $hoy->isoFormat('dddd D [de] MMMM [de] YYYY') }}
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Panel</li>
+    <li class="active">Inicio</li>
 @endsection
 
 @section('page-actions')
-    <a href="{{ route('home', ['vista' => 'admin']) }}" class="k2-btn">
-        <i class="bi bi-layout-text-window"></i> Vista clásica
-    </a>
+    @if($instActiva)
+        <a href="{{ route('home.institucion') }}" class="k2-btn" title="Dashboard de {{ $instActiva->nombre }}">
+            <i class="bi bi-building"></i> Dashboard de {{ $instActiva->sigla ?: \Illuminate\Support\Str::limit($instActiva->nombre, 22) }}
+        </a>
+    @endif
     <a href="{{ route('usuarios.create') }}" class="k2-btn">
         <i class="bi bi-person-plus"></i> Nuevo usuario
     </a>

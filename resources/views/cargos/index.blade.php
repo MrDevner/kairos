@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-briefcase me-1"></i> Cargos
     </h5>
     @if(auth()->user()->permisos()->administrador()->tieneTodosLosPermisos())
@@ -15,25 +15,13 @@
         <a href="{{ route('categorias-cargo.index') }}" class="btn btn-sm btn-outline-secondary me-1">
             <i class="bi bi-tags me-1"></i> Categorías
         </a>
-        <a href="{{ route('cargos.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+        <a href="{{ route('cargos.create') }}" class="btn btn-sm btn-primary">
             <i class="bi bi-plus-lg me-1"></i> Nuevo cargo
         </a>
     </div>
     @endif
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show py-2 small">
-        {{ session('error') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 {{-- Filtros --}}
 <div class="card mb-3">
@@ -61,7 +49,7 @@
                 </select>
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i>
                 </button>
                 <a href="{{ route('cargos.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -74,7 +62,7 @@
 
 {{-- Tabla --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-list-ul me-2"></i> Listado
         <span class="badge bg-light text-dark ms-auto">{{ $cargos->total() }} registros</span>
     </div>
@@ -99,7 +87,7 @@
                             <td class="fw-semibold">{{ $c->nombre }}</td>
                             <td>
                                 @if($c->categoria)
-                                    <span class="badge" style="background:var(--celeste);color:var(--azul)">
+                                    <span class="badge" style="background:var(--k2-primary-50);color:var(--k2-primary-text)">
                                         {{ $c->categoria->nombre }}
                                     </span>
                                 @else

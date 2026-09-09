@@ -10,20 +10,14 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)"><i class="bi bi-tags-fill me-1"></i> Categorías de tickets</h5>
+    <h5 class="k2-page-title"><i class="bi bi-tags-fill me-1"></i> Categorías de tickets</h5>
 </div>
 
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show py-2 small">
-        {{ session('success') }}
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 <div class="row g-3">
     <div class="col-md-5">
         <div class="card">
-            <div class="card-header" style="background:var(--azul);color:#fff">Nueva categoría</div>
+            <div class="card-header">Nueva categoría</div>
             <div class="card-body">
                 <form method="POST" action="{{ route('tickets.categorias.store') }}">
                     @csrf
@@ -32,7 +26,7 @@
                                placeholder="Nombre" value="{{ old('nombre') }}" required maxlength="100">
                         @error('nombre')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
-                    <button type="submit" class="btn btn-sm w-100" style="background:var(--azul);color:#fff">
+                    <button type="submit" class="btn btn-sm w-100 btn-primary">
                         <i class="bi bi-plus-lg me-1"></i> Crear
                     </button>
                 </form>

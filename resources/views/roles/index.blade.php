@@ -8,10 +8,10 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0" style="color:var(--azul)">
+    <h5 class="k2-page-title">
         <i class="bi bi-shield-check me-1"></i> Roles
     </h5>
-    <a href="{{ route('roles.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+    <a href="{{ route('roles.create') }}" class="btn btn-sm btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nuevo rol
     </a>
 </div>
@@ -25,7 +25,7 @@
                        class="form-control form-control-sm" placeholder="Buscar por nombre o descripción…">
             </div>
             <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                <button type="submit" class="btn btn-sm btn-primary">
                     <i class="bi bi-search"></i> Buscar
                 </button>
                 <a href="{{ route('roles.index') }}" class="btn btn-sm btn-outline-secondary ms-1">
@@ -38,7 +38,7 @@
 
 {{-- Tabla --}}
 <div class="card">
-    <div class="card-header d-flex align-items-center" style="background:var(--azul);color:#fff">
+    <div class="card-header d-flex align-items-center">
         <i class="bi bi-list-ul me-2"></i> Listado
         <span class="badge bg-light text-dark ms-auto">{{ $roles->total() }} registros</span>
     </div>
