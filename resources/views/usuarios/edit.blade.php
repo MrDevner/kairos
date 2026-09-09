@@ -124,6 +124,7 @@
 
                 <div class="col-md-4 d-flex align-items-end">
                     <div class="form-check mb-1">
+                        <input type="hidden" name="activo" value="0">
                         <input class="form-check-input" type="checkbox" name="activo" id="activo" value="1"
                                @checked(old('activo', $usuario->activo))>
                         <label class="form-check-label small" for="activo">Usuario activo</label>

@@ -81,9 +81,35 @@ class UsuarioController extends Controller
         return view('usuarios.create', compact('roles'));
     }
 
+    /**
+     * Verifica si un número de documento ya está en uso. Paso previo obligatorio
+     * antes de habilitar el resto del formulario de alta de usuario.
+     */
+    public function verificarDocumento(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'documento' => ['required', 'string', 'max:20'],
+        ]);
+
+        $usuario = User::where('documento', $data['documento'])->first();
+
+        if (! $usuario) {
+            return response()->json(['disponible' => true]);
+        }
+
+        return response()->json([
+            'disponible' => false,
+            'usuario' => [
+                'nombre' => $usuario->apellidos . ', ' . $usuario->nombres,
+                'activo' => (bool) $usuario->activo,
+                'url'    => route('usuarios.show', $usuario),
+            ],
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
-        $data = $this->validar($request);
+        $data = $this->validar($request, null, esNuevo: true);
         $data['activo'] = $request->boolean('activo');
         $data = $this->manejarFoto($request, $data);
         $data = $this->manejarPassword($request, $data);
@@ -172,7 +198,7 @@ class UsuarioController extends Controller
         return redirect()->route('usuarios.index')->with('success', 'Usuario desactivado.');
     }
 
-    private function validar(Request $request, ?int $exceptId = null): array
+    private function validar(Request $request, ?int $exceptId = null, bool $esNuevo = false): array
     {
         return $request->validate([
             'apellidos'            => ['required', 'string', 'max:100'],
@@ -184,7 +210,7 @@ class UsuarioController extends Controller
             'id_ciudad_domicilio'  => ['nullable', 'integer', 'exists:ciudades,id'],
             'id_pais_nacimiento'   => ['nullable', 'integer', 'exists:paises,id'],
             'id_estado_nacimiento' => ['nullable', 'integer', 'exists:estados,id'],
-            'sexo'                 => ['nullable', 'in:M,F,X'],
+            'sexo'                 => [$esNuevo ? 'required' : 'nullable', 'in:M,F,X'],
             'nacimiento'           => ['nullable', 'date'],
             'password'             => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);

@@ -7,6 +7,11 @@
 @endsection
 
 @section('content')
+@php
+    $filtrosActivos = collect([request('buscar'), request('activo')])
+        ->filter(fn ($v) => $v !== null && $v !== '')
+        ->count();
+@endphp
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold mb-0" style="color:var(--azul)">
         <i class="bi bi-people-fill me-1"></i>
@@ -16,9 +21,19 @@
             Usuarios
         @endif
     </h5>
-    <a href="{{ route('usuarios.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
-        <i class="bi bi-plus-lg me-1"></i> Nuevo usuario
-    </a>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-sm btn-outline-primary position-relative"
+                data-bs-toggle="modal" data-bs-target="#modalFiltros">
+            <i class="bi bi-funnel me-1"></i> Filtrar
+            @if($filtrosActivos > 0)
+                <span class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                      style="font-size:.6rem">{{ $filtrosActivos }}</span>
+            @endif
+        </button>
+        <a href="{{ route('usuarios.create') }}" class="btn btn-sm" style="background:var(--azul);color:#fff">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo usuario
+        </a>
+    </div>
 </div>
 
 @if($verTodos ?? false)
@@ -29,34 +44,46 @@
     </div>
 @endif
 
-{{-- Filtros --}}
-<div class="card mb-3">
-    <div class="card-body py-2">
-        <form method="GET" action="{{ route('usuarios.index') }}" class="row g-2 align-items-end">
-            @if($verTodos ?? false)
-                <input type="hidden" name="todos" value="1">
-            @endif
-            <div class="col-sm-5">
-                <input type="text" name="buscar" value="{{ request('buscar') }}"
-                       class="form-control form-control-sm" placeholder="Buscar por nombre, apellido o documento…">
-            </div>
-            <div class="col-sm-3">
-                <select name="activo" class="form-select form-select-sm">
-                    <option value="">— Todos los estados —</option>
-                    <option value="1" @selected(request('activo') === '1')>Activos</option>
-                    <option value="0" @selected(request('activo') === '0')>Inactivos</option>
-                </select>
-            </div>
-            <div class="col-sm-auto">
-                <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
-                    <i class="bi bi-search"></i> Filtrar
-                </button>
-                <a href="{{ route('usuarios.index', ($verTodos ?? false) ? ['todos' => 1] : []) }}"
-                   class="btn btn-sm btn-outline-secondary ms-1">
-                    <i class="bi bi-x"></i> Limpiar
-                </a>
-            </div>
-        </form>
+{{-- Modal de filtros --}}
+<div class="modal fade" id="modalFiltros" tabindex="-1" aria-labelledby="modalFiltrosLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="GET" action="{{ route('usuarios.index') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalFiltrosLabel">
+                        <i class="bi bi-funnel me-1"></i> Filtrar usuarios
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @if($verTodos ?? false)
+                        <input type="hidden" name="todos" value="1">
+                    @endif
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Buscar</label>
+                        <input type="text" name="buscar" value="{{ request('buscar') }}"
+                               class="form-control form-control-sm" placeholder="Nombre, apellido o documento…">
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label fw-semibold small">Estado</label>
+                        <select name="activo" class="form-select form-select-sm">
+                            <option value="">— Todos los estados —</option>
+                            <option value="1" @selected(request('activo') === '1')>Activos</option>
+                            <option value="0" @selected(request('activo') === '0')>Inactivos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('usuarios.index', ($verTodos ?? false) ? ['todos' => 1] : []) }}"
+                       class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x"></i> Limpiar
+                    </a>
+                    <button type="submit" class="btn btn-sm" style="background:var(--azul);color:#fff">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
